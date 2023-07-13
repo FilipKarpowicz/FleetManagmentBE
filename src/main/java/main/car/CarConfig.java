@@ -30,9 +30,7 @@ public class CarConfig {
                     LocalDate.of(2024, Month.MAY,15)
             );
 
-            repository.saveAll(
-                    List.of(opel, ford)
-            );
+
         };
     }
 }

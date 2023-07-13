@@ -1,5 +1,6 @@
 package main.Driver;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,11 +10,13 @@ public class DriverService {
 
     private final DriverRepository driverRepository;
 
+    @Autowired
     public DriverService(DriverRepository driverRepository) {
         this.driverRepository = driverRepository;
     }
 
-    public static List<Driver> getDrivers() {
+
+    public List<Driver> getDrivers(){
         return driverRepository.findAll();
     }
 }
