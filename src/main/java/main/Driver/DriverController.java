@@ -5,32 +5,37 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping(path = "api/v1/driver")
 public class DriverController {
 
     private final DriverService driverService;
     @Autowired
     public DriverController(DriverService driverService){this.driverService = driverService;}
 
-    @GetMapping
-    public List<Driver> getDrivers(){
-        return driverService.getDrivers();
+    @GetMapping(path = "api/v1/batchDrivers/{batchNumber}")
+    public List<Driver> getBatchOfDrivers(@PathVariable("batchNumber") Integer batchNumber){
+        return driverService.get15Drivers(batchNumber);
     }
 
-    @DeleteMapping(path = {"{drvId}"})
+    @GetMapping(path = "api/v1/driverById/{drvId}")
+    public Optional<Driver> getDriverById(@PathVariable("drvId") Long drvId){
+        return driverService.getDriverById(drvId);
+    }
+
+    @DeleteMapping(path = {"api/v1/driverById/{drvId}"})
     public void deleteDriverById(@PathVariable("drvId") Long drvId){
         driverService.deleteDriverById(drvId);
     }
 
-    @PostMapping
+    @PostMapping(path = "api/v1/addDriver")
     public void reqisterNewDriver(@RequestBody Driver driver){
         driverService.addNewDriver(driver);
     }
 
 
-    @PutMapping
+    @PutMapping(path = "api/v1/upadteDriver/{drvId}")
     public void updateDriver(
             @PathVariable("drvId") Long drvId,
             @RequestParam(required = false) String firstName,
@@ -43,5 +48,6 @@ public class DriverController {
     ){
         driverService.updateDriver(drvId,firstName,lastName,birthdate,pesel,drvLicNo,carId,overallDrvRating);
     }
+
 
 }

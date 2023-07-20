@@ -29,6 +29,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+			<version>2.6.0</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.thethingsnetwork</groupId>
 			<artifactId>data-mqtt</artifactId>
 			<version>2.1.0</version>

@@ -1,6 +1,7 @@
 package main.Driver;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +21,15 @@ public class DriverService {
     }
 
 
-    public List<Driver> getDrivers(){
-        return driverRepository.findAll();
+    public Optional<Driver> getDriverById(Long drvId){
+        return driverRepository.findById(drvId);
+    }
+
+    public List<Driver> get15Drivers(Integer BatchNumber){
+        Long from  = (long) (15 * (BatchNumber - 1));
+        Long to = (long) (15 * BatchNumber);
+        return driverRepository.find15Drivers(from, to);
+
     }
 
     public void deleteDriverById(Long drvId){
@@ -29,9 +37,9 @@ public class DriverService {
     }
 
     public void addNewDriver(Driver driver){
-        Optional <Driver> driverOptional = driverRepository.findById(driver.getDrvId());
+        Optional <Driver> driverOptional = driverRepository.findDriverByPesel(driver.getPesel());
         if (driverOptional.isPresent()){
-            throw new IllegalStateException("Id taken");
+            throw new IllegalStateException("Driver with this pesel already exist");
         }
         else {
             driverRepository.save(driver);
