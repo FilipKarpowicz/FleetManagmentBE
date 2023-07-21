@@ -1,0 +1,58 @@
+
+POST http://localhost:8080/api/v1/addDriver
+Content-Type: application/json
+Cookie: key=first-value
+
+{ "firstName": "Adam",
+  "lastName": "Nowak",
+  "birthdate": "2002-01-03",
+  "pesel": "1311541201297",
+  "drvLicNo": "1231543",
+  "carId": "2",
+  "overallDrvRating": "1"
+}
+
+###
+POST http://localhost:8080/api/v1/addDriver
+Content-Type: application/json
+Cookie: key=first-value
+
+{ "firstName": "Piotr",
+  "lastName": "Nowak",
+  "birthdate": "2003-01-03",
+  "pesel": "13115899801297",
+  "drvLicNo": "156423",
+  "carId": "3",
+  "overallDrvRating": "4"
+}
+
+###
+
+POST http://localhost:8080/api/v1/addDriver
+Content-Type: application/json
+Cookie: key=first-value
+
+{ "firstName": "Krzysztof",
+  "lastName": "Krawczyk",
+  "birthdate": "2004-02-13",
+  "pesel": "1897841201297",
+  "drvLicNo": "17845",
+  "carId": "4",
+  "overallDrvRating": "1"
+}
+
+###
+
+POST http://localhost:8080/api/v1/addDriver
+Content-Type: application/json
+Cookie: key=first-value
+
+{ "firstName": "Bartosz",
+  "lastName": "Krawczyk",
+  "birthdate": "2002-02-13",
+  "pesel": "138748201297",
+  "drvLicNo": "123165543",
+  "carId": "5",
+  "overallDrvRating": "3"
+}
+

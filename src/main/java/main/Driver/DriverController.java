@@ -14,9 +14,30 @@ public class DriverController {
     @Autowired
     public DriverController(DriverService driverService){this.driverService = driverService;}
 
+    @GetMapping(path = "api/v1/sortDriversBy/{column}/{sortingType}")
+    public List<Driver> sortDriversByRating(@PathVariable("sortingType") String sortingType,@PathVariable("column") String column,@RequestParam Integer batchNumber){
+        return driverService.get15DriversSorted(sortingType,column,batchNumber);
+    }
+
+    @GetMapping(path = "api/v1/findDriversByValue/{column}")
+    public List<Driver> findDriversByValue(@PathVariable("column") String column, @RequestParam Long value,@RequestParam Integer batchNumber){
+        return driverService.findDriverByValue(column, value, batchNumber);
+    }
+
+    @GetMapping(path = "api/v1/findDriversByBirthdate")
+    public List<Driver> findDriversByBirthdate(@RequestParam Integer batchNumber,@RequestParam(required = false) Integer day,@RequestParam(required = false) Integer month,@RequestParam(required = false) Integer year){
+        return driverService.findDriversByBirthdate(batchNumber,day,month,year);
+    }
+
+    @GetMapping(path = "api/v1/findDriversByPattern/{column}")
+    public List<Driver> findDriversByPattern(@PathVariable("column") String column, @RequestParam String pattern, @RequestParam Integer batchNumber){
+        return driverService.findDriverByPattern(column,pattern,batchNumber);
+    }
+
     @GetMapping(path = "api/v1/batchDrivers/{batchNumber}")
     public List<Driver> getBatchOfDrivers(@PathVariable("batchNumber") Integer batchNumber){
-        return driverService.get15Drivers(batchNumber);
+        System.out.println("RUN");
+        return driverService.calculateBatch(batchNumber);
     }
 
     @GetMapping(path = "api/v1/driverById/{drvId}")

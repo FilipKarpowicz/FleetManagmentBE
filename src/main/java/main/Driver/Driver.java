@@ -27,15 +27,6 @@ public class Driver {
     private Long carId;
     private Integer overallDrvRating;
 
-    public Driver(String firstName, String lastName, LocalDate birthdate, Long pesel, String drvLicNo, Long carId, Integer overallDrvRating) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthdate = birthdate;
-        this.pesel = pesel;
-        this.drvLicNo = drvLicNo;
-        this.carId = carId;
-        this.overallDrvRating = overallDrvRating;
-    }
 
     public Driver() {
 
@@ -53,14 +44,6 @@ public class Driver {
                 ", carId=" + carId +
                 ", overallDrvRating=" + overallDrvRating +
                 '}';
-    }
-
-    public Long getDrvId() {
-        return drvId;
-    }
-
-    public void setDrvId(Long drvId) {
-        this.drvId = drvId;
     }
 
     public String getFirstName() {
@@ -117,5 +100,13 @@ public class Driver {
 
     public void setOverallDrvRating(Integer overallDrvRating) {
         this.overallDrvRating = overallDrvRating;
+    }
+
+    public Long getDrvId() {
+        return drvId;
+    }
+
+    public void setDrvId(Long drvId) {
+        this.drvId = drvId;
     }
 }
