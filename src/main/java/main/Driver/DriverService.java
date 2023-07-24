@@ -13,8 +13,7 @@ public class DriverService {
 
     private final DriverRepository driverRepository;
 
-    public List<Driver> calculateBatch(Integer batchNumber){
-        List<Driver> table = driverRepository.findAll();
+    private List<Driver> calculateBatch(Integer batchNumber,List<Driver> table){
         int from = 15 * (batchNumber - 1);
         int to = 15 * batchNumber;
         if(table.size() > from + to && table.size() > from){
@@ -24,11 +23,8 @@ public class DriverService {
         } else {
             throw new IllegalStateException("batch is empty");
         }
-
-        System.out.println(table);
         return table;
     }
-
 
 
     @Autowired
@@ -36,36 +32,41 @@ public class DriverService {
         this.driverRepository = driverRepository;
     }
 
+    public List<Driver> getDriversBatch(Integer batchNumber){
+        List<Driver> table = driverRepository.findAll();
+        return calculateBatch(batchNumber, table);
+    }
+
     public List<Driver> get15DriversSorted(String sortingType,String column,Integer batchNumber){
-        List<Driver> batch = calculateBatch(batchNumber);
+        List<Driver> table = driverRepository.findAll();
         if (sortingType.equals("ascending")){
             switch (column) {
-                case "drvId" -> batch.sort(Comparator.comparing(Driver::getDrvId));
-                case "firstName" -> batch.sort(Comparator.comparing(Driver::getFirstName));
-                case "lastName" -> batch.sort(Comparator.comparing(Driver::getLastName));
-                case "pesel" -> batch.sort(Comparator.comparing(Driver::getPesel));
-                case "birthdate" -> batch.sort(Comparator.comparing(Driver::getBirthdate));
-                case "drvLicNo" -> batch.sort(Comparator.comparing(Driver::getDrvLicNo));
-                case "carId" -> batch.sort(Comparator.comparing(Driver::getCarId));
-                case "overallDrvRating" -> batch.sort(Comparator.comparing(Driver::getOverallDrvRating));
+                case "drvId" -> table.sort(Comparator.comparing(Driver::getDrvId));
+                case "firstName" -> table.sort(Comparator.comparing(Driver::getFirstName));
+                case "lastName" -> table.sort(Comparator.comparing(Driver::getLastName));
+                case "pesel" -> table.sort(Comparator.comparing(Driver::getPesel));
+                case "birthdate" -> table.sort(Comparator.comparing(Driver::getBirthdate));
+                case "drvLicNo" -> table.sort(Comparator.comparing(Driver::getDrvLicNo));
+                case "carId" -> table.sort(Comparator.comparing(Driver::getCarId));
+                case "overallDrvRating" -> table.sort(Comparator.comparing(Driver::getOverallDrvRating));
                 default -> throw new IllegalStateException("There is no column named '" + column + "' in Driver table");
             }
         }else if (sortingType.equals("descending")){
             switch (column) {
-                case "drvId" -> batch.sort(Comparator.comparing(Driver::getDrvId).reversed());
-                case "firstName" -> batch.sort(Comparator.comparing(Driver::getFirstName).reversed());
-                case "lastName" -> batch.sort(Comparator.comparing(Driver::getLastName).reversed());
-                case "pesel" -> batch.sort(Comparator.comparing(Driver::getPesel).reversed());
-                case "birthdate" -> batch.sort(Comparator.comparing(Driver::getBirthdate).reversed());
-                case "drvLicNo" -> batch.sort(Comparator.comparing(Driver::getDrvLicNo).reversed());
-                case "carId" -> batch.sort(Comparator.comparing(Driver::getCarId).reversed());
-                case "overallDrvRating" -> batch.sort(Comparator.comparing(Driver::getOverallDrvRating).reversed());
+                case "drvId" -> table.sort(Comparator.comparing(Driver::getDrvId).reversed());
+                case "firstName" -> table.sort(Comparator.comparing(Driver::getFirstName).reversed());
+                case "lastName" -> table.sort(Comparator.comparing(Driver::getLastName).reversed());
+                case "pesel" -> table.sort(Comparator.comparing(Driver::getPesel).reversed());
+                case "birthdate" -> table.sort(Comparator.comparing(Driver::getBirthdate).reversed());
+                case "drvLicNo" -> table.sort(Comparator.comparing(Driver::getDrvLicNo).reversed());
+                case "carId" -> table.sort(Comparator.comparing(Driver::getCarId).reversed());
+                case "overallDrvRating" -> table.sort(Comparator.comparing(Driver::getOverallDrvRating).reversed());
                 default -> throw new IllegalStateException("There is no column named '" + column + "' in Driver table");
             }
         }else {
             throw new IllegalStateException("Sorting type named '" + sortingType + "' is invalid");
         }
-        return batch;
+        return table;
     }
 
     public List<Driver> findDriverByValue(String column, Long value, Integer batchNumber) {
@@ -86,9 +87,7 @@ public class DriverService {
             }
             default -> throw new IllegalStateException("Column '" + column + "'is not valid for searching by value");
         }
-        int from = 15 * (batchNumber - 1);
-        int to = 15 * batchNumber;
-        return table.subList(from, to);
+        return calculateBatch(batchNumber,table);
 
     }
     public List<Driver> findDriverByPattern(String column, String pattern,Integer batchNumber) {
@@ -105,9 +104,7 @@ public class DriverService {
             }
             default -> throw new IllegalStateException("Column '" + column + "'is not valid for searching by pattern");
         }
-        int from = 15 * (batchNumber - 1);
-        int to = 15 * batchNumber;
-        return table.subList(from, to);
+        return calculateBatch(batchNumber,table);
     }
 
     public List<Driver> findDriversByBirthdate(Integer batchNumber, Integer day, Integer month, Integer year) {
@@ -142,9 +139,8 @@ public class DriverService {
                 }
             }
         }
-        int from = 15 * (batchNumber - 1);
-        int to = 15 * batchNumber;
-        return table.subList(from, to);
+
+        return calculateBatch(batchNumber,table);
     }
 
     public Optional<Driver> getDriverById(Long drvId){

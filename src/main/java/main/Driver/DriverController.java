@@ -1,7 +1,10 @@
 package main.Driver;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,8 +39,7 @@ public class DriverController {
 
     @GetMapping(path = "api/v1/batchDrivers/{batchNumber}")
     public List<Driver> getBatchOfDrivers(@PathVariable("batchNumber") Integer batchNumber){
-        System.out.println("RUN");
-        return driverService.calculateBatch(batchNumber);
+        return driverService.getDriversBatch(batchNumber);
     }
 
     @GetMapping(path = "api/v1/driverById/{drvId}")

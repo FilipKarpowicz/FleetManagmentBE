@@ -23,17 +23,14 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
     @Query("SELECT s From Driver s WHERE CAST(s.pesel AS string ) LIKE ?1%")
     List<Driver> findDriversByPesel(String pesel);
 
-    @Query("SELECT s FROM Driver s WHERE s.drvId BETWEEN ?1 AND ?2 AND s.firstName LIKE %?3% ")
+    @Query("SELECT s FROM Driver s WHERE s.firstName LIKE %?1% ")
     List<Driver> driversLikeByFirstName(String firstName );
 
-    @Query("SELECT s FROM Driver s WHERE s.drvId BETWEEN ?1 AND ?2 AND s.lastName LIKE %?3% ")
+    @Query("SELECT s FROM Driver s WHERE s.lastName LIKE %?1% ")
     List<Driver> driversLikeByLastName(String lastName );
 
-    @Query("SELECT s FROM Driver s WHERE s.drvId BETWEEN ?1 AND ?2 AND s.drvLicNo LIKE %?3% ")
+    @Query("SELECT s FROM Driver s WHERE s.drvLicNo LIKE %?1% ")
     List<Driver> driversLikeByDrvLicNo(String drvLicNo );
-
-    @Query("SELECT s FROM Driver s WHERE s.drvId BETWEEN ?1 AND ?2 AND s.overallDrvRating = ?3 ")
-    Optional<Driver> findDriverByOverallDrvRating(Long from, Long to, Long value);
 
     @Query("SELECT s FROM Driver s WHERE s.birthdate = ?1 ")
     List<Driver> findDriverByBirthDate(LocalDate date);

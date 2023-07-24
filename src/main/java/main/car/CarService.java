@@ -27,11 +27,7 @@ public class CarService {
     }
 
     public void addNewCar(Car car) {
-        Optional<Car> carOptional = carRepository.findCarByBrand(car.getBrand());
-        if (carOptional.isPresent()){
-            throw new IllegalStateException("Brand Taken");
-        }
-        carRepository.save(car);
+
     }
 
     public void deleteCar(Long carId) {
@@ -44,22 +40,6 @@ public class CarService {
 
     @Transactional
     public void updateCar(Long carId, String brand, String model, String comment, String reviewTo) {
-        Car car = carRepository.findById(carId).orElseThrow(
-                () -> new IllegalStateException("Car with id" + carId + "does not exists"));
 
-        System.out.println(car.toString());
-        if(brand != null & !Objects.equals(car.getBrand(),brand)){
-            car.setBrand(brand);
-        }
-
-        if(model != null & !Objects.equals(car.getModel(),model)){
-            car.setModel(model);
-        }
-        if(comment != null & !Objects.equals(car.getComment(),comment)){
-            car.setComment(comment);
-        }
-        if(reviewTo != null & !Objects.equals(car.getReview_to(),reviewTo)){
-            car.setReview_to(LocalDate.parse(reviewTo));
-        }
     }
 }

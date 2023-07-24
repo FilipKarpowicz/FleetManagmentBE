@@ -16,47 +16,63 @@ public class Car {
             allocationSize = 1
     )
     @GeneratedValue(
-           strategy = GenerationType.SEQUENCE,
+            strategy = GenerationType.SEQUENCE,
             generator = "car_sequence"
     )
-    private Long id;
-    private String  brand;
+    private Long carId;
+    private String make;
     private String model;
+    private String vin;
+    private String plateNo;
+    private String type;
     private String comment;
-    private LocalDate review_to;
-    @Transient
-    private Integer days_to_review;
-
-    public Car(Long id, String brand,
-               String model, String comment,
-               LocalDate review_to) {
-        this.id = id;
-        this.brand = brand;
-        this.model = model;
-        this.comment = comment;
-        this.review_to = review_to;
-    }
-
-    public Car(String brand,
-               String model, String comment,
-               LocalDate review_to) {
-        this.brand = brand;
-        this.model = model;
-        this.comment = comment;
-        this.review_to = review_to;
-    }
+    private LocalDate serviceDate;
+    private Long serviceMileage;
 
     public Car() {
 
     }
 
-
-    public String getBrand() {
-        return brand;
+    @Override
+    public String toString() {
+        return "Car{" +
+                "carId=" + carId +
+                ", make='" + make + '\'' +
+                ", model='" + model + '\'' +
+                ", vin='" + vin + '\'' +
+                ", plateNo='" + plateNo + '\'' +
+                ", type='" + type + '\'' +
+                ", comment='" + comment + '\'' +
+                ", serviceDate=" + serviceDate +
+                ", serviceMileage=" + serviceMileage +
+                '}';
     }
 
-    public void setBrand(String brand) {
-        this.brand = brand;
+    public Car(String make, String model, String vin, String plateNo, String type, String comment, LocalDate serviceDate, Long serviceMileage) {
+        this.make = make;
+        this.model = model;
+        this.vin = vin;
+        this.plateNo = plateNo;
+        this.type = type;
+        this.comment = comment;
+        this.serviceDate = serviceDate;
+        this.serviceMileage = serviceMileage;
+    }
+
+    public Long getCarId() {
+        return carId;
+    }
+
+    public void setCarId(Long carId) {
+        this.carId = carId;
+    }
+
+    public String getMake() {
+        return make;
+    }
+
+    public void setMake(String make) {
+        this.make = make;
     }
 
     public String getModel() {
@@ -67,6 +83,30 @@ public class Car {
         this.model = model;
     }
 
+    public String getVin() {
+        return vin;
+    }
+
+    public void setVin(String vin) {
+        this.vin = vin;
+    }
+
+    public String getPlateNo() {
+        return plateNo;
+    }
+
+    public void setPlateNo(String plateNo) {
+        this.plateNo = plateNo;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public String getComment() {
         return comment;
     }
@@ -75,31 +115,19 @@ public class Car {
         this.comment = comment;
     }
 
-    public LocalDate getReview_to() {
-        return review_to;
+    public LocalDate getServiceDate() {
+        return serviceDate;
     }
 
-    public void setReview_to(LocalDate review_to) {
-        this.review_to = review_to;
+    public void setServiceDate(LocalDate serviceDate) {
+        this.serviceDate = serviceDate;
     }
 
-    public Integer getDays_to_review() {
-        return Math.toIntExact(ChronoUnit.DAYS.between(LocalDate.now(), this.review_to));
+    public Long getServiceMileage() {
+        return serviceMileage;
     }
 
-    public void setDays_to_review(Integer days_to_review) {
-        this.days_to_review = days_to_review;
-    }
-
-    @Override
-    public String toString() {
-        return "Car{" +
-                "id=" + id +
-                ", brand='" + brand + '\'' +
-                ", model='" + model + '\'' +
-                ", comment='" + comment + '\'' +
-                ", serwis_to=" + review_to + '\'' +
-                ", days_to_review='" + days_to_review +
-                '}';
+    public void setServiceMileage(Long serviceMileage) {
+        this.serviceMileage = serviceMileage;
     }
 }
