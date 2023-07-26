@@ -169,10 +169,6 @@ public class DriverService {
         Driver driverById = driverRepository.findById(drvId).orElseThrow(
                 () ->new IllegalStateException("Driver with that id does not exist")
         );
-        Optional <Driver> driverOptional = driverRepository.findDriverByCarId(carId);
-        if(driverOptional.isPresent()){
-            throw new IllegalStateException("Car ID you trying to set is already taken");
-        }
 
         if(firstName != null && !Objects.equals(firstName, driverById.getFirstName())){
             driverById.setFirstName(firstName);
@@ -195,6 +191,10 @@ public class DriverService {
         }
 
         if(carId != null && !Objects.equals(carId,driverById.getCarId())){
+            Optional <Driver> driverOptional = driverRepository.findDriverByCarId(carId);
+            if(driverOptional.isPresent()){
+                throw new IllegalStateException("Car ID you trying to set is already taken");
+            }
             driverById.setCarId(carId);
         }
 
