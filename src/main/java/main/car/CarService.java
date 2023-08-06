@@ -13,7 +13,7 @@ import java.util.*;
 @Service
 public class CarService {
 
-    private final CarRepository carRepository;
+    public static CarRepository carRepository;
 
     @Autowired
     public CarService(CarRepository carRepository) {

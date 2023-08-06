@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(path = "api/location")
+@RequestMapping(path = "api/Location")
 public class LocationController {
     public final LocationService service;
 
@@ -14,17 +14,17 @@ public class LocationController {
         this.service = service;
     }
 
-    @GetMapping(path = "getBy/locationId")
+    @GetMapping(path = "GetBy/LocationId")
     Optional<Location> getByLocationId(@RequestParam(name = "locationId") Long locationId){
         return service.getByLocationId(locationId);
     }
 
-    @GetMapping(path = "getAll")
+    @GetMapping(path = "GetAll")
     List<Location> getAll(){
         return service.findAll();
     }
 
-    @PostMapping(path = "add")
+    @PostMapping(path = "Add")
     void addNewLocation(@RequestBody Location location){
         service.addNewLocation(location);
     }

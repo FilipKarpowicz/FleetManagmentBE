@@ -8,7 +8,8 @@ import java.util.Optional;
 
 @Service
 public class LocationService {
-    public final LocationRepository repository;
+    public static LocationRepository repository;
+
     //WGS-84 SRID
     private final GeometryFactory factory = new GeometryFactory(new PrecisionModel(), 4326);
 
@@ -16,7 +17,7 @@ public class LocationService {
         this.repository = repository;
     }
 
-    Optional<Location> getByLocationId(Long locationId){
+    public static Optional<Location> getByLocationId(Long locationId){
         return repository.findById(locationId);
     }
 

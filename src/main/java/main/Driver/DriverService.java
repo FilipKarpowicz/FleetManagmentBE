@@ -11,7 +11,7 @@ import java.util.*;
 @Service
 public class DriverService {
 
-    private final DriverRepository driverRepository;
+    public static DriverRepository driverRepository;
 
     private List<Driver> calculateBatch(Integer batchNumber,List<Driver> table){
         int from = 15 * (batchNumber - 1);
@@ -143,7 +143,7 @@ public class DriverService {
         return calculateBatch(batchNumber,table);
     }
 
-    public Optional<Driver> getDriverById(Long drvId){
+    public static Optional<Driver> getDriverById(Long drvId){
         return driverRepository.findById(drvId);
     }
 
