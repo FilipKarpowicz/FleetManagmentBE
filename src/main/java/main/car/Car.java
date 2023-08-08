@@ -1,6 +1,7 @@
 package main.car;
 
 import jakarta.persistence.*;
+import main.CarData.CarData;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -28,6 +29,10 @@ public class Car {
     private String comment;
     private LocalDate serviceDate;
     private Long serviceMileage;
+
+    @OneToOne(mappedBy = "car", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private CarData carData;
 
     public Car() {
 
@@ -129,5 +134,9 @@ public class Car {
 
     public void setServiceMileage(Long serviceMileage) {
         this.serviceMileage = serviceMileage;
+    }
+
+    public void setCarData(CarData carData) {
+        this.carData = carData;
     }
 }

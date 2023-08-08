@@ -2,6 +2,8 @@ package main.car;
 
 
 
+import main.CarData.CarData;
+import main.CarData.CarDataService;
 import main.Driver.Driver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -154,6 +156,7 @@ public class CarService {
             throw new IllegalStateException("Car with plate number " + car.getPlateNo() + " already exist");
         }else {
             carRepository.save(car);
+            CarDataService.createNewCarDataRecord(car);
         }
     }
 
@@ -163,6 +166,7 @@ public class CarService {
             throw new IllegalStateException("Car with id" + carId + "does not exists");
         }
         carRepository.deleteById(carId);
+        CarDataService.deleteCarDataRecord(carId);
     }
 
     @Transactional
