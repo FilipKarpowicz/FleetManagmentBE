@@ -1,6 +1,7 @@
 package main.Errand;
 
 import jakarta.persistence.*;
+import main.ErrandData.ErrandData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,11 +26,16 @@ public class Errand {
     private Long drvId;
     private String plannedRoute;    //1-2-3-4... tak latwiej przechowywac w tablicy sql
 
-    public Errand(Long errandId, Long carId, Long drvId, String plannedRoute) {
+    @OneToOne(mappedBy = "errand", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private ErrandData errandData;
+
+    public Errand(Long errandId, Long carId, Long drvId, String plannedRoute, ErrandData errandData) {
         this.errandId = errandId;
         this.carId = carId;
         this.drvId = drvId;
         this.plannedRoute = plannedRoute;
+        this.errandData = errandData;
     }
 
     public Errand() {
