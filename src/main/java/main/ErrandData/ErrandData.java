@@ -27,7 +27,6 @@ public class ErrandData {
     private Double avgEnergyConsumption;
     private Double avgSpeed;
     private Integer completedPoints;
-    //private List<LocalDateTime> routeTimestamps;
     private String allLocations;    //"16-32-24-8-45"
 
     @OneToOne(fetch = FetchType.LAZY)

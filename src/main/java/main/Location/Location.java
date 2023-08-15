@@ -3,6 +3,8 @@ package main.Location;
 import jakarta.persistence.*;
 import org.locationtech.jts.geom.Point;
 
+import java.util.Date;
+
 @Entity
 @Table
 public class Location {
@@ -21,10 +23,14 @@ public class Location {
     private Point point;
     private String realAddress;
 
-    public Location(Long locationId, Point point, String realAddress) {
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date arrivalTime;   //UTC
+
+    public Location(Long locationId, Point point, String realAddress, Date arrivalTime) {
         this.locationId = locationId;
         this.point = point;
         this.realAddress = realAddress;
+        this.arrivalTime = arrivalTime;
     }
 
     public Location() {
@@ -52,5 +58,23 @@ public class Location {
 
     public void setRealAddress(String realAddress) {
         this.realAddress = realAddress;
+    }
+
+    public Date getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(Date arrivalTime) {
+        this.arrivalTime = arrivalTime;
+    }
+
+    @Override
+    public String toString() {
+        return "Location{" +
+                "locationId=" + locationId +
+                ", point=" + point +
+                ", realAddress='" + realAddress + '\'' +
+                ", arrivalTime=" + arrivalTime +
+                '}';
     }
 }
