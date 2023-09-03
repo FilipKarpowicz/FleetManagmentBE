@@ -29,6 +29,9 @@ public class ErrandController {
         return service.getByCarId(carId);
     }
 
+    @GetMapping(path = "SortBy")
+
+
     @PutMapping(path = "EditErrand/{errandId}")
     public void editErrand(@PathVariable("errandId") Long errandId,
                                 @RequestParam(required = false) Long carId,
@@ -36,4 +39,6 @@ public class ErrandController {
                                 @RequestParam(required = false) String newRoute){   //newRoute=1-2-5-12
         service.editErrand(errandId, carId, drvId, newRoute);
     }
+
+    //endpoint ktory zwraca 15 errandow pod wyszukiwarke z tymi polami i sortowaniem
 }

@@ -36,4 +36,6 @@ public class LocationController {
                         @RequestParam(name = "arrivalTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ") Date arrivalTime){
         service.updateLocation(locationId, arrivalTime);
     }
+
+    //zwrot wszystkich lokalizacji z id erranda
 }
