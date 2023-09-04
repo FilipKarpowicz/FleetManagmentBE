@@ -1,7 +1,7 @@
 package main.CarData;
 
 import jakarta.persistence.*;
-import main.car.Car;
+import main.Car.Car;
 
 import java.time.LocalDateTime;
 

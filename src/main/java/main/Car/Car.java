@@ -1,11 +1,9 @@
-package main.car;
+package main.Car;
 
 import jakarta.persistence.*;
 import main.CarData.CarData;
 
 import java.time.LocalDate;
-import java.time.Period;
-import java.time.temporal.ChronoUnit;
 
 @Entity
 @Table

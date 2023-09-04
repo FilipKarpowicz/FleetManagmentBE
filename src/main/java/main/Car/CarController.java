@@ -1,4 +1,4 @@
-package main.car;
+package main.Car;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

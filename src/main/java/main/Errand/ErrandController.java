@@ -40,5 +40,5 @@ public class ErrandController {
         service.editErrand(errandId, carId, drvId, newRoute);
     }
 
-    //endpoint ktory zwraca 15 errandow pod wyszukiwarke z tymi polami i sortowaniem
+    //endpoint ktory zwraca 15 errandow pod wyszukiwarke z tymi polami i sortowaniem. Wyszukiwarka musi byc zrobiona po stronie backendu, czyli np. dostajac firstName = "Ba" ma znalezc "Bartek"
 }
