@@ -2,7 +2,6 @@ package main.ErrandData;
 
 import jakarta.persistence.*;
 import main.Errand.Errand;
-import main.car.Car;
 
 import java.time.LocalDateTime;
 

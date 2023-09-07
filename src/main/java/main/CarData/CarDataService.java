@@ -1,6 +1,6 @@
 package main.CarData;
 
-import main.car.Car;
+import main.Car.Car;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

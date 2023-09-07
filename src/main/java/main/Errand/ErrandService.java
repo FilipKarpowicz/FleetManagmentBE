@@ -4,13 +4,10 @@ import main.Driver.Driver;
 import main.Driver.DriverService;
 import main.Location.Location;
 import main.Location.LocationService;
-import main.car.Car;
-import main.car.CarService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ErrandService {
