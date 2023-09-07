@@ -24,8 +24,9 @@ public class Driver {
     private LocalDate birthdate;
     private Long pesel;
     private String drvLicNo;
-    private Long carId;
     private Integer overallDrvRating;
+
+    private Long carId;
 
 
     public Driver() {

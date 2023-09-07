@@ -19,7 +19,9 @@ public class UserEntity {
     private Long userId;
     private String login;
     private String password;
-    private String privilige;
+    private String privilege;
+
+    private String Name;
 
     public UserEntity(){
 
@@ -49,21 +51,30 @@ public class UserEntity {
         this.password = password;
     }
 
-    public String getPrivilige() {
-        return privilige;
+    public String getPrivilege() {
+        return privilege;
     }
 
-    public void setPrivilige(String privilige) {
-        this.privilige = privilige;
+    public void setPrivilege(String privilige) {
+        this.privilege = privilige;
+    }
+
+    public String getName() {
+        return Name;
+    }
+
+    public void setName(String name) {
+        Name = name;
     }
 
     @Override
     public String toString() {
-        return "User{" +
+        return "UserEntity{" +
                 "userId=" + userId +
                 ", login='" + login + '\'' +
                 ", password='" + password + '\'' +
-                ", privilige='" + privilige + '\'' +
+                ", privilege='" + privilege + '\'' +
+                ", Name='" + Name + '\'' +
                 '}';
     }
 }
