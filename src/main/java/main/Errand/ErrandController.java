@@ -29,7 +29,8 @@ public class ErrandController {
         return service.getByCarId(carId);
     }
 
-    @GetMapping(path = "SortBy")
+    @GetMapping
+    List<Errand> getErrands(){return service.getAll();}
 
 
     @PutMapping(path = "EditErrand/{errandId}")

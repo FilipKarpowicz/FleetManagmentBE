@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "**")
 @RequestMapping(path = "api/v1/cars")
 public class CarController {
 
@@ -42,6 +43,7 @@ public class CarController {
         return carService.findCarsByServiceDate(batchNumber, day, month, year);
     }
 
+    @CrossOrigin
     @GetMapping
     public List<Car> getCars() {
         return carService.getCars();

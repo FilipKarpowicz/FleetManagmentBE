@@ -64,4 +64,8 @@ public class ErrandService {
             manipulatedErrand.setPlannedRouteAsString(newRoute);    //dac exception jesli jest invalid
         }
     }
+
+    public List<Errand> getAll() {
+        return repository.findAll();
+    }
 }
