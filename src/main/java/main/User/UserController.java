@@ -1,10 +1,10 @@
 package main.User;
 
+import io.swagger.annotations.ResponseHeader;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,13 +17,29 @@ public class UserController {
     @Autowired
     public UserController(UserService userService){this.userService = userService;}
 
-    @GetMapping(path="user")
-    public List<UserEntity> getAllUsers(){
-        return userService.getUsers();
+    @GetMapping(path="users")
+    public List<UserEntity> getAllUsers(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String login,
+            @RequestParam(required = false) String privilege
+    ){
+        return userService.findUsers(name,login,privilege);
     }
 
     @GetMapping(path = "login")
     public Optional<UserEntity> login(@RequestParam("login") String login, @RequestParam("password") String password){
         return userService.loginUser(login,password);
+    }
+
+
+
+    @PutMapping(path = "user/setPassword")
+
+    public void updatePassword(
+            @RequestHeader String newPassword,
+            @RequestHeader String oldPassword,
+            @RequestHeader Long userId
+    ) {
+       userService.updatePassword(userId,newPassword,oldPassword);
     }
 }
