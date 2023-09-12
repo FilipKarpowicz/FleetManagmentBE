@@ -1,5 +1,6 @@
 package main.Errand;
 
+import org.h2.util.json.JSONArray;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -41,5 +42,12 @@ public class ErrandController {
         service.editErrand(errandId, carId, drvId, newRoute);
     }
 
-    //endpoint ktory zwraca 15 errandow pod wyszukiwarke z tymi polami i sortowaniem. Wyszukiwarka musi byc zrobiona po stronie backendu, czyli np. dostajac firstName = "Ba" ma znalezc "Bartek"
+    @GetMapping(path = "SearchErrands")
+    public List<Errand> searchErrands(@RequestParam(required = false) String firstNamePart,
+                                   @RequestParam(required = false) String lastNamePart,
+                                   @RequestParam(required = false) String makePart,
+                                   @RequestParam(required = false) String modelPart,
+                                   @RequestParam(required = true) Integer batchNumber){
+        return service.searchErrands(firstNamePart, lastNamePart, makePart, modelPart, batchNumber);
+    }
 }

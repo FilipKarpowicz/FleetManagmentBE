@@ -39,6 +39,10 @@ public class CarService {
         return calculateBatch(batchNumber, table);
     }
 
+    public static Optional<Car> getCarById(Long carId){
+        return carRepository.findCarByCarId(carId);
+    }
+
     public List<Car> getBatchCarsSorted(String sortingType,String column,Integer batchNumber){
         List<Car> table = carRepository.findAll();
         if (sortingType.equals("ascending")){

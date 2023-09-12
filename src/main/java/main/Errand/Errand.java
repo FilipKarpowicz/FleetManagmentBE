@@ -2,6 +2,7 @@ package main.Errand;
 
 import jakarta.persistence.*;
 import main.ErrandData.ErrandData;
+import org.h2.util.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,9 +67,14 @@ public class Errand {
     }
 
     public List<Long> getPlannedRouteAsList() {
-        List<String> routeStringList = new ArrayList<String>(Arrays.asList(this.plannedRoute.split("-")));  //convert String to List<String>
-        List<Long> routeList = routeStringList.stream().map(s->Long.parseLong(s)).collect(Collectors.toList());   //convert List<String> to List<Long>
-        return routeList;
+        if (this.plannedRoute != null) {
+            List<String> routeStringList = new ArrayList<String>(Arrays.asList(this.plannedRoute.split("-")));  //convert String to List<String>
+            List<Long> routeList = routeStringList.stream().map(s -> Long.parseLong(s)).collect(Collectors.toList());   //convert List<String> to List<Long>
+            return routeList;
+        }
+        else{
+            return null;
+        }
     }
 
     public String getPlannedRouteAsString(){
@@ -83,4 +89,13 @@ public class Errand {
     public void setPlannedRouteAsString(String plannedRoute){
         this.plannedRoute = plannedRoute;
     }
+
+//    public JSONObject createJsonObject(){
+//        JSONObject errandJson = new JSONObject();
+//        errandJson.put("errandId", this.errandId);
+//        errandJson.put("carId", this.carId);
+//        errandJson.put("drvId", this.drvId);
+//        errandJson.put("plannedRouteAsString", this.getPlannedRouteAsString());
+//        errandJson.put("plannedRouteAsList", this.getPlannedRouteAsList());
+//    }
 }

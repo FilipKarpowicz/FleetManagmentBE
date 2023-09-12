@@ -17,4 +17,7 @@ public interface ErrandRepository extends JpaRepository<Errand, Long> {
 
     @Query("FROM Errand as errand WHERE errand.errandId=?1")
     Optional<Errand> findByErrandId(Long errandId);
+
+//    @Query("FROM Errand as errand WHERE errand.")
+//    List<Errand> searchErrands(String namePart, String lastNamePart, String makePart, String modelPart);
 }

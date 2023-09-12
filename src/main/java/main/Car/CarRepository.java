@@ -58,4 +58,7 @@ public interface CarRepository extends JpaRepository<Car, Long> {
 
     @Query("SELECT s FROM Car s WHERE cast(s.serviceMileage as string ) LIKE ?1%")
     List<Car> findCarsByServiceMileage(Long value);
+
+    @Query("SELECT s from Car s WHERE s.carId=?1")
+    Optional<Car> findCarByCarId(Long carId);
 }
