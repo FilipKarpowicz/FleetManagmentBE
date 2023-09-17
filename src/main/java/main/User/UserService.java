@@ -1,6 +1,7 @@
 package main.User;
 
 import jakarta.transaction.Transactional;
+import main.Driver.Driver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -59,7 +60,7 @@ public class UserService {
                     return userRepository.findUserLogin(login);
                 } else {
                     //all records
-                    return userRepository.findAll();
+                    return userRepository.findAllSorted();
                 }
             }
 
@@ -79,4 +80,29 @@ public class UserService {
         }
 
     }
+
+    @Transactional
+    public UserEntity updateUser(Long userId, String login, String name, String password, String privilege){
+        UserEntity userById = userRepository.findById(userId).orElseThrow(
+                () ->new IllegalStateException("User with that id does not exist")
+        );
+
+        if( login != null && !Objects.equals(login,userById.getLogin())){
+            userById.setLogin(login);
+        }
+
+        if( name != null && !Objects.equals(name,userById.getName())){
+            userById.setName(name);
+        }
+
+        if( password != null && !Objects.equals(password,userById.getPassword())){
+            userById.setPassword(password);
+        }
+
+        if( privilege != null && !Objects.equals(privilege,userById.getPrivilege())){
+            userById.setPrivilege(privilege);
+        }
+    return userById;
+    }
+
 }

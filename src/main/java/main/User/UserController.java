@@ -1,6 +1,7 @@
 package main.User;
 
 import io.swagger.annotations.ResponseHeader;
+import netscape.javascript.JSObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,5 +42,15 @@ public class UserController {
             @RequestHeader Long userId
     ) {
        userService.updatePassword(userId,newPassword,oldPassword);
+    }
+
+    @PutMapping(path = "user/modify")
+    public ResponseEntity<UserEntity> updateUser(@RequestParam Long userId,
+                           @RequestParam(required = false) String login,
+                           @RequestParam(required = false) String password,
+                           @RequestParam(required = false) String name,
+                           @RequestParam(required = false) String privilege){
+        UserEntity user = userService.updateUser(userId,login,name,password,privilege);
+        return ResponseEntity.ok(user);
     }
 }

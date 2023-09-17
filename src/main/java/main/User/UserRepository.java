@@ -14,26 +14,29 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> loginUser(String login, String password);
 
     @Query("SELECT s FROM UserEntity s WHERE s.login LIKE %?1% AND " +
-            "s.Name LIKE %?2% AND s.privilege=?3")
+            "s.Name LIKE %?2% AND s.privilege=?3 ORDER BY s.userId")
     List<UserEntity> findUserAll(String login, String name, String privilege);
 
-    @Query("SELECT s FROM UserEntity s WHERE s.Name LIKE %?1% AND s.privilege=?2")
+    @Query("SELECT s FROM UserEntity s WHERE s.Name LIKE %?1% AND s.privilege=?2  ORDER BY s.userId")
     List<UserEntity> findUserPrivilegeName(String name, String privilege);
 
-    @Query("SELECT s FROM UserEntity s WHERE s.login LIKE %?1% AND s.privilege=?2")
+    @Query("SELECT s FROM UserEntity s WHERE s.login LIKE %?1% AND s.privilege=?2  ORDER BY s.userId")
     List<UserEntity> findUserPrivilegeLogin(String login, String privilege);
 
-    @Query("SELECT s FROM UserEntity s WHERE s.login LIKE %?1% AND s.Name LIKE %?2%")
+    @Query("SELECT s FROM UserEntity s WHERE s.login LIKE %?1% AND s.Name LIKE %?2%  ORDER BY s.userId")
     List<UserEntity> findUserLoginName(String login, String name);
 
-    @Query("SELECT s FROM UserEntity s WHERE s.privilege=?1")
+    @Query("SELECT s FROM UserEntity s WHERE s.privilege=?1  ORDER BY s.userId")
     List<UserEntity> findUserPrivilege( String privilege);
 
-    @Query("SELECT s FROM UserEntity s WHERE s.Name LIKE %?1%")
+    @Query("SELECT s FROM UserEntity s WHERE s.Name LIKE %?1%  ORDER BY s.userId")
     List<UserEntity> findUserName( String name);
 
-    @Query("SELECT s FROM UserEntity s WHERE s.login LIKE %?1%")
+    @Query("SELECT s FROM UserEntity s WHERE s.login LIKE %?1%  ORDER BY s.userId")
     List<UserEntity> findUserLogin(String login);
+
+    @Query("SELECT s FROM UserEntity s ORDER BY s.userId")
+    List<UserEntity> findAllSorted();
 
 
 }
