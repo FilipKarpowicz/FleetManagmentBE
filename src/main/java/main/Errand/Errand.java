@@ -73,7 +73,7 @@ public class Errand {
             return routeList;
         }
         else{
-            return null;
+            return new ArrayList<Long>();
         }
     }
 

@@ -5,10 +5,9 @@ import org.locationtech.jts.geom.*;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.sql.Timestamp;
+import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
 
@@ -36,12 +35,28 @@ public class LocationService {
     }
 
     @Transactional
-    public void updateLocation(Long locationId, Date arrivalTime){
+    public void updateLocation(Long locationId, Date arrivalTime, String street, String buildingNumber, String city, Long latitude, Long longitude){
         Location manipulatedLocation = getByLocationId(locationId).orElseThrow(
                 () -> new IllegalStateException("Location with that id does not exist")
         );
         if(arrivalTime!=null){
             manipulatedLocation.setArrivalTime(arrivalTime);
         }
+//        if(manipulatedLocation.getRealAddress() != null){
+//            String oldStreet = Arrays.asList(manipulatedLocation.getRealAddress().split("-")).get(0).toString();
+//            String oldBuildingNumber = Arrays.asList(manipulatedLocation.getRealAddress().split("-")).get(1).toString();
+//            String oldCity = Arrays.asList(manipulatedLocation.getRealAddress().split("-")).get(2).toString();
+//        }
+    }
+
+    public static List<String> getListOfRealAddresses(List<Long> plannedRoute){ //1-2-3-4
+        List<String> listOfRealAddresses = new ArrayList<String>();
+
+        for (Long locationId : plannedRoute){
+            Location location = getByLocationId(locationId).orElse(null);
+            if(location != null)    listOfRealAddresses.add(location.getRealAddress());
+        }
+
+        return listOfRealAddresses;
     }
 }

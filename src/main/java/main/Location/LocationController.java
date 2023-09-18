@@ -33,8 +33,13 @@ public class LocationController {
 
     @PutMapping(path = "Update/{LocationId}")
     void updateLocation(@PathVariable(name = "LocationId") Long locationId,
-                        @RequestParam(name = "arrivalTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ") Date arrivalTime){
-        service.updateLocation(locationId, arrivalTime);
+                        @RequestParam(name = "ArrivalTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ") Date arrivalTime,
+                        @RequestParam(name = "Street", required = false) String street,
+                        @RequestParam(name = "BuildingNumber", required = false) String buildingNumber,
+                        @RequestParam(name = "City", required = false) String city,
+                        @RequestParam(name = "Latitude", required = false) Long latitude,
+                        @RequestParam(name = "Longitude", required = false) Long longitude){
+        service.updateLocation(locationId, arrivalTime, street, buildingNumber, city, latitude, longitude);
     }
 
     //zwrot wszystkich lokalizacji z id erranda

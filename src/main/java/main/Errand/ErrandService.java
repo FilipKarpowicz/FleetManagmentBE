@@ -8,10 +8,15 @@ import main.Location.Location;
 import main.Location.LocationService;
 import org.h2.util.json.JSONArray;
 import org.h2.util.json.JSONObject;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+
+import static main.ErrandData.ErrandDataService.getCompletedPointsByErrandId;
+import static main.Location.LocationService.getListOfRealAddresses;
 
 @Service
 public class ErrandService {
@@ -58,11 +63,13 @@ public class ErrandService {
         Errand manipulatedErrand = getByErrandId(errandId).orElseThrow(
                 () -> new IllegalStateException("Errand with that id does not exist")
         );
-        if(drvId != null && isDrvIdValid(drvId)){
-            manipulatedErrand.setDrvId(drvId);  //dac exception jesli jest invalid
+        if(drvId != null){
+            if(isDrvIdValid(drvId)) manipulatedErrand.setDrvId(drvId);
+            else throw new IllegalStateException("Driver ID is invalid");
         }
-        if(newRoute != null && isRouteValid(newRoute)) {
-            manipulatedErrand.setPlannedRouteAsString(newRoute);    //dac exception jesli jest invalid
+        if(newRoute != null) {
+            if(isRouteValid(newRoute))  manipulatedErrand.setPlannedRouteAsString(newRoute);
+            else throw new IllegalStateException("Route is invalid");
         }
     }
 
@@ -80,14 +87,16 @@ public class ErrandService {
         if(modelPart == null)   modelPart = "";
 
         for(Errand errand : allErrands){
-            Car car = CarService.getCarById(errand.getCarId()).get();
-            Driver driver = DriverService.getDriverById(errand.getDrvId()).get();
+            Car car = CarService.getCarById(errand.getCarId()).orElse(null);
+            Driver driver = DriverService.getDriverById(errand.getDrvId()).orElse(null);
 
-            Boolean errandMatchesSearch = false;
-            errandMatchesSearch = driver.getFirstName().contains(firstNamePart) && driver.getLastName().contains(lastNamePart) &&
-                    car.getMake().contains(makePart) && car.getModel().contains(modelPart);
+            if(car != null && driver != null) {
+                Boolean errandMatchesSearch = false;
+                errandMatchesSearch = driver.getFirstName().contains(firstNamePart) && driver.getLastName().contains(lastNamePart) &&
+                        car.getMake().contains(makePart) && car.getModel().contains(modelPart);
 
-            if (errandMatchesSearch)    matchedErrands.add(errand);
+                if (errandMatchesSearch) matchedErrands.add(errand);
+            }
         }
 
         if(matchedErrands.isEmpty())    throw new IllegalStateException("no results found");
@@ -103,11 +112,22 @@ public class ErrandService {
         }
     }
 
-//    public JSONArray displayMatchedErrands(String firstNamePart, String lastNamePart, String makePart, String modelPart, Integer batchNumber){
-//        List<Errand> matchedErrands = this.searchErrands(firstNamePart, lastNamePart, makePart, modelPart, batchNumber);
-//        for(Errand errand : matchedErrands){
-//            JSONObject errandJson = errand.createJsonObject();
-//        }
-//    }
-    //dodac sklejanie, tak zeby do kazdego wyszukanego erranda dodac liste jego realAdressow i completed points
+    public ResponseEntity<Object> searchResultsResponse(List<Errand> matchedErrands){
+        Map<String, List<Object>> allErrands = new HashMap<String, List<Object>>();
+        List<Object> listOfErrands = new ArrayList<Object>();
+        try{
+            for(Errand errand : matchedErrands){
+                Map<String, Object> singleErrand = new HashMap<String, Object>();
+                singleErrand.put("errand", errand);
+                singleErrand.put("realAddressList", getListOfRealAddresses(errand.getPlannedRouteAsList()));
+                singleErrand.put("completedPoints", getCompletedPointsByErrandId(errand.getErrandId()));
+                listOfErrands.add(singleErrand);
+            }
+            allErrands.put("errands", listOfErrands);
+            return new ResponseEntity<Object>(allErrands, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<Object>(allErrands, HttpStatus.CONFLICT);
+        }
+    }
 }
