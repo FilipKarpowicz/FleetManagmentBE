@@ -1,5 +1,6 @@
 package main.ErrandData;
 
+import main.Errand.Errand;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -28,7 +29,9 @@ public class ErrandDataService {
         else throw new IllegalStateException("ErrandData with that id does not exist");
     }
 
-    public static void generateNewDataRecord(ErrandData errandData){
+    public static void generateNewDataRecord(Errand errand){
+        ErrandData errandData = new ErrandData();
+        errandData.setErrand(errand);
         repository.save(errandData);
     }
 }

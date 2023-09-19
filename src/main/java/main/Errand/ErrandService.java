@@ -34,9 +34,7 @@ public class ErrandService {
         if(!isCarIdValid(errand.getCarId())) throw new IllegalStateException("Car with that ID does not exist");
         if(isDrvIdValid(errand.getDrvId()) && isCarIdValid(errand.getCarId())){
             repository.save(errand);
-            ErrandData errandData = new ErrandData();
-            errandData.setErrand(errand);
-            ErrandDataService.generateNewDataRecord(errandData);
+            ErrandDataService.generateNewDataRecord(errand);
         }
     }
 
