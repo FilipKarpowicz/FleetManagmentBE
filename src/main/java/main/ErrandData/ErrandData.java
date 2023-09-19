@@ -4,12 +4,7 @@ import jakarta.persistence.*;
 import main.Errand.Errand;
 
 import java.time.LocalDateTime;
-
-enum ErrandStatus{
-    WAITING,
-    IN_PROGRESS,
-    FINISHED
-}
+import main.ErrandData.ErrandStatus;
 
 @Entity
 @Table

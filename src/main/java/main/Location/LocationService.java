@@ -35,18 +35,23 @@ public class LocationService {
     }
 
     @Transactional
-    public void updateLocation(Long locationId, Date arrivalTime, String street, String buildingNumber, String city, Long latitude, Long longitude){
+    public void updateLocation(Long locationId, Date arrivalTime, String realAddress){
         Location manipulatedLocation = getByLocationId(locationId).orElseThrow(
                 () -> new IllegalStateException("Location with that id does not exist")
         );
         if(arrivalTime!=null){
             manipulatedLocation.setArrivalTime(arrivalTime);
         }
-//        if(manipulatedLocation.getRealAddress() != null){
-//            String oldStreet = Arrays.asList(manipulatedLocation.getRealAddress().split("-")).get(0).toString();
-//            String oldBuildingNumber = Arrays.asList(manipulatedLocation.getRealAddress().split("-")).get(1).toString();
-//            String oldCity = Arrays.asList(manipulatedLocation.getRealAddress().split("-")).get(2).toString();
-//        }
+        if(realAddress!=null){
+            manipulatedLocation.setRealAddress(realAddress);
+        }
+    }
+
+    public void deleteLocationById(Long locationId){
+        if(getByLocationId(locationId).isPresent()){
+            repository.deleteById(locationId);
+        }
+        else throw new IllegalStateException("Location with that id does not exist");
     }
 
     public static List<String> getListOfRealAddresses(List<Long> plannedRoute){ //1-2-3-4

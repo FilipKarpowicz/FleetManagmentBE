@@ -4,6 +4,9 @@ import main.Car.Car;
 import main.Car.CarService;
 import main.Driver.Driver;
 import main.Driver.DriverService;
+import main.ErrandData.ErrandData;
+import main.ErrandData.ErrandDataService;
+import main.ErrandData.ErrandStatus;
 import main.Location.Location;
 import main.Location.LocationService;
 import org.h2.util.json.JSONArray;
@@ -27,7 +30,14 @@ public class ErrandService {
     }
 
     public void addNewErrand(Errand errand){
-        repository.save(errand);
+        if(!isDrvIdValid(errand.getDrvId())) throw new IllegalStateException("Driver with that ID does not exist");
+        if(!isCarIdValid(errand.getCarId())) throw new IllegalStateException("Car with that ID does not exist");
+        if(isDrvIdValid(errand.getDrvId()) && isCarIdValid(errand.getCarId())){
+            repository.save(errand);
+            ErrandData errandData = new ErrandData();
+            errandData.setErrand(errand);
+            ErrandDataService.generateNewDataRecord(errandData);
+        }
     }
 
     List<Errand> getByDrvId(Long drvId){
@@ -56,6 +66,11 @@ public class ErrandService {
     private Boolean isDrvIdValid(Long drvId){
         Optional<Driver> checkedDriver = DriverService.getDriverById(drvId);
         return checkedDriver.isPresent();
+    }
+
+    private Boolean isCarIdValid(Long carId){
+        Optional<Car> checkedCar = CarService.getCarById(carId);
+        return checkedCar.isPresent();
     }
 
     @Transactional
@@ -129,5 +144,13 @@ public class ErrandService {
         catch (Exception e){
             return new ResponseEntity<Object>(allErrands, HttpStatus.CONFLICT);
         }
+    }
+
+    public void deleteErrandById(Long errandId){
+        if(getByErrandId(errandId).isPresent()){
+            repository.deleteById(errandId);
+            //ErrandDataService.deleteDataById(errandId);
+        }
+        else throw new IllegalStateException("Errand with that id does not exist");
     }
 }

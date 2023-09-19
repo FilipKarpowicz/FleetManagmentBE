@@ -20,4 +20,15 @@ public class ErrandDataService {
         ErrandData errandData = getByErrandId(errandId).get();
         return errandData.getCompletedPoints();
     }
+
+    public static void deleteDataById(Long errandId){
+        if(getByErrandId(errandId).isPresent()){
+            repository.deleteById(errandId);
+        }
+        else throw new IllegalStateException("ErrandData with that id does not exist");
+    }
+
+    public static void generateNewDataRecord(ErrandData errandData){
+        repository.save(errandData);
+    }
 }
