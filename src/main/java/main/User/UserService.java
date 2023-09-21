@@ -2,6 +2,7 @@ package main.User;
 
 import jakarta.transaction.Transactional;
 import main.Driver.Driver;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -105,4 +106,20 @@ public class UserService {
     return userById;
     }
 
+    public JSONObject addNewUser(UserEntity user) {
+        Optional<UserEntity> userByLogin = userRepository.findUserEntityByLogin(user.getLogin());
+        if(userByLogin.isPresent()){
+            JSONObject response = new JSONObject();
+            response.put("status","ERROR");
+            response.put("message","User with that login already exists");
+            return response;
+        }else {
+            userRepository.save(user);
+            JSONObject response = new JSONObject();
+            response.put("status","SUCCESS");
+            response.put("message","User added");
+            return response;
+        }
+
+    }
 }

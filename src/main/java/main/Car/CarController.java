@@ -43,7 +43,7 @@ public class CarController {
         return carService.findCarsByServiceDate(batchNumber, day, month, year);
     }
 
-    @CrossOrigin
+
     @GetMapping
     public List<Car> getCars() {
         return carService.getCars();

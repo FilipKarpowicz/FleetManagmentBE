@@ -2,12 +2,15 @@ package main.User;
 
 import io.swagger.annotations.ResponseHeader;
 import netscape.javascript.JSObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -52,5 +55,17 @@ public class UserController {
                            @RequestParam(required = false) String privilege){
         UserEntity user = userService.updateUser(userId,login,name,password,privilege);
         return ResponseEntity.ok(user);
+    }
+
+    @PostMapping(path = "user/add")
+    public ResponseEntity<String> addUser(@RequestBody UserEntity user){
+        JSONObject response = userService.addNewUser(user);
+        String status = response.getString("status");
+        System.out.println(status);
+        if(Objects.equals(status, "SUCCESS")){
+            return ResponseEntity.ok(response.toString());
+        }else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response.toString());
+        }
     }
 }
