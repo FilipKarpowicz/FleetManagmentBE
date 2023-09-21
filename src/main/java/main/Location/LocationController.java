@@ -22,8 +22,8 @@ public class LocationController {
     }
 
     @GetMapping(path = "GetAll")
-    List<Location> getAll(){
-        return service.findAll();
+    List<Location> getAll(@RequestParam(name = "batchNumber") Integer batchNumber){
+        return service.findAll(batchNumber);
     }
 
     @PostMapping(path = "Add")

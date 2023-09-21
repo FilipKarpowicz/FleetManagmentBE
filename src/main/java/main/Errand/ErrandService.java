@@ -90,9 +90,11 @@ public class ErrandService {
         return repository.findAll();
     }
 
-    public List<Errand> searchErrands(String firstNamePart, String lastNamePart, String makePart, String modelPart, Integer batchNumber){
+    public ResponseEntity<Object> searchErrands(String firstNamePart, String lastNamePart, String makePart, String modelPart, Integer batchNumber){
         List<Errand> allErrands = repository.findAll();
-        List<Errand> matchedErrands = new ArrayList<>();
+        List<Errand> matchedErrands = new ArrayList<Errand>();
+        List<Errand> responseErrandList = new ArrayList<Errand>();
+        String responseMessage = "Search successful";
 
         if(firstNamePart == null)   firstNamePart = "";
         if(lastNamePart == null)    lastNamePart = "";
@@ -112,43 +114,44 @@ public class ErrandService {
             }
         }
 
-        if(matchedErrands.isEmpty())    throw new IllegalStateException("no results found");
-
-        Integer startIndex = batchNumber*15 - 15;
-        Integer endIndex = batchNumber*15;
-        if(matchedErrands.size() > startIndex + endIndex && matchedErrands.size() > startIndex){
-            return matchedErrands.subList(startIndex, endIndex);
-        } else if (matchedErrands.size() > startIndex) {
-            return matchedErrands.subList(startIndex, matchedErrands.size());
-        } else {
-            throw new IllegalStateException("batch is empty");
+        if(matchedErrands.isEmpty())    responseMessage = "No results found";
+        else {
+            Integer startIndex = batchNumber * 15 - 15;
+            Integer endIndex = batchNumber * 15;
+            if (matchedErrands.size() > startIndex + endIndex && matchedErrands.size() > startIndex) {
+                responseErrandList = matchedErrands.subList(startIndex, endIndex);
+            } else if (matchedErrands.size() > startIndex) {
+                responseErrandList = matchedErrands.subList(startIndex, matchedErrands.size());
+            } else {
+                responseMessage = "Batch is empty";
+            }
         }
-    }
 
-    public ResponseEntity<Object> searchResultsResponse(List<Errand> matchedErrands){
-        Map<String, List<Object>> allErrands = new HashMap<String, List<Object>>();
+        Map<String, Object> response = new HashMap<String, Object>();
         List<Object> listOfErrands = new ArrayList<Object>();
         try{
-            for(Errand errand : matchedErrands){
-                Map<String, Object> singleErrand = new HashMap<String, Object>();
-                singleErrand.put("errand", errand);
-                singleErrand.put("realAddressList", getListOfRealAddresses(errand.getPlannedRouteAsList()));
-                singleErrand.put("completedPoints", getCompletedPointsByErrandId(errand.getErrandId()));
-                listOfErrands.add(singleErrand);
+            for(Errand errand : responseErrandList){
+                Map<String, Object> singleErrandFields = new HashMap<String, Object>();
+                singleErrandFields.put("errand", errand);
+                singleErrandFields.put("realAddressList", getListOfRealAddresses(errand.getPlannedRouteAsList()));
+                singleErrandFields.put("completedPoints", getCompletedPointsByErrandId(errand.getErrandId()));
+                listOfErrands.add(singleErrandFields);
             }
-            allErrands.put("errands", listOfErrands);
-            return new ResponseEntity<Object>(allErrands, HttpStatus.OK);
+            response.put("errands", listOfErrands);
+            response.put("message", responseMessage);
+            return new ResponseEntity<Object>(response, HttpStatus.OK);
         }
         catch (Exception e){
-            return new ResponseEntity<Object>(allErrands, HttpStatus.CONFLICT);
+            response.put("message", "Unknown error");
+            return new ResponseEntity<Object>(response, HttpStatus.CONFLICT);
         }
     }
 
-    public void deleteErrandById(Long errandId){
-        if(getByErrandId(errandId).isPresent()){
+    public void deleteErrandById(Long errandId) {
+        if (!getByErrandId(errandId).isPresent()) throw new IllegalStateException("Errand with that id does not exist");
+        else {
             repository.deleteById(errandId);
-            //ErrandDataService.deleteDataById(errandId);
+            //ErrandDataService.deleteDataById(errandId);   //usuwanie jest niepotrzebne. Jak usuwa sie obiekt klasy Errand, to ErrandData od razu jest usuwane
         }
-        else throw new IllegalStateException("Errand with that id does not exist");
     }
 }

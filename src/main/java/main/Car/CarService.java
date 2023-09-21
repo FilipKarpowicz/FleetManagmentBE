@@ -167,8 +167,10 @@ public class CarService {
         if (!exists) {
             throw new IllegalStateException("Car with id" + carId + "does not exists");
         }
-        carRepository.deleteById(carId);
-        CarDataService.deleteCarDataRecord(carId);
+        else {
+            carRepository.deleteById(carId);
+            //CarDataService.deleteCarDataRecord(carId);
+        }
     }
 
     @Transactional

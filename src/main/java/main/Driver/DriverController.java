@@ -53,7 +53,7 @@ public class DriverController {
     }
 
     @PostMapping(path = "api/v1/addDriver")
-    public void reqisterNewDriver(@RequestBody Driver driver){
+    public void registerNewDriver(@RequestBody Driver driver){
         driverService.addNewDriver(driver);
     }
 

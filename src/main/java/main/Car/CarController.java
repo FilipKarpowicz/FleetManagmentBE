@@ -8,7 +8,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "**")
-@RequestMapping(path = "api/v1/cars")
+@RequestMapping(path = "Cars")
 public class CarController {
 
     private final CarService carService;
@@ -18,27 +18,27 @@ public class CarController {
         this.carService = carService;
     }
 
-    @GetMapping(path = "batchCars/{batchNumber}")
+    @GetMapping(path = "BatchCars/{batchNumber}")
     public List<Car> getCarsBatch(@PathVariable("batchNumber") Integer batchNumber){
         return carService.getCarsBatch(batchNumber);
     }
 
-    @GetMapping(path = "sortCarsBy/{column}/{sortingType}/")
+    @GetMapping(path = "SortCarsBy/{column}/{sortingType}/")
     public List<Car> sortCarsBy(@PathVariable("column") String column,@PathVariable("sortingType") String sortingType,@RequestParam Integer batchNumber){
         return carService.getBatchCarsSorted(sortingType,column,batchNumber);
     }
 
-    @GetMapping(path = "findCarsByServiceMileage")
+    @GetMapping(path = "FindCarsByServiceMileage")
     public List<Car> findCarsByServiceMileage(@RequestParam Long value, @RequestParam Integer batchNumnber){
         return carService.findCarByServiceMileage(value, batchNumnber);
     }
 
-    @GetMapping(path = "findCarsByPattern/{column}")
+    @GetMapping(path = "FindCarsByPattern/{column}")
     List<Car> findCarsByPattern(@PathVariable("column") String column,@RequestParam String pattern, @RequestParam Integer batchNumber){
         return carService.findCarsByPattern(column, pattern, batchNumber);
     }
 
-    @GetMapping(path = "findCarsByServiceDate")
+    @GetMapping(path = "FindCarsByServiceDate")
     List<Car> findCarsByServiceDate(@RequestParam Integer batchNumber,@RequestParam(required = false) Integer day,@RequestParam(required = false) Integer month, @RequestParam(required = false) Integer year){
         return carService.findCarsByServiceDate(batchNumber, day, month, year);
     }
@@ -54,12 +54,12 @@ public class CarController {
         carService.addNewCar(car);
     }
 
-    @DeleteMapping(path = "{carId}")
+    @DeleteMapping(path = "Delete/{carId}")
     public void deleteCar(@PathVariable("carId") Long carId){
          carService.deleteCar(carId);
     }
 
-    @PutMapping(path = "{carId}")
+    @PutMapping(path = "Update/{carId}")
     public void updateCar(
             @PathVariable("carId") Long carId,
             @RequestParam(required = false) String make,

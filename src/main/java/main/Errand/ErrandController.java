@@ -49,7 +49,7 @@ public class ErrandController {
                                                 @RequestParam(required = false) String makePart,
                                                 @RequestParam(required = false) String modelPart,
                                                 @RequestParam(required = true) Integer batchNumber){
-        return service.searchResultsResponse(service.searchErrands(firstNamePart, lastNamePart, makePart, modelPart, batchNumber));
+        return service.searchErrands(firstNamePart, lastNamePart, makePart, modelPart, batchNumber);
     }
 
     @DeleteMapping(path = "Delete/{ErrandId}")
