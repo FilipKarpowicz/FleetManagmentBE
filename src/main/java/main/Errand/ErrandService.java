@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -30,8 +31,8 @@ public class ErrandService {
     }
 
     public void addNewErrand(Errand errand){
-        if(!isDrvIdValid(errand.getDrvId())) throw new IllegalStateException("Driver with that ID does not exist");
-        if(!isCarIdValid(errand.getCarId())) throw new IllegalStateException("Car with that ID does not exist");
+        if(!isDrvIdValid(errand.getDrvId())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Driver with that ID does not exist");
+        if(!isCarIdValid(errand.getCarId())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Car with that ID does not exist");
         if(isDrvIdValid(errand.getDrvId()) && isCarIdValid(errand.getCarId())){
             repository.save(errand);
             ErrandDataService.generateNewDataRecord(errand);
@@ -74,15 +75,15 @@ public class ErrandService {
     @Transactional
     public void editErrand(Long errandId, Long carId, Long drvId, String newRoute){
         Errand manipulatedErrand = getByErrandId(errandId).orElseThrow(
-                () -> new IllegalStateException("Errand with that id does not exist")
+                () -> new ResponseStatusException(HttpStatus.CONFLICT, "Errand with that id does not exist")
         );
         if(drvId != null){
             if(isDrvIdValid(drvId)) manipulatedErrand.setDrvId(drvId);
-            else throw new IllegalStateException("Driver ID is invalid");
+            else throw new ResponseStatusException(HttpStatus.CONFLICT, "Driver ID is invalid");
         }
         if(newRoute != null) {
             if(isRouteValid(newRoute))  manipulatedErrand.setPlannedRouteAsString(newRoute);
-            else throw new IllegalStateException("Route is invalid");
+            else throw new ResponseStatusException(HttpStatus.CONFLICT, "Route is invalid");
         }
     }
 
@@ -94,7 +95,6 @@ public class ErrandService {
         List<Errand> allErrands = repository.findAll();
         List<Errand> matchedErrands = new ArrayList<Errand>();
         List<Errand> responseErrandList = new ArrayList<Errand>();
-        String responseMessage = "Search successful";
 
         if(firstNamePart == null)   firstNamePart = "";
         if(lastNamePart == null)    lastNamePart = "";
@@ -114,7 +114,7 @@ public class ErrandService {
             }
         }
 
-        if(matchedErrands.isEmpty())    responseMessage = "No results found";
+        if(matchedErrands.isEmpty())    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No results found");
         else {
             Integer startIndex = batchNumber * 10 - 10;
             Integer endIndex = batchNumber * 10;
@@ -123,7 +123,7 @@ public class ErrandService {
             } else if (matchedErrands.size() > startIndex) {
                 responseErrandList = matchedErrands.subList(startIndex, matchedErrands.size());
             } else {
-                responseMessage = "Batch is empty";
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Batch is empty");
             }
         }
 
@@ -140,13 +140,11 @@ public class ErrandService {
                 listOfErrands.add(singleErrandFields);
             }
             response.put("errands", listOfErrands);
-            response.put("message", responseMessage);
             response.put("size", numberOfBatches);
             return new ResponseEntity<Object>(response, HttpStatus.OK);
         }
         catch (Exception e){
-            response.put("message", "Unknown error");
-            return new ResponseEntity<Object>(response, HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown error");
         }
     }
 

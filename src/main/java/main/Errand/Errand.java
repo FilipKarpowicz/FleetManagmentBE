@@ -96,13 +96,4 @@ public class Errand {
     public void setPlannedRouteAsString(String plannedRoute){
         this.plannedRoute = plannedRoute;
     }
-
-//    public JSONObject createJsonObject(){
-//        JSONObject errandJson = new JSONObject();
-//        errandJson.put("errandId", this.errandId);
-//        errandJson.put("carId", this.carId);
-//        errandJson.put("drvId", this.drvId);
-//        errandJson.put("plannedRouteAsString", this.getPlannedRouteAsString());
-//        errandJson.put("plannedRouteAsList", this.getPlannedRouteAsList());
-//    }
 }
