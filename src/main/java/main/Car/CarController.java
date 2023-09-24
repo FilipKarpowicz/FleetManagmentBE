@@ -1,7 +1,11 @@
 package main.Car;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -73,4 +77,17 @@ public class CarController {
             carService.updateCar(carId,make,model,vin,plateNo,type,comment,serviceDate,serviceMileage);
     }
 
+    @GetMapping(path = "SearchCars")
+    public ResponseEntity<Object> searchCars(@RequestParam(required = false) String makePart,
+                                                @RequestParam(required = false) String modelPart,
+                                                @RequestParam(required = false) String vinPart,
+                                                @RequestParam(required = false) String plateNumberPart,
+                                                @RequestParam(required = false) String typePart,
+                                                @RequestParam(required = false) Long serviceMileageLowerThreshold,
+                                                @RequestParam(required = false) Long serviceMileageUpperThreshold,
+                                                @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate serviceDateLowerThreshold,
+                                                @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate serviceDateUpperThreshold,
+                                                @RequestParam(required = true) Integer batchNumber){
+        return carService.searchCars(makePart, modelPart, vinPart, plateNumberPart, typePart, serviceMileageLowerThreshold, serviceMileageUpperThreshold, serviceDateLowerThreshold, serviceDateUpperThreshold, batchNumber);
+    }
 }

@@ -116,8 +116,8 @@ public class ErrandService {
 
         if(matchedErrands.isEmpty())    responseMessage = "No results found";
         else {
-            Integer startIndex = batchNumber * 15 - 15;
-            Integer endIndex = batchNumber * 15;
+            Integer startIndex = batchNumber * 10 - 10;
+            Integer endIndex = batchNumber * 10;
             if (matchedErrands.size() > startIndex + endIndex && matchedErrands.size() > startIndex) {
                 responseErrandList = matchedErrands.subList(startIndex, endIndex);
             } else if (matchedErrands.size() > startIndex) {
@@ -126,6 +126,8 @@ public class ErrandService {
                 responseMessage = "Batch is empty";
             }
         }
+
+        Integer numberOfBatches = (Integer) (matchedErrands.size()/10) + 1;
 
         Map<String, Object> response = new HashMap<String, Object>();
         List<Object> listOfErrands = new ArrayList<Object>();
@@ -139,6 +141,7 @@ public class ErrandService {
             }
             response.put("errands", listOfErrands);
             response.put("message", responseMessage);
+            response.put("size", numberOfBatches);
             return new ResponseEntity<Object>(response, HttpStatus.OK);
         }
         catch (Exception e){
