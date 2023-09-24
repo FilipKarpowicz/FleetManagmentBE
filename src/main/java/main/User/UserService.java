@@ -1,7 +1,6 @@
 package main.User;
 
 import jakarta.transaction.Transactional;
-import main.Driver.Driver;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,44 +27,53 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public List<UserEntity> findUsers(String name, String login, String privilege) {
+    public JSONObject findUsers(String name, String login, String privilege, Integer batch) {
+        List<UserEntity> users;
         if (privilege != null) {
             if (name != null) {
                 if (login != null) {
-                    return userRepository.findUserAll(login, name, privilege);
+                    users = userRepository.findUserAll(login, name, privilege);
                 } else {
                     //priv and name
-                    return userRepository.findUserPrivilegeName(name, privilege);
+                    users = userRepository.findUserPrivilegeName(name, privilege);
                 }
             } else {
                 if (login != null) {
                     //login and priv
-                    return userRepository.findUserPrivilegeLogin(login, privilege);
+                    users = userRepository.findUserPrivilegeLogin(login, privilege);
                 } else {
                     //only priv
-                    return userRepository.findUserPrivilege(privilege);
+                    users = userRepository.findUserPrivilege(privilege);
                 }
             }
         } else {
             if (name != null) {
                 if (login != null) {
                     //name and login
-                    return userRepository.findUserLoginName(login, name);
+                    users = userRepository.findUserLoginName(login, name);
                 } else {
                     // name
-                    return userRepository.findUserName(name);
+                    users = userRepository.findUserName(name);
                 }
             } else {
                 if (login != null) {
                     //login
-                    return userRepository.findUserLogin(login);
+                    users = userRepository.findUserLogin(login);
                 } else {
                     //all records
-                    return userRepository.findAllSorted();
+                    users = userRepository.findAllSorted();
                 }
             }
 
         }
+        int from = batch * 10 - 10;
+        int to = Math.min(batch * 10, users.size());
+        int size = users.size() / 10 + 1;
+        JSONObject response = new JSONObject();
+        response.put("size",size);
+        response.put("data",users.subList(from,to));
+        System.out.println(response);
+        return response;
     }
 
     @Transactional

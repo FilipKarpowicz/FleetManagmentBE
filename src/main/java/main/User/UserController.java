@@ -1,15 +1,11 @@
 package main.User;
 
-import io.swagger.annotations.ResponseHeader;
-import netscape.javascript.JSObject;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -22,12 +18,13 @@ public class UserController {
     public UserController(UserService userService){this.userService = userService;}
 
     @GetMapping(path="users")
-    public List<UserEntity> getAllUsers(
+    public String getAllUsers(
+            @RequestParam Integer batch,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String login,
             @RequestParam(required = false) String privilege
     ){
-        return userService.findUsers(name,login,privilege);
+        return userService.findUsers(name,login,privilege,batch).toString();
     }
 
     @GetMapping(path = "login")
@@ -38,7 +35,6 @@ public class UserController {
 
 
     @PutMapping(path = "user/setPassword")
-
     public void updatePassword(
             @RequestHeader String newPassword,
             @RequestHeader String oldPassword,
