@@ -1,6 +1,7 @@
 package main.Errand;
 
 import org.h2.util.json.JSONArray;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -43,11 +44,16 @@ public class ErrandController {
     }
 
     @GetMapping(path = "SearchErrands")
-    public List<Errand> searchErrands(@RequestParam(required = false) String firstNamePart,
-                                   @RequestParam(required = false) String lastNamePart,
-                                   @RequestParam(required = false) String makePart,
-                                   @RequestParam(required = false) String modelPart,
-                                   @RequestParam(required = true) Integer batchNumber){
+    public ResponseEntity<Object> searchErrands(@RequestParam(required = false) String firstNamePart,
+                                                @RequestParam(required = false) String lastNamePart,
+                                                @RequestParam(required = false) String makePart,
+                                                @RequestParam(required = false) String modelPart,
+                                                @RequestParam(required = true) Integer batchNumber){
         return service.searchErrands(firstNamePart, lastNamePart, makePart, modelPart, batchNumber);
+    }
+
+    @DeleteMapping(path = "Delete/{ErrandId}")
+    public void deleteErrand(@PathVariable(name = "ErrandId") Long errandId){
+        service.deleteErrandById(errandId);
     }
 }

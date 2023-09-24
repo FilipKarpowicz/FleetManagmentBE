@@ -38,5 +38,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @Query("SELECT s FROM UserEntity s ORDER BY s.userId")
     List<UserEntity> findAllSorted();
 
+    @Query("SELECT s FROM UserEntity s WHERE s.login=?1")
+    Optional<UserEntity> findUserEntityByLogin(String login);
+
 
 }

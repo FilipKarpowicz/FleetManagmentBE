@@ -14,7 +14,7 @@ public class CarDataService {
         this.repository = repository;
     }
 
-    Optional <CarData> getByCarId(Long carId){
+    static Optional <CarData> getByCarId(Long carId){
         return repository.findById(carId);
     }
 
@@ -27,12 +27,19 @@ public class CarDataService {
     @Transactional
     public void editCarData(Long carId, Double overallMileage){
         CarData manipulatedData = getByCarId(carId).orElseThrow(
-                () -> new IllegalStateException("CarData with that id does not exist")
+                () -> new IllegalStateException("Car data with that ID does not exist")
         );
-        manipulatedData.setOverallMileage(overallMileage);
+        if(overallMileage!=null){
+            if(overallMileage>1500000) throw new IllegalStateException("Car mileage cannot be higher than 1 500 000 km");
+            else manipulatedData.setOverallMileage(overallMileage);
+        }
+        else throw new IllegalStateException("Car mileage needs to be provided in order to update car data");
     }
 
     public static void deleteCarDataRecord(Long carId){
-        repository.deleteById(carId);
+        if(getByCarId(carId).isPresent()) {
+            repository.deleteById(carId);
+        }
+        else throw new IllegalStateException("Car data with that ID does not exist");
     }
 }

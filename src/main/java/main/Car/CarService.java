@@ -3,12 +3,21 @@ package main.Car;
 
 
 import main.CarData.CarDataService;
+import main.Driver.Driver;
+import main.Driver.DriverService;
+import main.Errand.Errand;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.*;
+
+import static main.ErrandData.ErrandDataService.getCompletedPointsByErrandId;
+import static main.Location.LocationService.getListOfRealAddresses;
 
 @Service
 public class CarService {
@@ -150,16 +159,19 @@ public class CarService {
     }
 
     public void addNewCar(Car car) {
-        Optional<Car> carByVin = carRepository.findCarByVin(car.getVin());
-        Optional<Car> carByPlate = carRepository.findCarByPlate(car.getPlateNo());
-        if(carByVin.isPresent()){
-            throw new IllegalStateException("Car with vin " + car.getVin() + " already exist");
-        } else if (carByPlate.isPresent()) {
-            throw new IllegalStateException("Car with plate number " + car.getPlateNo() + " already exist");
-        }else {
-            carRepository.save(car);
-            CarDataService.createNewCarDataRecord(car);
+        if(car.getMake() != null && car.getModel() != null && car.getVin() != null && car.getPlateNo() != null && car.getType() != null) {
+            Optional<Car> carByVin = carRepository.findCarByVin(car.getVin());
+            Optional<Car> carByPlate = carRepository.findCarByPlate(car.getPlateNo());
+            if (carByVin.isPresent()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Car with vin " + car.getVin() + " already exist");
+            } else if (carByPlate.isPresent()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Car with plate number " + car.getPlateNo() + " already exist");
+            } else {
+                carRepository.save(car);
+                CarDataService.createNewCarDataRecord(car);
+            }
         }
+            else throw new ResponseStatusException(HttpStatus.CONFLICT, "Please fill in all required fields");
     }
 
     public void deleteCar(Long carId) {
@@ -167,8 +179,10 @@ public class CarService {
         if (!exists) {
             throw new IllegalStateException("Car with id" + carId + "does not exists");
         }
-        carRepository.deleteById(carId);
-        CarDataService.deleteCarDataRecord(carId);
+        else {
+            carRepository.deleteById(carId);
+            //CarDataService.deleteCarDataRecord(carId);
+        }
     }
 
     @Transactional
@@ -218,5 +232,74 @@ public class CarService {
             throw new IllegalStateException("None of values was changed");
         }
 
+    }
+
+    public ResponseEntity<Object> searchCars(String makePart, String modelPart, String vinPart, String plateNumberPart, String typePart, Long serviceMileageLowerThreshold, Long serviceMileageUpperThreshold, LocalDate serviceDateLowerThreshold, LocalDate serviceDateUpperThreshold, Integer batchNumber){
+        List<Car> allCars = carRepository.findAll();
+        List<Car> matchedCars = new ArrayList<Car>();
+        List<Car> responseCarList = new ArrayList<Car>();
+
+        if(makePart == null)    makePart = "";
+        if(modelPart == null)   modelPart = "";
+        if(vinPart == null) vinPart = "";
+        if(plateNumberPart == null) plateNumberPart = "";
+        if(typePart == null)    typePart = "";
+
+        for(Car car : allCars){
+            Boolean carMatchesSearch = false;
+
+            carMatchesSearch = car.getMake().contains(makePart) && car.getModel().contains(modelPart) && car.getVin().contains(vinPart)
+                            && car.getPlateNo().contains(plateNumberPart) && car.getType().contains(typePart);
+
+            if(car.getServiceDate() != null) {
+                if (serviceDateLowerThreshold != null) {
+                    carMatchesSearch = carMatchesSearch && car.getServiceDate().isAfter(serviceDateLowerThreshold);
+                }
+                if (serviceDateUpperThreshold != null) {
+                    carMatchesSearch = carMatchesSearch && car.getServiceDate().isBefore(serviceDateUpperThreshold);
+                }
+            }
+            if(car.getServiceMileage() != null) {
+                if (serviceMileageLowerThreshold != null) {
+                    carMatchesSearch = carMatchesSearch && car.getServiceMileage() > serviceMileageLowerThreshold;
+                }
+                if (serviceMileageUpperThreshold != null) {
+                    carMatchesSearch = carMatchesSearch && car.getServiceMileage() < serviceMileageUpperThreshold;
+                }
+            }
+
+            if (carMatchesSearch) matchedCars.add(car);
+        }
+
+        if(matchedCars.isEmpty())    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No results found");
+        else {
+            Integer startIndex = batchNumber * 10 - 10;
+            Integer endIndex = batchNumber * 10;
+            if (matchedCars.size() > startIndex + endIndex && matchedCars.size() > startIndex) {
+                responseCarList = matchedCars.subList(startIndex, endIndex);
+            } else if (matchedCars.size() > startIndex) {
+                responseCarList = matchedCars.subList(startIndex, matchedCars.size());
+            } else {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Batch is empty");
+            }
+        }
+
+        Integer numberOfBatches = (Integer) (matchedCars.size()/10) + 1;
+
+        Map<String, Object> response = new HashMap<String, Object>();
+        List<Object> listOfCars = new ArrayList<Object>();
+        try{
+            for(Car car : responseCarList){
+                Map<String, Object> singleCarFields = new HashMap<String, Object>();
+                singleCarFields.put("car", car);
+                listOfCars.add(singleCarFields);
+            }
+            response.put("errands", listOfCars);
+            response.put("size", numberOfBatches);
+            return new ResponseEntity<Object>(response, HttpStatus.OK);
+        }
+        catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown error");
+        }
     }
 }

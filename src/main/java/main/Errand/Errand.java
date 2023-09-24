@@ -2,7 +2,9 @@ package main.Errand;
 
 import jakarta.persistence.*;
 import main.ErrandData.ErrandData;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.h2.util.json.JSONObject;
+import org.hibernate.annotations.NotFound;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,8 +24,13 @@ public class Errand {
             strategy = GenerationType.IDENTITY,
             generator = "errand_sequence"
     )
+    @NotNull
     private Long errandId;
+
+    @NotNull
     private Long carId;
+
+    @NotNull
     private Long drvId;
     private String plannedRoute;    //1-2-3-4... tak latwiej przechowywac w tablicy sql
 
@@ -73,7 +80,7 @@ public class Errand {
             return routeList;
         }
         else{
-            return null;
+            return new ArrayList<Long>();
         }
     }
 

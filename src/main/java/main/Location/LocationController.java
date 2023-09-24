@@ -22,8 +22,8 @@ public class LocationController {
     }
 
     @GetMapping(path = "GetAll")
-    List<Location> getAll(){
-        return service.findAll();
+    List<Location> getAll(@RequestParam(name = "batchNumber") Integer batchNumber){
+        return service.findAll(batchNumber);
     }
 
     @PostMapping(path = "Add")
@@ -33,9 +33,13 @@ public class LocationController {
 
     @PutMapping(path = "Update/{LocationId}")
     void updateLocation(@PathVariable(name = "LocationId") Long locationId,
-                        @RequestParam(name = "arrivalTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ") Date arrivalTime){
-        service.updateLocation(locationId, arrivalTime);
+                        @RequestParam(name = "ArrivalTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ") Date arrivalTime,
+                        @RequestParam(name = "RealAddress", required = false) String realAddress){
+        service.updateLocation(locationId, arrivalTime, realAddress);
     }
 
-    //zwrot wszystkich lokalizacji z id erranda
+    @DeleteMapping(path = "Delete/{LocationId}")
+    void deleteLocation(@PathVariable(name = "LocationId") Long locationId){
+        service.deleteLocationById(locationId);
+    }
 }
