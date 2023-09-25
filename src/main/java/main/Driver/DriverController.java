@@ -1,59 +1,30 @@
 package main.Driver;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class DriverController {
 
     private final DriverService driverService;
+
     @Autowired
-    public DriverController(DriverService driverService){this.driverService = driverService;}
-
-    @GetMapping(path = "api/v1/sortDriversBy/{column}/{sortingType}")
-    public List<Driver> sortDriversByRating(@PathVariable("sortingType") String sortingType,@PathVariable("column") String column,@RequestParam Integer batchNumber){
-        return driverService.get15DriversSorted(sortingType,column,batchNumber);
-    }
-
-    @GetMapping(path = "api/v1/findDriversByValue/{column}")
-    public List<Driver> findDriversByValue(@PathVariable("column") String column, @RequestParam Long value,@RequestParam Integer batchNumber){
-        return driverService.findDriverByValue(column, value, batchNumber);
-    }
-
-    @GetMapping(path = "api/v1/findDriversByBirthdate")
-    public List<Driver> findDriversByBirthdate(@RequestParam Integer batchNumber,@RequestParam(required = false) Integer day,@RequestParam(required = false) Integer month,@RequestParam(required = false) Integer year){
-        return driverService.findDriversByBirthdate(batchNumber,day,month,year);
-    }
-
-    @GetMapping(path = "api/v1/findDriversByPattern/{column}")
-    public List<Driver> findDriversByPattern(@PathVariable("column") String column, @RequestParam String pattern, @RequestParam Integer batchNumber){
-        return driverService.findDriverByPattern(column,pattern,batchNumber);
-    }
-
-    @GetMapping(path = "api/v1/batchDrivers/{batchNumber}")
-    public List<Driver> getBatchOfDrivers(@PathVariable("batchNumber") Integer batchNumber){
-        return driverService.getDriversBatch(batchNumber);
-    }
-
-    @GetMapping(path = "api/v1/driverById/{drvId}")
-    public Optional<Driver> getDriverById(@PathVariable("drvId") Long drvId){
-        return driverService.getDriverById(drvId);
+    public DriverController(DriverService driverService) {
+        this.driverService = driverService;
     }
 
     @DeleteMapping(path = {"api/v1/driverById/{drvId}"})
-    public void deleteDriverById(@PathVariable("drvId") Long drvId){
+    public void deleteDriverById(@PathVariable("drvId") Long drvId) {
         driverService.deleteDriverById(drvId);
     }
 
     @PostMapping(path = "api/v1/addDriver")
-    public void registerNewDriver(@RequestBody Driver driver){
+    public void registerNewDriver(@RequestBody Driver driver) {
         driverService.addNewDriver(driver);
     }
 
@@ -68,9 +39,25 @@ public class DriverController {
             @RequestParam(required = false) String drvLicNo,
             @RequestParam(required = false) Long carId,
             @RequestParam(required = false) Integer overallDrvRating
-    ){
-        driverService.updateDriver(drvId,firstName,lastName,birthdate,pesel,drvLicNo,carId,overallDrvRating);
+    ) {
+        driverService.updateDriver(drvId, firstName, lastName, birthdate, pesel, drvLicNo, carId, overallDrvRating);
     }
+
+    @GetMapping(path = "drivers")
+    public ResponseEntity<String> findDrivers(
+            @RequestParam Integer batch,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) Long pesel,
+            @RequestParam(required = false) String drvLicNo,
+            @RequestParam(required = false) Long carId,
+            @RequestParam(required = false) String MoreOrLess,
+            @RequestParam(required = false) Integer overallDrvRating) {
+        JSONObject response =  driverService.findDrivers(firstName,lastName,pesel,drvLicNo,carId,overallDrvRating,MoreOrLess,batch);
+        return ResponseEntity.ok(response.toString());
+    }
+
+
 
 
 }

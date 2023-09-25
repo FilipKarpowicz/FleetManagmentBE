@@ -1,6 +1,8 @@
 package main.User;
 
 import jakarta.transaction.Transactional;
+import main.Errand.Errand;
+import main.Errand.ErrandRepository;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -70,8 +72,8 @@ public class UserService {
         int to = Math.min(batch * 10, users.size());
         int size = users.size() / 10 + 1;
         JSONObject response = new JSONObject();
-        response.put("size",size);
-        response.put("data",users.subList(from,to));
+        response.put("size", size);
+        response.put("data", users.subList(from, to));
         System.out.println(response);
         return response;
     }
@@ -91,43 +93,55 @@ public class UserService {
     }
 
     @Transactional
-    public UserEntity updateUser(Long userId, String login, String name, String password, String privilege){
+    public UserEntity updateUser(Long userId, String login, String name, String password, String privilege) {
         UserEntity userById = userRepository.findById(userId).orElseThrow(
-                () ->new IllegalStateException("User with that id does not exist")
+                () -> new IllegalStateException("User with that id does not exist")
         );
 
-        if( login != null && !Objects.equals(login,userById.getLogin())){
+        if (login != null && !Objects.equals(login, userById.getLogin())) {
             userById.setLogin(login);
         }
 
-        if( name != null && !Objects.equals(name,userById.getName())){
+        if (name != null && !Objects.equals(name, userById.getName())) {
             userById.setName(name);
         }
 
-        if( password != null && !Objects.equals(password,userById.getPassword())){
+        if (password != null && !Objects.equals(password, userById.getPassword())) {
             userById.setPassword(password);
         }
 
-        if( privilege != null && !Objects.equals(privilege,userById.getPrivilege())){
+        if (privilege != null && !Objects.equals(privilege, userById.getPrivilege())) {
             userById.setPrivilege(privilege);
         }
-    return userById;
+        return userById;
     }
 
     public JSONObject addNewUser(UserEntity user) {
         Optional<UserEntity> userByLogin = userRepository.findUserEntityByLogin(user.getLogin());
-        if(userByLogin.isPresent()){
-            JSONObject response = new JSONObject();
-            response.put("status","ERROR");
-            response.put("message","User with that login already exists");
-            return response;
-        }else {
+        JSONObject response = new JSONObject();
+        if (userByLogin.isPresent()) {
+            response.put("status", "ERROR");
+            response.put("message", "User with that login already exists");
+        } else {
             userRepository.save(user);
-            JSONObject response = new JSONObject();
-            response.put("status","SUCCESS");
-            response.put("message","User added");
-            return response;
+            response.put("status", "SUCCESS");
+            response.put("message", "User added");
         }
+        return response;
 
+    }
+
+    public JSONObject deleteUser(Long userId) {
+        Optional<UserEntity> user = userRepository.findById(userId);
+        JSONObject response = new JSONObject();
+        if (user.isPresent()) {
+            userRepository.deleteById(userId);
+            response.put("status", "SUCCESS");
+            response.put("message", "User deleted");
+        } else {
+            response.put("status", "ERROR");
+            response.put("message", "User with that id does not exist");
+        }
+        return response;
     }
 }

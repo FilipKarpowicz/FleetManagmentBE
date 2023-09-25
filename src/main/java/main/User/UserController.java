@@ -15,23 +15,24 @@ public class UserController {
     private final UserService userService;
 
     @Autowired
-    public UserController(UserService userService){this.userService = userService;}
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
-    @GetMapping(path="users")
+    @GetMapping(path = "users")
     public String getAllUsers(
             @RequestParam Integer batch,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String login,
             @RequestParam(required = false) String privilege
-    ){
-        return userService.findUsers(name,login,privilege,batch).toString();
+    ) {
+        return userService.findUsers(name, login, privilege, batch).toString();
     }
 
     @GetMapping(path = "login")
-    public Optional<UserEntity> login(@RequestParam("login") String login, @RequestParam("password") String password){
-        return userService.loginUser(login,password);
+    public Optional<UserEntity> login(@RequestParam("login") String login, @RequestParam("password") String password) {
+        return userService.loginUser(login, password);
     }
-
 
 
     @PutMapping(path = "user/setPassword")
@@ -40,28 +41,37 @@ public class UserController {
             @RequestHeader String oldPassword,
             @RequestHeader Long userId
     ) {
-       userService.updatePassword(userId,newPassword,oldPassword);
+        userService.updatePassword(userId, newPassword, oldPassword);
     }
 
     @PutMapping(path = "user/modify")
     public ResponseEntity<UserEntity> updateUser(@RequestParam Long userId,
-                           @RequestParam(required = false) String login,
-                           @RequestParam(required = false) String password,
-                           @RequestParam(required = false) String name,
-                           @RequestParam(required = false) String privilege){
-        UserEntity user = userService.updateUser(userId,login,name,password,privilege);
+                                                 @RequestParam(required = false) String login,
+                                                 @RequestParam(required = false) String password,
+                                                 @RequestParam(required = false) String name,
+                                                 @RequestParam(required = false) String privilege) {
+        UserEntity user = userService.updateUser(userId, login, name, password, privilege);
         return ResponseEntity.ok(user);
     }
 
     @PostMapping(path = "user/add")
-    public ResponseEntity<String> addUser(@RequestBody UserEntity user){
+    public ResponseEntity<String> addUser(@RequestBody UserEntity user) {
         JSONObject response = userService.addNewUser(user);
         String status = response.getString("status");
-        System.out.println(status);
-        if(Objects.equals(status, "SUCCESS")){
+        if (Objects.equals(status, "SUCCESS")) {
+            return ResponseEntity.ok(response.toString());
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response.toString());
+        }
+    }
+
+    @DeleteMapping(path = "user/delete")
+    public ResponseEntity<String> deleteUser(@RequestParam Long userId) {
+        JSONObject response = userService.deleteUser(userId);
+        if (Objects.equals(response.getString("status"), "SUCCESS")) {
             return ResponseEntity.ok(response.toString());
         }else{
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response.toString());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response.toString());
         }
     }
 }
