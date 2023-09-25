@@ -26,8 +26,6 @@ public class Driver {
     private String drvLicNo;
     private Integer overallDrvRating;
 
-    private Long carId;
-
 
     public Driver() {
 
@@ -42,7 +40,6 @@ public class Driver {
                 ", birthdate=" + birthdate +
                 ", pesel=" + pesel +
                 ", drvLicNo='" + drvLicNo + '\'' +
-                ", carId=" + carId +
                 ", overallDrvRating=" + overallDrvRating +
                 '}';
     }
@@ -85,14 +82,6 @@ public class Driver {
 
     public void setDrvLicNo(String drvLicNo) {
         this.drvLicNo = drvLicNo;
-    }
-
-    public Long getCarId() {
-        return carId;
-    }
-
-    public void setCarId(Long carId) {
-        this.carId = carId;
     }
 
     public Integer getOverallDrvRating() {

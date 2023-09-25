@@ -47,18 +47,15 @@ public class DriverService {
 
     public void addNewDriver(Driver driver) {
         Optional<Driver> driverByPeselOptional = driverRepository.findDriverByPesel(driver.getPesel());
-        Optional<Driver> driverByCarIdOptional = driverRepository.findDriverByCarId(driver.getCarId());
         if (driverByPeselOptional.isPresent()) {
             throw new IllegalStateException("Driver with this pesel already exist");
-        } else if (driverByCarIdOptional.isPresent()) {
-            throw new IllegalStateException("Driver with this car ID already exist");
         } else {
             driverRepository.save(driver);
         }
     }
 
     @Transactional
-    public void updateDriver(Long drvId, String firstName, String lastName, LocalDate birthdate, Long pesel, String drvLicNo, Long carId, Integer overallDrvRating) {
+    public void updateDriver(Long drvId, String firstName, String lastName, LocalDate birthdate, Long pesel, String drvLicNo, Integer overallDrvRating) {
         Driver driverById = driverRepository.findById(drvId).orElseThrow(
                 () -> new IllegalStateException("Driver with that id does not exist")
         );
@@ -83,14 +80,6 @@ public class DriverService {
             driverById.setDrvLicNo(drvLicNo);
         }
 
-        if (carId != null && !Objects.equals(carId, driverById.getCarId())) {
-            Optional<Driver> driverOptional = driverRepository.findDriverByCarId(carId);
-            if (driverOptional.isPresent()) {
-                throw new IllegalStateException("Car ID you trying to set is already taken");
-            }
-            driverById.setCarId(carId);
-        }
-
         if (overallDrvRating != null && !Objects.equals(overallDrvRating, driverById.getOverallDrvRating())) {
             driverById.setOverallDrvRating(overallDrvRating);
         }
@@ -99,24 +88,19 @@ public class DriverService {
     }
 
 
-    public JSONObject findDrivers(String firstName, String lastName, Long pesel, String drvLicNo, Long carId, Integer overallDrvRating, String LessOrMore, Integer batch) {
+    public JSONObject findDrivers(String firstName, String lastName, Long pesel, String drvLicNo, Integer overallDrvRating, String LessOrMore, Integer batch) {
         JSONObject response = new JSONObject();
         Pageable pages = PageRequest.of(batch - 1,10, Sort.by("drvId"));
-        if (carId != null) {
-            Optional<Driver> carIds = driverRepository.findDriverByCarId(carId);
-            List<Driver> data = new ArrayList<Driver>();
-            carIds.ifPresent(data::add);
-            response.put("size", 1);
-            response.put("data", data);
-            return response;
-        } else if (overallDrvRating != null && LessOrMore != null) {
+        if (overallDrvRating != null && LessOrMore != null) {
             switch (LessOrMore) {
                 case "More" -> {
                     List<Driver> data = driverRepository.findDriversMore(pesel, firstName, lastName, drvLicNo, overallDrvRating, pages);
+                    response.put("status","SUCCESS");
                     response.put("data", data);
                 }
                 case "Less" -> {
                     List<Driver> data = driverRepository.findDriversLess(pesel, firstName, lastName, drvLicNo, overallDrvRating, pages);
+                    response.put("status","SUCCESS");
                     response.put("data", data);
                 }
                 default -> {
@@ -126,6 +110,7 @@ public class DriverService {
             }
         }else {
             List<Driver> data = driverRepository.findDriversByAll(pesel, firstName, lastName, drvLicNo, pages);
+            response.put("status","SUCCESS");
             response.put("data", data);
         }
 

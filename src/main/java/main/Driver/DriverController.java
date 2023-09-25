@@ -2,6 +2,8 @@ package main.Driver;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,18 +31,17 @@ public class DriverController {
     }
 
 
-    @PutMapping(path = "api/v1/upadteDriver/{drvId}")
+    @PutMapping(path = "driver/modify")
     public void updateDriver(
-            @PathVariable("drvId") Long drvId,
+            @RequestParam Long drvId,
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) LocalDate birthdate,
             @RequestParam(required = false) Long pesel,
             @RequestParam(required = false) String drvLicNo,
-            @RequestParam(required = false) Long carId,
             @RequestParam(required = false) Integer overallDrvRating
     ) {
-        driverService.updateDriver(drvId, firstName, lastName, birthdate, pesel, drvLicNo, carId, overallDrvRating);
+        driverService.updateDriver(drvId, firstName, lastName, birthdate, pesel, drvLicNo, overallDrvRating);
     }
 
     @GetMapping(path = "drivers")
@@ -50,11 +51,15 @@ public class DriverController {
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) Long pesel,
             @RequestParam(required = false) String drvLicNo,
-            @RequestParam(required = false) Long carId,
-            @RequestParam(required = false) String MoreOrLess,
+            @RequestParam(required = false) String moreOrLess,
             @RequestParam(required = false) Integer overallDrvRating) {
-        JSONObject response =  driverService.findDrivers(firstName,lastName,pesel,drvLicNo,carId,overallDrvRating,MoreOrLess,batch);
-        return ResponseEntity.ok(response.toString());
+        JSONObject response =  driverService.findDrivers(firstName,lastName,pesel,drvLicNo,overallDrvRating,moreOrLess,batch);
+        if (response.get("status") == "SUCCESS"){
+            return ResponseEntity.ok(response.toString());
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.toString());
+        }
+
     }
 
 

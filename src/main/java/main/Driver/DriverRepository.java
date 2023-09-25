@@ -13,8 +13,6 @@ import java.util.Optional;
 
 @Repository
 public interface DriverRepository extends JpaRepository<Driver, Long> {
-    @Query("SELECT s FROM Driver s WHERE s.carId=?1")
-    Optional<Driver> findDriverByCarId(Long carID);
 
     @Query("SELECT s FROM Driver s WHERE s.pesel=?1")
     Optional<Driver> findDriverByPesel(Long pesel);
