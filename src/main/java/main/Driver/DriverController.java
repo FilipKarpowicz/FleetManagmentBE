@@ -20,19 +20,29 @@ public class DriverController {
         this.driverService = driverService;
     }
 
-    @DeleteMapping(path = {"api/v1/driverById/{drvId}"})
-    public void deleteDriverById(@PathVariable("drvId") Long drvId) {
-        driverService.deleteDriverById(drvId);
+    @DeleteMapping(path = {"driver/delete"})
+    public ResponseEntity<String> deleteDriverById(@RequestParam("drvId") Long drvId) {
+        JSONObject response = driverService.deleteDriverById(drvId);
+        if (response.get("status") == "SUCCESS"){
+            return ResponseEntity.ok(response.toString());
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.toString());
+        }
     }
 
-    @PostMapping(path = "api/v1/addDriver")
-    public void registerNewDriver(@RequestBody Driver driver) {
-        driverService.addNewDriver(driver);
+    @PostMapping(path = "driver/add")
+    public ResponseEntity<String> registerNewDriver(@RequestBody Driver driver) {
+        JSONObject response = driverService.addNewDriver(driver);
+        if (response.get("status") == "SUCCESS"){
+            return ResponseEntity.ok(response.toString());
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.toString());
+        }
     }
 
 
     @PutMapping(path = "driver/modify")
-    public void updateDriver(
+    public ResponseEntity<String> updateDriver(
             @RequestParam Long drvId,
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
@@ -41,7 +51,12 @@ public class DriverController {
             @RequestParam(required = false) String drvLicNo,
             @RequestParam(required = false) Integer overallDrvRating
     ) {
-        driverService.updateDriver(drvId, firstName, lastName, birthdate, pesel, drvLicNo, overallDrvRating);
+        JSONObject response = driverService.updateDriver(drvId, firstName, lastName, birthdate, pesel, drvLicNo, overallDrvRating);
+        if (response.get("status") == "SUCCESS"){
+            return ResponseEntity.ok(response.toString());
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.toString());
+        }
     }
 
     @GetMapping(path = "drivers")

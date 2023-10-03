@@ -1,6 +1,7 @@
 package main.Driver;
 
 import io.swagger.models.auth.In;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,16 +21,16 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
     @Query("SELECT s FROM Driver s WHERE (?1 IS NULL OR cast(s.pesel as string ) LIKE %?1)" +
             "AND (?2 IS NULL OR s.firstName LIKE %?2%) AND (?3 IS NULL OR s.lastName LIKE %?3%)" +
             "AND (?4 IS NULL OR s.drvLicNo LIKE %?4%)")
-    List<Driver>findDriversByAll(Long pesel,String firstName, String lastName,String drvLicNo, Pageable pageable);
+    Page<Driver>findDriversByAll(Long pesel,String firstName, String lastName,String drvLicNo, Pageable pageable);
+
+    @Query("SELECT s FROM Driver s WHERE (?1 IS NULL OR cast(s.pesel as string ) LIKE %?1)" +
+            "AND (?2 IS NULL OR s.firstName LIKE %?2%) AND (?3 IS NULL OR s.lastName LIKE %?3%)" +
+            "AND (?4 IS NULL OR s.drvLicNo LIKE %?4%) AND (?5 IS NULL OR s.overallDrvRating < ?5)")
+    Page<Driver> findDriversLess(Long pesel, String firstName, String lastName, String drvLicNo, Integer overallDrvRating, Pageable pageable);
 
     @Query("SELECT s FROM Driver s WHERE (?1 IS NULL OR cast(s.pesel as string ) LIKE %?1)" +
             "AND (?2 IS NULL OR s.firstName LIKE %?2%) AND (?3 IS NULL OR s.lastName LIKE %?3%)" +
             "AND (?4 IS NULL OR s.drvLicNo LIKE %?4%) AND (?5 IS NULL OR s.overallDrvRating > ?5)")
-    List<Driver>findDriversLess(Long pesel,String firstName, String lastName,String drvLicNo, Integer overallDrvRating, Pageable pageable);
-
-    @Query("SELECT s FROM Driver s WHERE (?1 IS NULL OR cast(s.pesel as string ) LIKE %?1)" +
-            "AND (?2 IS NULL OR s.firstName LIKE %?2%) AND (?3 IS NULL OR s.lastName LIKE %?3%)" +
-            "AND (?4 IS NULL OR s.drvLicNo LIKE %?4%) AND (?5 IS NULL OR s.overallDrvRating > ?5)")
-    List<Driver>findDriversMore(Long pesel, String firstName, String lastName, String drvLicNo, Integer overallDrvRating, Pageable pageable);
+    Page<Driver>findDriversMore(Long pesel, String firstName, String lastName, String drvLicNo, Integer overallDrvRating, Pageable pageable);
 
 }
