@@ -169,6 +169,7 @@ public class CarService {
             } else {
                 carRepository.save(car);
                 CarDataService.createNewCarDataRecord(car);
+                throw new ResponseStatusException(HttpStatus.CREATED, "The car was saved");
             }
         }
             else throw new ResponseStatusException(HttpStatus.CONFLICT, "Please fill in all required fields");
@@ -287,14 +288,8 @@ public class CarService {
         Integer numberOfBatches = (Integer) (matchedCars.size()/10) + 1;
 
         Map<String, Object> response = new HashMap<String, Object>();
-        List<Object> listOfCars = new ArrayList<Object>();
         try{
-            for(Car car : responseCarList){
-                Map<String, Object> singleCarFields = new HashMap<String, Object>();
-                singleCarFields.put("car", car);
-                listOfCars.add(singleCarFields);
-            }
-            response.put("errands", listOfCars);
+            response.put("cars", matchedCars);
             response.put("size", numberOfBatches);
             return new ResponseEntity<Object>(response, HttpStatus.OK);
         }

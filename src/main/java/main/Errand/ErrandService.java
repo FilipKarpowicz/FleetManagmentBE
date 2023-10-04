@@ -32,8 +32,8 @@ public class ErrandService {
 
     public void addNewErrand(Errand errand){
         if(!isDrvIdValid(errand.getDrvId())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Driver with that ID does not exist");
-        if(!isCarIdValid(errand.getCarId())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Car with that ID does not exist");
-        if(isDrvIdValid(errand.getDrvId()) && isCarIdValid(errand.getCarId())){
+        else if(!isCarIdValid(errand.getCarId())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Car with that ID does not exist");
+        else{
             repository.save(errand);
             ErrandDataService.generateNewDataRecord(errand);
         }
