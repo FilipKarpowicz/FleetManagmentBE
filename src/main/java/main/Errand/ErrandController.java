@@ -17,8 +17,9 @@ public class ErrandController {
     }
 
     @PostMapping(path = "Add")
-    public void addNewErrand(@RequestBody Errand errand){
-        service.addNewErrand(errand);
+    public ResponseEntity<Object> addNewErrand(@RequestBody Errand errand){
+        System.out.println(errand.getPlannedRouteAsString());
+        return service.addNewErrand(errand);
     }
 
     @GetMapping(path = "GetBy/DrvId")
