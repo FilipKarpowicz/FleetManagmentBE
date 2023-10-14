@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "**")
-@RequestMapping(path = "Cars")
+@RequestMapping(path = "car")
 public class CarController {
 
     private final CarService carService;
@@ -53,19 +53,19 @@ public class CarController {
         return carService.getCars();
     }
 
-    @PostMapping
+    @PostMapping(path = "add")
     public void registerNewCar(@RequestBody Car car){
         carService.addNewCar(car);
     }
 
-    @DeleteMapping(path = "Delete/{carId}")
-    public void deleteCar(@PathVariable("carId") Long carId){
+    @DeleteMapping(path = "delete")
+    public void deleteCar(@RequestParam("carId") Long carId){
          carService.deleteCar(carId);
     }
 
-    @PutMapping(path = "Update/{carId}")
+    @PutMapping(path = "update")
     public void updateCar(
-            @PathVariable("carId") Long carId,
+            @RequestParam(required = true, name = "carId") Long carId,
             @RequestParam(required = false) String make,
             @RequestParam(required = false) String model,
             @RequestParam(required = false) String vin,
@@ -77,7 +77,7 @@ public class CarController {
             carService.updateCar(carId,make,model,vin,plateNo,type,comment,serviceDate,serviceMileage);
     }
 
-    @GetMapping(path = "SearchCars")
+    @GetMapping(path = "searchCars")
     public ResponseEntity<Object> searchCars(@RequestParam(required = false) String makePart,
                                                 @RequestParam(required = false) String modelPart,
                                                 @RequestParam(required = false) String vinPart,
@@ -87,7 +87,7 @@ public class CarController {
                                                 @RequestParam(required = false) Long serviceMileageUpperThreshold,
                                                 @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate serviceDateLowerThreshold,
                                                 @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate serviceDateUpperThreshold,
-                                                @RequestParam(required = true) Integer batchNumber){
-        return carService.searchCars(makePart, modelPart, vinPart, plateNumberPart, typePart, serviceMileageLowerThreshold, serviceMileageUpperThreshold, serviceDateLowerThreshold, serviceDateUpperThreshold, batchNumber);
+                                                @RequestParam(required = true) Integer batch){
+        return carService.searchCars(makePart, modelPart, vinPart, plateNumberPart, typePart, serviceMileageLowerThreshold, serviceMileageUpperThreshold, serviceDateLowerThreshold, serviceDateUpperThreshold, batch);
     }
 }

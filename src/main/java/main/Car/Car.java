@@ -26,6 +26,7 @@ public class Car {
     private String type;
     private String comment;
     private LocalDate serviceDate;
+
     private Long serviceMileage;
 
     @OneToOne(mappedBy = "car", cascade = CascadeType.ALL)
