@@ -54,7 +54,7 @@ public class ErrandController {
     }
 
     @DeleteMapping(path = "Delete/{ErrandId}")
-    public void deleteErrand(@PathVariable(name = "ErrandId") Long errandId){
-        service.deleteErrandById(errandId);
+    public ResponseEntity<Object> deleteErrand(@PathVariable(name = "ErrandId") Long errandId){
+        return service.deleteErrandById(errandId);
     }
 }

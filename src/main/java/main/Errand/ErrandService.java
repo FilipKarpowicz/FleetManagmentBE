@@ -124,8 +124,8 @@ public class ErrandService {
 
         if (matchedErrands.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No results found");
         else {
-            Integer startIndex = batchNumber * 10 - 10;
-            Integer endIndex = batchNumber * 10;
+            Integer startIndex = batchNumber * 12 - 12;
+            Integer endIndex = batchNumber * 12;
             if (matchedErrands.size() > startIndex + endIndex && matchedErrands.size() > startIndex) {
                 responseErrandList = matchedErrands.subList(startIndex, endIndex);
             } else if (matchedErrands.size() > startIndex) {
@@ -135,7 +135,7 @@ public class ErrandService {
             }
         }
 
-        Integer numberOfBatches = (Integer) (matchedErrands.size() / 10) + 1;
+        Integer numberOfBatches = (Integer) (matchedErrands.size() / 12) + 1;
 
         Map<String, Object> response = new HashMap<String, Object>();
         List<Object> listOfErrands = new ArrayList<Object>();
@@ -155,10 +155,14 @@ public class ErrandService {
         }
     }
 
-    public void deleteErrandById(Long errandId) {
+    public ResponseEntity<Object> deleteErrandById(Long errandId) {
+        Map<String, Object> response = new HashMap<String, Object>();
         if (!getByErrandId(errandId).isPresent()) throw new IllegalStateException("Errand with that id does not exist");
         else {
             repository.deleteById(errandId);
+            response.put("status", "SUCCESS");
+            response.put("message", "Errand deleted!");
+            return new ResponseEntity<Object>(response, HttpStatus.OK);
             //ErrandDataService.deleteDataById(errandId);   //usuwanie jest niepotrzebne. Jak usuwa sie obiekt klasy Errand, to ErrandData od razu jest usuwane
         }
     }

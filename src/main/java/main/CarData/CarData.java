@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class CarData {
     @Id
     @Column(name = "car_id")
-    private Long id;
+    private Long idd;
     private Double avgEnergyConsumption;
     private Double overallMileage;
     private Integer battSoc;
@@ -41,11 +41,11 @@ public class CarData {
     }
 
     public Long getId() {
-        return id;
+        return idd;
     }
 
     public void setId(Long id) {
-        this.id = id;
+        this.idd = id;
     }
 
     public Double getAvgEnergyConsumption() {
