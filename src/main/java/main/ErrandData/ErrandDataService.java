@@ -22,6 +22,7 @@ public class ErrandDataService {
     public void generateNewDataRecord(Errand errand){
         ErrandData errandData = new ErrandData();
         errandData.setErrand(errand);
+        errandData.setErrandStatus(ErrandStatus.WAITING);
         repository.save(errandData);
     }
 

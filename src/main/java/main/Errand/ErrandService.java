@@ -20,9 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
-import static main.ErrandData.ErrandDataService.getCompletedPointsByErrandId;
-import static main.Location.LocationService.getListOfRealAddresses;
-
 @Service
 public class ErrandService {
     private final ErrandRepository repository;
@@ -169,6 +166,7 @@ public class ErrandService {
         Map<String, Object> response = new HashMap<String, Object>();
         if (!getByErrandId(errandId).isPresent()) throw new IllegalStateException("Errand with that id does not exist");
         else {
+            //dodac usuwanie lokalizacji plannedRoute i allLocations
             repository.deleteById(errandId);
             response.put("status", "SUCCESS");
             response.put("message", "Errand deleted!");

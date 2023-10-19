@@ -93,7 +93,7 @@ public class Errand {
         this.plannedRoute = newRoute;
     }
 
-    public void setPlannedRoute(String plannedRoute){
+    public void setPlannedRouteAsString(String plannedRoute){
         this.plannedRoute = plannedRoute;
     }
 }
