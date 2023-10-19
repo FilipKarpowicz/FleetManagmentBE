@@ -42,7 +42,7 @@ public class ErrandService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Driver with that ID does not exist");
         if (!isCarIdValid(errand.getCarId()))
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Car with that ID does not exist");
-        System.out.println(errand.getPlannedRouteAsString());
+        System.out.println(errand.getPlannedRoute());
         repository.save(errand);
         errandDataService.generateNewDataRecord(errand);
         Map<String, Object> response = new HashMap<String, Object>();
@@ -97,7 +97,7 @@ public class ErrandService {
             else throw new ResponseStatusException(HttpStatus.CONFLICT, "Driver ID is invalid");
         }
         if(newRoute != null) {
-            if(isRouteValid(newRoute))  manipulatedErrand.setPlannedRouteAsString(newRoute);
+            if(isRouteValid(newRoute))  manipulatedErrand.setPlannedRoute(newRoute);
             else throw new ResponseStatusException(HttpStatus.CONFLICT, "Route is invalid");
         }
     }
