@@ -1,15 +1,19 @@
 package main.Location;
 
+import io.swagger.models.auth.In;
 import jakarta.transaction.Transactional;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.PrecisionModel;
+import org.locationtech.jts.geom.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.sql.Timestamp;
+import java.util.stream.Collectors;
+
+import static java.lang.Integer.parseInt;
 
 @Service
 public class LocationService {
@@ -26,9 +30,13 @@ public class LocationService {
         return repository.findById(locationId);
     }
 
-    public Long addNewLocation(Location location){
-        Location savedLocation = repository.save(location);
-        return savedLocation.getLocationId();
+    public ResponseEntity<Object> addNewLocation(Location location) {
+        repository.save(location);
+        Map<String, Object> response = new HashMap<String, Object>();
+        response.put("status", "SUCCESS");
+        response.put("message", "Point added!");
+        response.put("pointId", location.getLocationId());
+        return new ResponseEntity<Object>(response, HttpStatus.OK);
     }
 
     List<Location> findAll(Integer batchNumber){
@@ -75,5 +83,27 @@ public class LocationService {
         }
 
         return listOfRealAddresses;
+    }
+
+    public ResponseEntity<Object> findLocationList(String route) {
+        Map<String, Object> response = new HashMap<String, Object>();
+        String[] list = route.split("-");
+        List<Location> data = new ArrayList<Location>();
+        for (int i = 0; i < list.length; i++) {
+            Long id = Long.parseLong(list[i]);
+            Optional<Location> temp = repository.findById(id);
+            if(temp.isPresent()){
+                data.add(temp.get());
+            }else{
+
+                response.put("status", "ERROR");
+                response.put("message", "Location does not exist");
+                response.put("locationId", list[i]);
+                return new ResponseEntity<Object>(response, HttpStatus.NOT_EXTENDED);
+            }
+        }
+        response.put("status", "SUCCES");
+        response.put("data", data);
+        return new ResponseEntity<Object>(response,HttpStatus.OK);
     }
 }

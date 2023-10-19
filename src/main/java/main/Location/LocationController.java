@@ -1,6 +1,7 @@
 package main.Location;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -22,14 +23,19 @@ public class LocationController {
         return service.getByLocationId(locationId);
     }
 
+    @GetMapping(path = "GetErrandLocations")
+    ResponseEntity<Object> getLocationList(@RequestParam(name = "route") String route){
+        return service.findLocationList(route);
+    }
+
     @GetMapping(path = "GetAll")
     List<Location> getAll(@RequestParam(name = "batchNumber") Integer batchNumber){
         return service.findAll(batchNumber);
     }
 
     @PostMapping(path = "Add")
-    void addNewLocation(@RequestBody Location location){
-        service.addNewLocation(location);
+    public ResponseEntity<Object> addNewLocation(@RequestBody Location location){
+        return service.addNewLocation(location);
     }
 
     @PutMapping(path = "Update/{LocationId}")

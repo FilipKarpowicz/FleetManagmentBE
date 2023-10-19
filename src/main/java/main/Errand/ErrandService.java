@@ -20,6 +20,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
+import static main.ErrandData.ErrandDataService.getCompletedPointsByErrandId;
+import static main.Location.LocationService.getListOfRealAddresses;
+
 @Service
 public class ErrandService {
     private final ErrandRepository repository;
@@ -37,13 +40,21 @@ public class ErrandService {
         this.locationService = locationService;
     }
 
-    public void addNewErrand(Errand errand){
-        if(!isDrvIdValid(errand.getDrvId())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Driver with that ID does not exist");
-        else if(!isCarIdValid(errand.getCarId())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Car with that ID does not exist");
-        else{
-            repository.save(errand);
-            errandDataService.generateNewDataRecord(errand);
-        }
+    public ResponseEntity<Object> addNewErrand(Errand errand) {
+        if (!isDrvIdValid(errand.getDrvId()))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Driver with that ID does not exist");
+        if (!isCarIdValid(errand.getCarId()))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Car with that ID does not exist");
+        System.out.println(errand.getPlannedRouteAsString());
+        repository.save(errand);
+        errandDataService.generateNewDataRecord(errand);
+        Map<String, Object> response = new HashMap<String, Object>();
+        response.put("status", "SUCCESS");
+        response.put("message", "Errand added!");
+        response.put("plannedRoute", errand.getErrandId());
+        return new ResponseEntity<Object>(response, HttpStatus.OK);
+
+
     }
 
     List<Errand> getByDrvId(Long drvId){
@@ -154,10 +165,15 @@ public class ErrandService {
         }
     }
 
-    public void deleteErrandById(Long errandId) {
+    public ResponseEntity<Object> deleteErrandById(Long errandId) {
+        Map<String, Object> response = new HashMap<String, Object>();
         if (!getByErrandId(errandId).isPresent()) throw new IllegalStateException("Errand with that id does not exist");
         else {
             repository.deleteById(errandId);
+            response.put("status", "SUCCESS");
+            response.put("message", "Errand deleted!");
+            return new ResponseEntity<Object>(response, HttpStatus.OK);
+            //ErrandDataService.deleteDataById(errandId);   //usuwanie jest niepotrzebne. Jak usuwa sie obiekt klasy Errand, to ErrandData od razu jest usuwane
         }
     }
 }
