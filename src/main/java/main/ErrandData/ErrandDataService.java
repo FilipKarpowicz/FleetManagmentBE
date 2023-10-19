@@ -9,27 +9,17 @@ import java.util.Optional;
 
 @Service
 public class ErrandDataService {
-    private static ErrandDataRepository repository;
+    private final ErrandDataRepository repository;
 
     public ErrandDataService(ErrandDataRepository repository) {
         this.repository = repository;
     }
 
-    public static Optional<ErrandData> getByErrandId(Long errandId){
+    public Optional<ErrandData> getByErrandId(Long errandId){
         return repository.findById(errandId);
     }
 
-    public static Integer getCompletedPointsByErrandId(Long errandId){
-        ErrandData errandData = getByErrandId(errandId).get();
-        return errandData.getCompletedPoints();
-    }
-
-    public static void deleteDataById(Long errandId){
-        if(!getByErrandId(errandId).isPresent()) throw new IllegalStateException("Errand data with that ID does not exist");
-        else repository.deleteById(errandId);
-    }
-
-    public static void generateNewDataRecord(Errand errand){
+    public void generateNewDataRecord(Errand errand){
         ErrandData errandData = new ErrandData();
         errandData.setErrand(errand);
         repository.save(errandData);

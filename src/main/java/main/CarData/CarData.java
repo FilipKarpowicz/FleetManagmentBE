@@ -1,5 +1,6 @@
 package main.CarData;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import main.Car.Car;
 
@@ -7,30 +8,30 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table
+//@JsonIgnoreProperties(value = "car")
 public class CarData {
     @Id
     @Column(name = "car_id")
     private Long id;
-    private Double avgEnergyConsumption;
     private Double overallMileage;
     private Integer battSoc;
     private Integer battSoh;
-    private LocalDateTime lastUpdate;
-    private Integer remainingRange;
+    private Integer battNominalCapacity;   //Ah
+    private LocalDateTime lastUpdate;   //UTC
     private Long lastLocation;  //locationId
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "car_id")
     private Car car;
 
-    public CarData(Double overallMileage, Integer battSoc, Integer battSoh, LocalDateTime lastUpdate, Integer remainingRange, Long lastLocation, Car car){
+    public CarData(Double overallMileage, Integer battSoc, Integer battSoh, Integer battNominalCapacity, LocalDateTime lastUpdate, Long lastLocation, Car car){
         this.overallMileage = overallMileage;
         this.battSoc = battSoc;
         this.battSoh = battSoh;
         this.lastUpdate = lastUpdate;
-        this.remainingRange = remainingRange;
         this.lastLocation = lastLocation;
         this.car = car;
+        this.battNominalCapacity = battNominalCapacity;
     }
 
     public CarData(Car car) {
@@ -46,14 +47,6 @@ public class CarData {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Double getAvgEnergyConsumption() {
-        return avgEnergyConsumption;
-    }
-
-    public void setAvgEnergyConsumption(Double avgEnergyConsumption) {
-        this.avgEnergyConsumption = avgEnergyConsumption;
     }
 
     public Double getOverallMileage() {
@@ -88,14 +81,6 @@ public class CarData {
         this.lastUpdate = lastUpdate;
     }
 
-    public Integer getRemainingRange() {
-        return remainingRange;
-    }
-
-    public void setRemainingRange(Integer remainingRange) {
-        this.remainingRange = remainingRange;
-    }
-
     public Long getLastLocation() {
         return lastLocation;
     }
@@ -110,5 +95,13 @@ public class CarData {
 
     public void setCar(Car car) {
         this.car = car;
+    }
+
+    public Integer getBattNominalCapacity() {
+        return battNominalCapacity;
+    }
+
+    public void setBattNominalCapacity(Integer battNominalCapacity) {
+        this.battNominalCapacity = battNominalCapacity;
     }
 }

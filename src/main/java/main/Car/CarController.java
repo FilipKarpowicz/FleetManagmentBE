@@ -60,7 +60,7 @@ public class CarController {
 
     @DeleteMapping(path = "delete")
     public void deleteCar(@RequestParam("carId") Long carId){
-         carService.deleteCar(carId);
+        carService.deleteCar(carId);
     }
 
     @PutMapping(path = "update")

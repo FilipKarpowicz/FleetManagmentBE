@@ -3,6 +3,7 @@ package main.Location;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +11,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping(path = "api/Location")
 public class LocationController {
-    public final LocationService service;
+    private final LocationService service;
 
     public LocationController(LocationService service) {
         this.service = service;
@@ -33,7 +34,7 @@ public class LocationController {
 
     @PutMapping(path = "Update/{LocationId}")
     void updateLocation(@PathVariable(name = "LocationId") Long locationId,
-                        @RequestParam(name = "ArrivalTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ") Date arrivalTime,
+                        @RequestParam(name = "ArrivalTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ") LocalDateTime arrivalTime,
                         @RequestParam(name = "RealAddress", required = false) String realAddress){
         service.updateLocation(locationId, arrivalTime, realAddress);
     }

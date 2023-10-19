@@ -4,6 +4,11 @@ import jakarta.persistence.*;
 import main.Errand.Errand;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import main.ErrandData.ErrandStatus;
 
 @Entity
@@ -13,14 +18,15 @@ public class ErrandData {
     @Column(name = "errand_id")
     private Long id;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ErrandStatus errandStatus;
-    private LocalDateTime errandStartedTimestamp;
-    private LocalDateTime errandFinishedTimestamp;
-    private LocalDateTime errandDrivingTime;
-    private Double errandMileage;
-    private Double avgEnergyConsumption;
-    private Double avgSpeed;
-    private Integer completedPoints;
+    private LocalDateTime errandStartedTimestamp;   //UTC
+    private LocalDateTime errandLastTimestamp;  //UTC
+    private Double errandStartedMileage;
+    private Double errandLastMileage;
+    private Double errandStartedBatteryEnergy;
+    private Double errandLastBatteryEnergy;
     private String allLocations;    //"16-32-24-8-45"
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -28,16 +34,15 @@ public class ErrandData {
     @JoinColumn(name = "errand_id")
     private Errand errand;
 
-    public ErrandData(Long id, ErrandStatus errandStatus, LocalDateTime errandStartedTimestamp, LocalDateTime errandFinishedTimestamp, LocalDateTime errandDrivingTime, Double errandMileage, Double avgEnergyConsumption, Double avgSpeed, Integer completedPoints, String allLocations, Errand errand) {
+    public ErrandData(Long id, ErrandStatus errandStatus, LocalDateTime errandStartedTimestamp, LocalDateTime errandLastTimestamp, Double errandStartedMileage, Double errandLastMileage, Double errandStartedBatteryEnergy, Double errandLastBatteryEnergy, String allLocations, Errand errand) {
         this.id = id;
         this.errandStatus = errandStatus;
         this.errandStartedTimestamp = errandStartedTimestamp;
-        this.errandFinishedTimestamp = errandFinishedTimestamp;
-        this.errandDrivingTime = errandDrivingTime;
-        this.errandMileage = errandMileage;
-        this.avgEnergyConsumption = avgEnergyConsumption;
-        this.avgSpeed = avgSpeed;
-        this.completedPoints = completedPoints;
+        this.errandLastTimestamp = errandLastTimestamp;
+        this.errandStartedMileage = errandStartedMileage;
+        this.errandLastMileage = errandLastMileage;
+        this.errandStartedBatteryEnergy = errandStartedBatteryEnergy;
+        this.errandLastBatteryEnergy = errandLastBatteryEnergy;
         this.allLocations = allLocations;
         this.errand = errand;
     }
@@ -69,52 +74,44 @@ public class ErrandData {
         this.errandStartedTimestamp = errandStartedTimestamp;
     }
 
-    public LocalDateTime getErrandFinishedTimestamp() {
-        return errandFinishedTimestamp;
+    public LocalDateTime getErrandLastTimestamp() {
+        return errandLastTimestamp;
     }
 
-    public void setErrandFinishedTimestamp(LocalDateTime errandFinishedTimestamp) {
-        this.errandFinishedTimestamp = errandFinishedTimestamp;
+    public void setErrandLastTimestamp(LocalDateTime errandLastTimestamp) {
+        this.errandLastTimestamp = errandLastTimestamp;
     }
 
-    public LocalDateTime getErrandDrivingTime() {
-        return errandDrivingTime;
+    public Double getErrandStartedMileage() {
+        return errandStartedMileage;
     }
 
-    public void setErrandDrivingTime(LocalDateTime errandDrivingTime) {
-        this.errandDrivingTime = errandDrivingTime;
+    public void setErrandStartedMileage(Double errandStartedMileage) {
+        this.errandStartedMileage = errandStartedMileage;
     }
 
-    public Double getErrandMileage() {
-        return errandMileage;
+    public Double getErrandLastMileage() {
+        return errandLastMileage;
     }
 
-    public void setErrandMileage(Double errandMileage) {
-        this.errandMileage = errandMileage;
+    public void setErrandLastMileage(Double errandLastMileage) {
+        this.errandLastMileage = errandLastMileage;
     }
 
-    public Double getAvgEnergyConsumption() {
-        return avgEnergyConsumption;
+    public Double getErrandStartedBatteryEnergy() {
+        return errandStartedBatteryEnergy;
     }
 
-    public void setAvgEnergyConsumption(Double avgEnergyConsumption) {
-        this.avgEnergyConsumption = avgEnergyConsumption;
+    public void setErrandStartedBatteryEnergy(Double errandStartedBatteryEnergy) {
+        this.errandStartedBatteryEnergy = errandStartedBatteryEnergy;
     }
 
-    public Double getAvgSpeed() {
-        return avgSpeed;
+    public Double getErrandLastBatteryEnergy() {
+        return errandLastBatteryEnergy;
     }
 
-    public void setAvgSpeed(Double avgSpeed) {
-        this.avgSpeed = avgSpeed;
-    }
-
-    public Integer getCompletedPoints() {
-        return completedPoints;
-    }
-
-    public void setCompletedPoints(Integer completedPoints) {
-        this.completedPoints = completedPoints;
+    public void setErrandLastBatteryEnergy(Double errandLastBatteryEnergy) {
+        this.errandLastBatteryEnergy = errandLastBatteryEnergy;
     }
 
     public String getAllLocations() {

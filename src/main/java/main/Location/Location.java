@@ -3,7 +3,7 @@ package main.Location;
 import jakarta.persistence.*;
 import org.locationtech.jts.geom.Point;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table
@@ -22,12 +22,9 @@ public class Location {
     @Column(columnDefinition = "geography")
     private Point point;
     private String realAddress;
+    private LocalDateTime arrivalTime;   //UTC
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date arrivalTime;   //UTC
-
-    public Location(Long locationId, Point point, String realAddress, Date arrivalTime) {
-        this.locationId = locationId;
+    public Location(Point point, String realAddress, LocalDateTime arrivalTime) {
         this.point = point;
         this.realAddress = realAddress;
         this.arrivalTime = arrivalTime;
@@ -60,11 +57,11 @@ public class Location {
         this.realAddress = realAddress;
     }
 
-    public Date getArrivalTime() {
+    public LocalDateTime getArrivalTime() {
         return arrivalTime;
     }
 
-    public void setArrivalTime(Date arrivalTime) {
+    public void setArrivalTime(LocalDateTime arrivalTime) {
         this.arrivalTime = arrivalTime;
     }
 

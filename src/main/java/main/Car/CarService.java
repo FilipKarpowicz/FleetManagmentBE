@@ -2,6 +2,7 @@ package main.Car;
 
 
 
+import main.CarData.CarData;
 import main.CarData.CarDataService;
 import main.Driver.Driver;
 import main.Driver.DriverService;
@@ -16,17 +17,16 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.*;
 
-import static main.ErrandData.ErrandDataService.getCompletedPointsByErrandId;
-import static main.Location.LocationService.getListOfRealAddresses;
-
 @Service
 public class CarService {
 
-    public static CarRepository carRepository;
+    private final CarRepository carRepository;
+    private CarDataService carDataService;
 
     @Autowired
-    public CarService(CarRepository carRepository) {
+    public CarService(CarRepository carRepository, CarDataService carDataService) {
         this.carRepository = carRepository;
+        this.carDataService = carDataService;
     }
 
     private List<Car> calculateBatch(Integer batchNumber,List<Car> table){
@@ -48,7 +48,7 @@ public class CarService {
         return calculateBatch(batchNumber, table);
     }
 
-    public static Optional<Car> getCarById(Long carId){
+    public Optional<Car> getCarById(Long carId){
         return carRepository.findCarByCarId(carId);
     }
 
@@ -168,7 +168,7 @@ public class CarService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Car with plate number " + car.getPlateNo() + " already exist");
             } else {
                 carRepository.save(car);
-                CarDataService.createNewCarDataRecord(car);
+                carDataService.createNewCarDataRecord(car);
                 throw new ResponseStatusException(HttpStatus.CREATED, "The car was saved");
             }
         }
@@ -182,7 +182,6 @@ public class CarService {
         }
         else {
             carRepository.deleteById(carId);
-            //CarDataService.deleteCarDataRecord(carId);
         }
     }
 

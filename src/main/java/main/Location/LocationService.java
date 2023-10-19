@@ -1,20 +1,19 @@
 package main.Location;
 
-import io.swagger.models.auth.In;
 import jakarta.transaction.Transactional;
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.util.*;
-import java.sql.Timestamp;
-import java.util.stream.Collectors;
-
-import static java.lang.Integer.parseInt;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class LocationService {
-    public static LocationRepository repository;
+    private final LocationRepository repository;
 
     //WGS-84 SRID
     private final GeometryFactory factory = new GeometryFactory(new PrecisionModel(), 4326);
@@ -23,12 +22,13 @@ public class LocationService {
         this.repository = repository;
     }
 
-    public static Optional<Location> getByLocationId(Long locationId){
+    public Optional<Location> getByLocationId(Long locationId){
         return repository.findById(locationId);
     }
 
-    void addNewLocation(Location location){
-        repository.save(location);
+    public Long addNewLocation(Location location){
+        Location savedLocation = repository.save(location);
+        return savedLocation.getLocationId();
     }
 
     List<Location> findAll(Integer batchNumber){
@@ -47,7 +47,7 @@ public class LocationService {
     }
 
     @Transactional
-    public void updateLocation(Long locationId, Date arrivalTime, String realAddress){
+    public void updateLocation(Long locationId, LocalDateTime arrivalTime, String realAddress){
         Location manipulatedLocation = getByLocationId(locationId).orElseThrow(
                 () -> new IllegalStateException("Location with that id does not exist")
         );
@@ -66,7 +66,7 @@ public class LocationService {
         else throw new IllegalStateException("Location with that id does not exist");
     }
 
-    public static List<String> getListOfRealAddresses(List<Long> plannedRoute){ //list of locationId
+    public List<String> getListOfRealAddresses(List<Long> plannedRoute){ //list of locationId
         List<String> listOfRealAddresses = new ArrayList<String>();
 
         for (Long locationId : plannedRoute){

@@ -11,6 +11,7 @@ import main.Location.Location;
 import main.Location.LocationService;
 import org.h2.util.json.JSONArray;
 import org.h2.util.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,15 +20,21 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
-import static main.ErrandData.ErrandDataService.getCompletedPointsByErrandId;
-import static main.Location.LocationService.getListOfRealAddresses;
-
 @Service
 public class ErrandService {
     private final ErrandRepository repository;
+    private CarService carService;
+    private DriverService driverService;
+    private ErrandDataService errandDataService;
+    private LocationService locationService;
 
-    public ErrandService(ErrandRepository repository) {
+    @Autowired
+    public ErrandService(ErrandRepository repository, CarService carService, DriverService driverService, ErrandDataService errandDataService, LocationService locationService) {
         this.repository = repository;
+        this.carService = carService;
+        this.driverService = driverService;
+        this.errandDataService = errandDataService;
+        this.locationService = locationService;
     }
 
     public void addNewErrand(Errand errand){
@@ -35,7 +42,7 @@ public class ErrandService {
         else if(!isCarIdValid(errand.getCarId())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Car with that ID does not exist");
         else{
             repository.save(errand);
-            ErrandDataService.generateNewDataRecord(errand);
+            errandDataService.generateNewDataRecord(errand);
         }
     }
 
@@ -56,19 +63,19 @@ public class ErrandService {
         Boolean routeValid = true;
         for(String locationIdString : stringRoute){
             Long locationId = Long.parseLong(locationIdString);
-            Optional<Location> checkedLocation = LocationService.getByLocationId(locationId);
+            Optional<Location> checkedLocation = locationService.getByLocationId(locationId);
             routeValid = checkedLocation.isPresent();
         }
         return routeValid;
     }
 
     private Boolean isDrvIdValid(Long drvId){
-        Optional<Driver> checkedDriver = DriverService.getDriverById(drvId);
+        Optional<Driver> checkedDriver = driverService.getDriverById(drvId);
         return checkedDriver.isPresent();
     }
 
     private Boolean isCarIdValid(Long carId){
-        Optional<Car> checkedCar = CarService.getCarById(carId);
+        Optional<Car> checkedCar = carService.getCarById(carId);
         return checkedCar.isPresent();
     }
 
@@ -102,8 +109,8 @@ public class ErrandService {
         if(modelPart == null)   modelPart = "";
 
         for(Errand errand : allErrands){
-            Car car = CarService.getCarById(errand.getCarId()).orElse(null);
-            Driver driver = DriverService.getDriverById(errand.getDrvId()).orElse(null);
+            Car car = carService.getCarById(errand.getCarId()).orElse(null);
+            Driver driver = driverService.getDriverById(errand.getDrvId()).orElse(null);
 
             if(car != null && driver != null) {
                 Boolean errandMatchesSearch = false;
@@ -135,8 +142,7 @@ public class ErrandService {
             for(Errand errand : responseErrandList){
                 Map<String, Object> singleErrandFields = new HashMap<String, Object>();
                 singleErrandFields.put("errand", errand);
-                singleErrandFields.put("realAddressList", getListOfRealAddresses(errand.getPlannedRouteAsList()));
-                singleErrandFields.put("completedPoints", getCompletedPointsByErrandId(errand.getErrandId()));
+                singleErrandFields.put("realAddressList", locationService.getListOfRealAddresses(errand.getPlannedRouteAsList()));
                 listOfErrands.add(singleErrandFields);
             }
             response.put("errands", listOfErrands);
@@ -152,7 +158,6 @@ public class ErrandService {
         if (!getByErrandId(errandId).isPresent()) throw new IllegalStateException("Errand with that id does not exist");
         else {
             repository.deleteById(errandId);
-            //ErrandDataService.deleteDataById(errandId);   //usuwanie jest niepotrzebne. Jak usuwa sie obiekt klasy Errand, to ErrandData od razu jest usuwane
         }
     }
 }

@@ -1,5 +1,6 @@
 package main.Car;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import main.CarData.CarData;
 
@@ -26,7 +27,6 @@ public class Car {
     private String type;
     private String comment;
     private LocalDate serviceDate;
-
     private Long serviceMileage;
 
     @OneToOne(mappedBy = "car", cascade = CascadeType.ALL)

@@ -1,5 +1,6 @@
 package main.CarData;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -7,16 +8,11 @@ import java.util.Optional;
 @RestController
 @RequestMapping(path = "CarData")
 public class CarDataController {
-    public static CarDataService service;
+    private final CarDataService service;
 
+    @Autowired
     public CarDataController(CarDataService service) {
         this.service = service;
-    }
-
-    @PutMapping(path = "Update/{carId}")
-    void editCarData(@PathVariable(name = "carId") Long carId,
-                     @RequestParam(required = true) Double overallMileage){
-        service.editCarData(carId, overallMileage);
     }
 
     @GetMapping(path = "Get/{carId}")
