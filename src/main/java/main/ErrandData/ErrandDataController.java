@@ -1,6 +1,7 @@
 package main.ErrandData;
 
 import main.Errand.Errand;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,8 +17,8 @@ public class ErrandDataController {
     }
 
     @GetMapping(path = "Get/{errandId}")
-    public Optional<ErrandData> getErrandDataById(@PathVariable(name = "errandId") Long errandId){
-        return service.getByErrandId(errandId);
+    public ResponseEntity<Object> getErrandDataById(@PathVariable(name = "errandId") Long errandId){
+        return service.getCalculatedDataByErrandId(errandId);
     }
 
     @PutMapping(path = "ChangeStatus/{errandId}")

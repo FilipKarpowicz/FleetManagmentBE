@@ -186,7 +186,7 @@ public class CarService {
     }
 
     @Transactional
-    public void updateCar(Long carId, String make, String model, String vin, String plateNo,String type,String comment,LocalDate serviceDate, Long serviceMileage) {
+    public void updateCar(Long carId, String make, String model, String vin, String plateNo,String type,String comment,LocalDate serviceDate, Long serviceMileage, Double battNominalCapacity) {
         Car carById = carRepository.findById(carId).orElseThrow(
                 () -> new IllegalStateException("Car with id " + carId + " does not exist")
         );
@@ -225,6 +225,10 @@ public class CarService {
         }
         if(serviceMileage != null && !Objects.equals(carById.getServiceMileage(),serviceMileage)){
             carById.setServiceMileage(serviceMileage);
+            modifyFlag = 1;
+        }
+        if(battNominalCapacity != null && !Objects.equals(carById.getBattNominalCapacity(), battNominalCapacity)){
+            carById.setBattNominalCapacity(battNominalCapacity);
             modifyFlag = 1;
         }
 

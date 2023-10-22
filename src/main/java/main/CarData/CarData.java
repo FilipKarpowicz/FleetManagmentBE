@@ -16,7 +16,7 @@ public class CarData {
     private Double overallMileage;
     private Integer battSoc;
     private Integer battSoh;
-    private Integer battNominalCapacity;   //Ah
+    private Double battVoltage;
     private LocalDateTime lastUpdate;   //UTC
     private Long lastLocation;  //locationId
     @OneToOne(fetch = FetchType.LAZY)
@@ -24,14 +24,14 @@ public class CarData {
     @JoinColumn(name = "car_id")
     private Car car;
 
-    public CarData(Double overallMileage, Integer battSoc, Integer battSoh, Integer battNominalCapacity, LocalDateTime lastUpdate, Long lastLocation, Car car){
+    public CarData(Double overallMileage, Integer battSoc, Integer battSoh, Double battVoltage, LocalDateTime lastUpdate, Long lastLocation, Car car){
         this.overallMileage = overallMileage;
         this.battSoc = battSoc;
         this.battSoh = battSoh;
+        this.battVoltage = battVoltage;
         this.lastUpdate = lastUpdate;
         this.lastLocation = lastLocation;
         this.car = car;
-        this.battNominalCapacity = battNominalCapacity;
     }
 
     public CarData(Car car) {
@@ -97,11 +97,11 @@ public class CarData {
         this.car = car;
     }
 
-    public Integer getBattNominalCapacity() {
-        return battNominalCapacity;
+    public Double getBattVoltage() {
+        return battVoltage;
     }
 
-    public void setBattNominalCapacity(Integer battNominalCapacity) {
-        this.battNominalCapacity = battNominalCapacity;
+    public void setBattVoltage(Double battVoltage) {
+        this.battVoltage = battVoltage;
     }
 }

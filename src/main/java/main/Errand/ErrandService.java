@@ -5,6 +5,7 @@ import main.Car.CarService;
 import main.Driver.Driver;
 import main.Driver.DriverService;
 import main.ErrandData.ErrandData;
+import main.ErrandData.ErrandDataRepository;
 import main.ErrandData.ErrandDataService;
 import main.ErrandData.ErrandStatus;
 import main.Location.Location;
@@ -25,16 +26,17 @@ public class ErrandService {
     private final ErrandRepository repository;
     private CarService carService;
     private DriverService driverService;
-    private ErrandDataService errandDataService;
     private LocationService locationService;
 
+    private ErrandDataRepository errandDataRepository;
+
     @Autowired
-    public ErrandService(ErrandRepository repository, CarService carService, DriverService driverService, ErrandDataService errandDataService, LocationService locationService) {
+    public ErrandService(ErrandRepository repository, CarService carService, DriverService driverService, LocationService locationService, ErrandDataRepository errandDataRepository) {
         this.repository = repository;
         this.carService = carService;
         this.driverService = driverService;
-        this.errandDataService = errandDataService;
         this.locationService = locationService;
+        this.errandDataRepository = errandDataRepository;
     }
 
     public ResponseEntity<Object> addNewErrand(Errand errand) {
@@ -44,7 +46,7 @@ public class ErrandService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Car with that ID does not exist");
         System.out.println(errand.getPlannedRoute());
         repository.save(errand);
-        errandDataService.generateNewDataRecord(errand);
+        generateNewDataRecord(errand);
         Map<String, Object> response = new HashMap<String, Object>();
         response.put("status", "SUCCESS");
         response.put("message", "Errand added!");
@@ -62,7 +64,7 @@ public class ErrandService {
         return repository.findByCarId(carId);
     }
 
-    Optional<Errand> getByErrandId(Long errandId){
+    public Optional<Errand> getByErrandId(Long errandId){
         return repository.findByErrandId(errandId);
     }
 
@@ -100,6 +102,13 @@ public class ErrandService {
             if(isRouteValid(newRoute))  manipulatedErrand.setPlannedRoute(newRoute);
             else throw new ResponseStatusException(HttpStatus.CONFLICT, "Route is invalid");
         }
+    }
+
+    private void generateNewDataRecord(Errand errand){
+        ErrandData errandData = new ErrandData();
+        errandData.setErrand(errand);
+        errandData.setErrandStatus(ErrandStatus.WAITING);
+        errandDataRepository.save(errandData);
     }
 
     public List<Errand> getAll() {

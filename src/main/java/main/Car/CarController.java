@@ -73,8 +73,9 @@ public class CarController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String comment,
             @RequestParam(required = false) LocalDate serviceDate,
-            @RequestParam(required = false) Long serviceMileage){
-            carService.updateCar(carId,make,model,vin,plateNo,type,comment,serviceDate,serviceMileage);
+            @RequestParam(required = false) Long serviceMileage,
+            @RequestParam(required = false) Double battNominalCapacity){
+            carService.updateCar(carId,make,model,vin,plateNo,type,comment,serviceDate,serviceMileage, battNominalCapacity);
     }
 
     @GetMapping(path = "searchCars")
