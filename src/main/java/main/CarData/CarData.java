@@ -19,12 +19,13 @@ public class CarData {
     private Double battVoltage;
     private LocalDateTime lastUpdate;   //UTC
     private Long lastLocation;  //locationId
+    private Double lastErrandAvgEnergyConsumption;
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "car_id")
     private Car car;
 
-    public CarData(Double overallMileage, Integer battSoc, Integer battSoh, Double battVoltage, LocalDateTime lastUpdate, Long lastLocation, Car car){
+    public CarData(Double overallMileage, Integer battSoc, Integer battSoh, Double battVoltage, LocalDateTime lastUpdate, Long lastLocation, Car car, Double lastErrandAvgEnergyConsumption){
         this.overallMileage = overallMileage;
         this.battSoc = battSoc;
         this.battSoh = battSoh;
@@ -32,6 +33,7 @@ public class CarData {
         this.lastUpdate = lastUpdate;
         this.lastLocation = lastLocation;
         this.car = car;
+        this.lastErrandAvgEnergyConsumption = lastErrandAvgEnergyConsumption;
     }
 
     public CarData(Car car) {
@@ -103,5 +105,13 @@ public class CarData {
 
     public void setBattVoltage(Double battVoltage) {
         this.battVoltage = battVoltage;
+    }
+
+    public Double getLastErrandAvgEnergyConsumption() {
+        return lastErrandAvgEnergyConsumption;
+    }
+
+    public void setLastErrandAvgEnergyConsumption(Double lastErrandAvgEnergyConsumption) {
+        this.lastErrandAvgEnergyConsumption = lastErrandAvgEnergyConsumption;
     }
 }

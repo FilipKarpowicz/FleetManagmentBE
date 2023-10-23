@@ -60,7 +60,7 @@ public class ErrandService {
         return repository.findByDrvId(drvId);
     }
 
-    List<Errand> getByCarId(Long carId){
+    public List<Errand> getByCarId(Long carId){
         return repository.findByCarId(carId);
     }
 

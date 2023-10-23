@@ -1,6 +1,7 @@
 package main.CarData;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -16,8 +17,8 @@ public class CarDataController {
     }
 
     @GetMapping(path = "Get/{carId}")
-    public Optional<CarData> getCarDataById(@PathVariable(name = "carId") Long carId){
-        return service.getByCarId(carId);
+    public ResponseEntity<Object> getCarDataById(@PathVariable(name = "carId") Long carId){
+        return service.getResponse(carId);
     }
 
 }

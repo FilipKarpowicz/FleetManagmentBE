@@ -3,6 +3,7 @@ package main.Car;
 
 
 import main.CarData.CarData;
+import main.CarData.CarDataRepository;
 import main.CarData.CarDataService;
 import main.Driver.Driver;
 import main.Driver.DriverService;
@@ -21,12 +22,12 @@ import java.util.*;
 public class CarService {
 
     private final CarRepository carRepository;
-    private CarDataService carDataService;
+    private CarDataRepository carDataRepository;
 
     @Autowired
-    public CarService(CarRepository carRepository, CarDataService carDataService) {
+    public CarService(CarRepository carRepository, CarDataRepository carDataRepository) {
         this.carRepository = carRepository;
-        this.carDataService = carDataService;
+        this.carDataRepository = carDataRepository;
     }
 
     private List<Car> calculateBatch(Integer batchNumber,List<Car> table){
@@ -168,11 +169,17 @@ public class CarService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Car with plate number " + car.getPlateNo() + " already exist");
             } else {
                 carRepository.save(car);
-                carDataService.createNewCarDataRecord(car);
+                createNewCarDataRecord(car);
                 throw new ResponseStatusException(HttpStatus.CREATED, "The car was saved");
             }
         }
             else throw new ResponseStatusException(HttpStatus.CONFLICT, "Please fill in all required fields");
+    }
+
+    private void createNewCarDataRecord(Car car){
+        CarData carData = new CarData(car);
+        car.setCarData(carData);
+        carDataRepository.save(carData);
     }
 
     public void deleteCar(Long carId) {
@@ -277,6 +284,12 @@ public class CarService {
 
         if(matchedCars.isEmpty())    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No results found");
         else {
+            Collections.sort(matchedCars, new Comparator<Car>() {
+                public int compare(Car o1, Car o2) {
+                    // compare two instance of `Car` and return `int` as result.
+                    return o1.getCarId().compareTo(o2.getCarId());
+                }
+            });
             Integer startIndex = batchNumber * 10 - 10;
             Integer endIndex = batchNumber * 10;
             if (matchedCars.size() > startIndex + endIndex && matchedCars.size() > startIndex) {
