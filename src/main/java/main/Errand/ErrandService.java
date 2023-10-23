@@ -160,6 +160,7 @@ public class ErrandService {
                 Map<String, Object> singleErrandFields = new HashMap<String, Object>();
                 singleErrandFields.put("errand", errand);
                 singleErrandFields.put("realAddressList", locationService.getListOfRealAddresses(errand.getPlannedRouteAsList()));
+                singleErrandFields.put("errandStatus", errandDataRepository.findById(errand.getErrandId()).get().getErrandStatus());
                 listOfErrands.add(singleErrandFields);
             }
             response.put("errands", listOfErrands);

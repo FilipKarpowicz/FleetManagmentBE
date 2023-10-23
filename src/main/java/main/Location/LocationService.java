@@ -102,7 +102,7 @@ public class LocationService {
                 return new ResponseEntity<Object>(response, HttpStatus.NOT_EXTENDED);
             }
         }
-        response.put("status", "SUCCES");
+        response.put("status", "SUCCESS");
         response.put("data", data);
         return new ResponseEntity<Object>(response,HttpStatus.OK);
     }
