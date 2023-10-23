@@ -64,7 +64,7 @@ public class ErrandService {
         return repository.findByCarId(carId);
     }
 
-    public Optional<Errand> getByErrandId(Long errandId){
+    public Optional<Errand> getByErrandId(String errandId){
         return repository.findByErrandId(errandId);
     }
 
@@ -90,7 +90,7 @@ public class ErrandService {
     }
 
     @Transactional
-    public void editErrand(Long errandId, Long carId, Long drvId, String newRoute){
+    public void editErrand(String errandId, Long carId, Long drvId, String newRoute){
         Errand manipulatedErrand = getByErrandId(errandId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.CONFLICT, "Errand with that id does not exist")
         );
@@ -172,7 +172,7 @@ public class ErrandService {
         }
     }
 
-    public ResponseEntity<Object> deleteErrandById(Long errandId) {
+    public ResponseEntity<Object> deleteErrandById(String errandId) {
         Map<String, Object> response = new HashMap<String, Object>();
         if (!getByErrandId(errandId).isPresent()) throw new IllegalStateException("Errand with that id does not exist");
         else {

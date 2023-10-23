@@ -16,7 +16,7 @@ import main.ErrandData.ErrandStatus;
 public class ErrandData {
     @Id
     @Column(name = "errand_id")
-    private Long id;
+    private String id;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -34,7 +34,7 @@ public class ErrandData {
     @JoinColumn(name = "errand_id")
     private Errand errand;
 
-    public ErrandData(Long id, ErrandStatus errandStatus, LocalDateTime errandStartedTimestamp, LocalDateTime errandLastTimestamp, Double errandStartedMileage, Double errandLastMileage, Double errandStartedBatteryEnergy, Double errandLastBatteryEnergy, String allLocations, Errand errand) {
+    public ErrandData(String id, ErrandStatus errandStatus, LocalDateTime errandStartedTimestamp, LocalDateTime errandLastTimestamp, Double errandStartedMileage, Double errandLastMileage, Double errandStartedBatteryEnergy, Double errandLastBatteryEnergy, String allLocations, Errand errand) {
         this.id = id;
         this.errandStatus = errandStatus;
         this.errandStartedTimestamp = errandStartedTimestamp;
@@ -50,11 +50,11 @@ public class ErrandData {
     public ErrandData() {
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

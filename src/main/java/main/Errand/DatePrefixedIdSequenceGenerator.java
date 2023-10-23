@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.util.Properties;
 
 public class DatePrefixedIdSequenceGenerator extends SequenceStyleGenerator {
+
     public static final String DATE_FORMAT_PARAMETER = "dateFormat";
     public static final String DATE_FORMAT_DEFAULT = "%tY-%tm";
 
@@ -36,8 +37,8 @@ public class DatePrefixedIdSequenceGenerator extends SequenceStyleGenerator {
                           ServiceRegistry serviceRegistry) throws MappingException {
         super.configure(new TypeConfiguration().getBasicTypeRegistry().getRegisteredType(Long.class), params, serviceRegistry);
 
-        String dateFormat = ConfigurationHelper.getString(DATE_FORMAT_PARAMETER, params, DATE_FORMAT_DEFAULT).replace("%", "%1");
-        String numberFormat = ConfigurationHelper.getString(NUMBER_FORMAT_PARAMETER, params, NUMBER_FORMAT_DEFAULT).replace("%", "%2");
+        String dateFormat = ConfigurationHelper.getString(DATE_FORMAT_PARAMETER, params, DATE_FORMAT_DEFAULT).replace("%", "%1$");
+        String numberFormat = ConfigurationHelper.getString(NUMBER_FORMAT_PARAMETER, params, NUMBER_FORMAT_DEFAULT).replace("%", "%2$");
         String dateNumberSeparator = ConfigurationHelper.getString(DATE_NUMBER_SEPARATOR_PARAMETER, params, DATE_NUMBER_SEPARATOR_DEFAULT);
         this.format = dateFormat+dateNumberSeparator+numberFormat;
     }

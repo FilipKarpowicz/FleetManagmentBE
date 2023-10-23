@@ -45,8 +45,8 @@ public class CarDataService {
                 () -> new IllegalStateException("car with that id does not exist")
         );
 
-        Double battEnergy = car.getBattNominalCapacity() * (carData.getBattSoh()/100) * (carData.getBattSoc()/100) * carData.getBattVoltage();
-        Long activeErrandId = errandDataService.getActiveErrandDataForCarId(carId);
+        Double battEnergy = car.getBattNominalCapacity() * ((double) carData.getBattSoh()/100) * ((double) carData.getBattSoc()/100) * carData.getBattVoltage();
+        String activeErrandId = errandDataService.getActiveErrandDataForCarId(carId);
         Double remainingRange = null;
         if(activeErrandId != null) {
             remainingRange = battEnergy / errandDataService.calculateErrandAvgEnergyConsumption(activeErrandId);

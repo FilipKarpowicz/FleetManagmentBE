@@ -17,12 +17,12 @@ public class ErrandDataController {
     }
 
     @GetMapping(path = "Get/{errandId}")
-    public ResponseEntity<Object> getErrandDataById(@PathVariable(name = "errandId") Long errandId){
+    public ResponseEntity<Object> getErrandDataById(@PathVariable(name = "errandId") String errandId){
         return service.getCalculatedDataByErrandId(errandId);
     }
 
     @PutMapping(path = "ChangeStatus/{errandId}")
-    public void changeErrandStatus(@PathVariable(name = "errandId") Long errandId,
+    public void changeErrandStatus(@PathVariable(name = "errandId") String errandId,
                                    @RequestParam(name = "newStatus") ErrandStatus newStatus){
         service.changeErrandStatus(errandId, newStatus);
     }

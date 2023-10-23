@@ -38,7 +38,7 @@ public class ErrandDataService {
         this.carDataRepository = carDataRepository;
     }
 
-    public ResponseEntity<Object> getCalculatedDataByErrandId(Long errandId){
+    public ResponseEntity<Object> getCalculatedDataByErrandId(String errandId){
         Map<String, Object> response = new HashMap<String, Object>();
         Optional<ErrandData> maybeErrandData = repository.findById(errandId);
 
@@ -94,7 +94,7 @@ public class ErrandDataService {
         else return new BigDecimal(value).setScale(places, RoundingMode.HALF_UP).doubleValue();
     }
 
-    public Double calculateErrandAvgEnergyConsumption(Long errandId){
+    public Double calculateErrandAvgEnergyConsumption(String errandId){
         ErrandData errandData = getByErrandId(errandId).orElseThrow(
                 () -> new IllegalStateException("errand data with that id does not exist")
         );
@@ -108,7 +108,7 @@ public class ErrandDataService {
         else return null;
     }
 
-    public String caluclateErrandDrivingTime(Long errandId){
+    public String caluclateErrandDrivingTime(String errandId){
         ErrandData errandData = getByErrandId(errandId).orElseThrow(
                 () -> new IllegalStateException("errand data with that id does not exist")
         );
@@ -121,36 +121,39 @@ public class ErrandDataService {
         else return null;
     }
 
-    private Optional<ErrandData> getByErrandId(Long errandId){
+    private Optional<ErrandData> getByErrandId(String errandId){
         return repository.findById(errandId);
     }
 
     @Transactional
-    public void changeErrandStatus(Long errandId, ErrandStatus newStatus){
+    public void changeErrandStatus(String errandId, ErrandStatus newStatus){
         Optional<ErrandData> maybeManipulatedRecord = getByErrandId(errandId);
         Optional<Errand> maybeErrand = errandService.getByErrandId(errandId);
         if(maybeManipulatedRecord.isPresent() && maybeErrand.isPresent()){
             ErrandData manipulatedRecord = maybeManipulatedRecord.get();
             Errand errand = maybeErrand.get();
-            if(newStatus == ErrandStatus.IN_PROGRESS) {
-                Optional<Car> maybeCar = carService.getCarById(errand.getCarId());
-                Optional<CarData> maybeCarData = carDataRepository.findById(errand.getCarId());
-                if (maybeCar.isPresent() && maybeCarData.isPresent()) {
-                    CarData carData = maybeCarData.get();
-                    Car car = maybeCar.get();
-                    manipulatedRecord.setErrandStartedTimestamp(LocalDateTime.now());
-                    manipulatedRecord.setErrandStartedMileage(carData.getOverallMileage());
-                    manipulatedRecord.setErrandStartedBatteryEnergy(car.getBattNominalCapacity()*(carData.getBattSoh()/100)*(carData.getBattSoc()/100)*carData.getBattVoltage());
-                }
-                else{
-                    throw new IllegalStateException("Car data for that errand is corrupted");
-                }
+            if(newStatus == manipulatedRecord.getErrandStatus()){
+                throw new IllegalStateException("Status has not been changed");
             }
-            else if(newStatus == ErrandStatus.FINISHED) {
-                Double errandAvgEnergyConsumption = calculateErrandAvgEnergyConsumption(errandId);
-                if(errandAvgEnergyConsumption!=null) editCarData(errand.getCarId(), errandAvgEnergyConsumption);
+            else {
+                if (newStatus == ErrandStatus.IN_PROGRESS) {
+                    Optional<Car> maybeCar = carService.getCarById(errand.getCarId());
+                    Optional<CarData> maybeCarData = carDataRepository.findById(errand.getCarId());
+                    if (maybeCar.isPresent() && maybeCarData.isPresent()) {
+                        CarData carData = maybeCarData.get();
+                        Car car = maybeCar.get();
+                        manipulatedRecord.setErrandStartedTimestamp(LocalDateTime.now());
+                        manipulatedRecord.setErrandStartedMileage(carData.getOverallMileage());
+                        manipulatedRecord.setErrandStartedBatteryEnergy(car.getBattNominalCapacity() * ((double) carData.getBattSoh() / 100) * ((double) carData.getBattSoc() / 100) * carData.getBattVoltage());
+                    } else {
+                        throw new IllegalStateException("Car data for that errand is corrupted");
+                    }
+                } else if (newStatus == ErrandStatus.FINISHED) {
+                    Double errandAvgEnergyConsumption = calculateErrandAvgEnergyConsumption(errandId);
+                    if (errandAvgEnergyConsumption != null) editCarData(errand.getCarId(), errandAvgEnergyConsumption);
+                }
+                manipulatedRecord.setErrandStatus(newStatus);
             }
-            manipulatedRecord.setErrandStatus(newStatus);
         }
         else throw new IllegalStateException("Errand data with that ID does not exist");
     }
@@ -179,7 +182,7 @@ public class ErrandDataService {
         }
     }
 
-    public Long getActiveErrandDataForCarId(Long carId){
+    public String getActiveErrandDataForCarId(Long carId){
         Optional<ErrandData> activeErrandData = null;
         List<Errand> carErrandList = errandService.getByCarId(carId);
 
