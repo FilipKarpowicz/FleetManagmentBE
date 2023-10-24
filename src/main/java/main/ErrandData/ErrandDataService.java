@@ -126,7 +126,8 @@ public class ErrandDataService {
     }
 
     @Transactional
-    public void changeErrandStatus(Long errandId, ErrandStatus newStatus){
+    public ResponseEntity<Object> changeErrandStatus(Long errandId, ErrandStatus newStatus){
+        Map<String, Object> response = new HashMap<String, Object>();
         Optional<ErrandData> maybeManipulatedRecord = getByErrandId(errandId);
         Optional<Errand> maybeErrand = errandService.getByErrandId(errandId);
         if(maybeManipulatedRecord.isPresent() && maybeErrand.isPresent()){
@@ -141,18 +142,27 @@ public class ErrandDataService {
                     manipulatedRecord.setErrandStartedTimestamp(LocalDateTime.now());
                     manipulatedRecord.setErrandStartedMileage(carData.getOverallMileage());
                     manipulatedRecord.setErrandStartedBatteryEnergy(car.getBattNominalCapacity()*(carData.getBattSoh()/100)*(carData.getBattSoc()/100)*carData.getBattVoltage());
+                    response.put("status","SUCCESS");
+                    response.put("message","status changed to IN_PROGRESS");
                 }
                 else{
-                    throw new IllegalStateException("Car data for that errand is corrupted");
+                    response.put("status","ERROR");
+                    response.put("message","Car data for that errand is corrupted");
                 }
             }
             else if(newStatus == ErrandStatus.FINISHED) {
                 Double errandAvgEnergyConsumption = calculateErrandAvgEnergyConsumption(errandId);
                 if(errandAvgEnergyConsumption!=null) editCarData(errand.getCarId(), errandAvgEnergyConsumption);
+                response.put("status","SUCCESS");
+                response.put("message","status changed to IN_PROGRESS");
             }
             manipulatedRecord.setErrandStatus(newStatus);
         }
-        else throw new IllegalStateException("Errand data with that ID does not exist");
+        else{
+            response.put("status","ERROR");
+            response.put("message","Errand data with that ID does not exist");
+        }
+        return new ResponseEntity<Object>(response, HttpStatus.OK);
     }
 
     @Transactional

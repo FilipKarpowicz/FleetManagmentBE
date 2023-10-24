@@ -22,9 +22,9 @@ public class ErrandDataController {
     }
 
     @PutMapping(path = "ChangeStatus/{errandId}")
-    public void changeErrandStatus(@PathVariable(name = "errandId") Long errandId,
+    public ResponseEntity<Object> changeErrandStatus(@PathVariable(name = "errandId") Long errandId,
                                    @RequestParam(name = "newStatus") ErrandStatus newStatus){
-        service.changeErrandStatus(errandId, newStatus);
+        return service.changeErrandStatus(errandId, newStatus);
     }
 
     @GetMapping(path = "GetAll")
