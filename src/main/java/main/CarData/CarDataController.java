@@ -16,8 +16,8 @@ public class CarDataController {
         this.service = service;
     }
 
-    @GetMapping(path = "Get/{carId}")
-    public ResponseEntity<Object> getCarDataById(@PathVariable(name = "carId") Long carId){
+    @GetMapping(path = "Get")
+    public ResponseEntity<Object> getCarDataById(@RequestParam(name = "carId") Long carId){
         return service.getResponse(carId);
     }
 

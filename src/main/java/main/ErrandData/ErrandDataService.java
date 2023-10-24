@@ -67,6 +67,7 @@ public class ErrandDataService {
 
             response.put("errandMileage", roundPlaces(errandMileage, 2));
             response.put("errandDrivingTime", errandDrivingTimeString);
+            response.put("errandStartedTimestamp", errandData.getErrandStartedTimestamp());
             response.put("avgSpeed", roundPlaces(avgSpeed, 2));
             response.put("avgEnergyConsumption", roundPlaces(avgEnergyConsumption, 2));
             response.put("message", "Data calculated successfully");

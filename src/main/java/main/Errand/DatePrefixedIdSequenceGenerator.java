@@ -2,7 +2,12 @@ package main.Errand;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
+import org.hibernate.boot.model.naming.Identifier;
+import org.hibernate.boot.model.relational.*;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.jdbc.env.spi.IdentifierHelper;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.id.enhanced.OptimizerFactory;
 import org.hibernate.id.enhanced.SequenceStyleGenerator;
 import org.hibernate.internal.util.config.ConfigurationHelper;
 import org.hibernate.service.ServiceRegistry;
@@ -14,6 +19,17 @@ import java.time.LocalDate;
 import java.util.Properties;
 
 public class DatePrefixedIdSequenceGenerator extends SequenceStyleGenerator {
+
+    private static int cycle = 0;
+    private int instanceCycle = cycle;
+
+    private Type configure_type = null;
+    private Properties configure_params = null;
+    private ServiceRegistry configure_serviceRegistry = null;
+
+    private Database registerExportables_database = null;
+
+    private SqlStringGenerationContext initialize_context = null;
 
     public static final String DATE_FORMAT_PARAMETER = "dateFormat";
     public static final String DATE_FORMAT_DEFAULT = "%tY-%tm";
@@ -29,17 +45,43 @@ public class DatePrefixedIdSequenceGenerator extends SequenceStyleGenerator {
     @Override
     public Serializable generate(SharedSessionContractImplementor session,
                                  Object object) throws HibernateException {
+//        if(instanceCycle != cycle){
+//            super.configure(configure_type, configure_params, configure_serviceRegistry);
+//            super.registerExportables(registerExportables_database);
+//            super.initialize(initialize_context);
+//            instanceCycle = cycle;
+//        }
         return String.format(format, LocalDate.now(), super.generate(session, object));
     }
 
     @Override
     public void configure(Type type, Properties params,
                           ServiceRegistry serviceRegistry) throws MappingException {
-        super.configure(new TypeConfiguration().getBasicTypeRegistry().getRegisteredType(Long.class), params, serviceRegistry);
+        configure_type = new TypeConfiguration().getBasicTypeRegistry().getRegisteredType(Long.class);
+        configure_params = params;
+        configure_serviceRegistry = serviceRegistry;
+        super.configure(configure_type, configure_params, configure_serviceRegistry);
 
         String dateFormat = ConfigurationHelper.getString(DATE_FORMAT_PARAMETER, params, DATE_FORMAT_DEFAULT).replace("%", "%1$");
         String numberFormat = ConfigurationHelper.getString(NUMBER_FORMAT_PARAMETER, params, NUMBER_FORMAT_DEFAULT).replace("%", "%2$");
         String dateNumberSeparator = ConfigurationHelper.getString(DATE_NUMBER_SEPARATOR_PARAMETER, params, DATE_NUMBER_SEPARATOR_DEFAULT);
         this.format = dateFormat+dateNumberSeparator+numberFormat;
     }
+
+//    @Override
+//    public void registerExportables(Database database){
+//        registerExportables_database = database;
+//        super.registerExportables(registerExportables_database);
+//    }
+//
+//    @Override
+//    public void initialize(SqlStringGenerationContext context){
+//        initialize_context = context;
+//        super.initialize(initialize_context);
+//    }
+//
+//    public static void resetAllInstances(){
+//        cycle++;
+//        System.out.println(cycle);
+//    }
 }
