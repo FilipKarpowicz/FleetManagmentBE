@@ -1,5 +1,6 @@
 package main.ErrandData;
 
+import main.Errand.DatePrefixedIdSequenceGenerator;
 import main.Errand.Errand;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +17,8 @@ public class ErrandDataController {
         this.service = service;
     }
 
-    @GetMapping(path = "Get/{errandId}")
-    public ResponseEntity<Object> getErrandDataById(@PathVariable(name = "errandId") Long errandId){
+    @GetMapping(path = "Get")
+    public ResponseEntity<Object> getErrandDataById(@RequestParam(name = "errandId") String errandId){
         return service.getCalculatedDataByErrandId(errandId);
     }
 

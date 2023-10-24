@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import main.ErrandData.ErrandData;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.h2.util.json.JSONObject;
-import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+import main.Errand.DatePrefixedIdSequenceGenerator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,17 +17,23 @@ import java.util.stream.Collectors;
 @Table
 public class Errand {
     @Id
-    @SequenceGenerator(
-            name = "errand_sequence",
-            sequenceName = "errand_sequence",
-            allocationSize = 1
-    )
+//    @SequenceGenerator(
+//            name = "errand_sequence",
+//            sequenceName = "errand_sequence",
+//            allocationSize = 1
+//    )
     @GeneratedValue(
-            strategy = GenerationType.IDENTITY,
+//            strategy = GenerationType.IDENTITY,
+            strategy = GenerationType.SEQUENCE,
             generator = "errand_sequence"
     )
+    @GenericGenerator(
+            name = "errand_sequence",
+            strategy = "main.Errand.DatePrefixedIdSequenceGenerator",
+            parameters = {@Parameter(name = DatePrefixedIdSequenceGenerator.INCREMENT_PARAM, value = "1")}
+    )
     @NotNull
-    private Long errandId;
+    private String errandId;
 
     @NotNull
     private Long carId;
@@ -38,7 +46,7 @@ public class Errand {
     @PrimaryKeyJoinColumn
     private ErrandData errandData;
 
-    public Errand(Long errandId, Long carId, Long drvId, String plannedRoute, ErrandData errandData) {
+    public Errand(String errandId, Long carId, Long drvId, String plannedRoute, ErrandData errandData) {
         this.errandId = errandId;
         this.carId = carId;
         this.drvId = drvId;
@@ -49,11 +57,11 @@ public class Errand {
     public Errand() {
     }
 
-    public Long getErrandId() {
+    public String getErrandId() {
         return errandId;
     }
 
-    public void setErrandId(Long errandId) {
+    public void setErrandId(String errandId) {
         this.errandId = errandId;
     }
 

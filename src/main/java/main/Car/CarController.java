@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "**")
@@ -45,6 +46,11 @@ public class CarController {
     @GetMapping(path = "FindCarsByServiceDate")
     List<Car> findCarsByServiceDate(@RequestParam Integer batchNumber,@RequestParam(required = false) Integer day,@RequestParam(required = false) Integer month, @RequestParam(required = false) Integer year){
         return carService.findCarsByServiceDate(batchNumber, day, month, year);
+    }
+
+    @GetMapping(path = "GetById")
+    Optional<Car> getCarById(@RequestParam(name = "carId") Long carId){
+        return carService.getCarById(carId);
     }
 
 

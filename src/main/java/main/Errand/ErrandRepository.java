@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ErrandRepository extends JpaRepository<Errand, Long> {
+public interface ErrandRepository extends JpaRepository<Errand, String> {
     @Query("FROM Errand as errand WHERE errand.drvId=?1")
     List<Errand> findByDrvId(Long drvId);
 
@@ -16,7 +16,7 @@ public interface ErrandRepository extends JpaRepository<Errand, Long> {
     List<Errand> findByCarId(Long carId);
 
     @Query("FROM Errand as errand WHERE errand.errandId=?1")
-    Optional<Errand> findByErrandId(Long errandId);
+    Optional<Errand> findByErrandId(String errandId);
 
 //    @Query("FROM Errand as errand WHERE errand.")
 //    List<Errand> searchErrands(String namePart, String lastNamePart, String makePart, String modelPart);

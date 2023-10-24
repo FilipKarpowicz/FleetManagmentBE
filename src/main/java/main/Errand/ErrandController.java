@@ -37,7 +37,7 @@ public class ErrandController {
 
 
     @PutMapping(path = "EditErrand/{errandId}")
-    public void editErrand(@PathVariable("errandId") Long errandId,
+    public void editErrand(@PathVariable("errandId") String errandId,
                                 @RequestParam(required = false) Long carId,
                                 @RequestParam(required = false) Long drvId,
                                 @RequestParam(required = false) String newRoute){   //newRoute=1-2-5-12
@@ -54,7 +54,7 @@ public class ErrandController {
     }
 
     @DeleteMapping(path = "Delete/{ErrandId}")
-    public ResponseEntity<Object> deleteErrand(@PathVariable(name = "ErrandId") Long errandId){
+    public ResponseEntity<Object> deleteErrand(@PathVariable(name = "ErrandId") String errandId){
         return service.deleteErrandById(errandId);
     }
 }

@@ -38,7 +38,7 @@ public class ErrandDataService {
         this.carDataRepository = carDataRepository;
     }
 
-    public ResponseEntity<Object> getCalculatedDataByErrandId(Long errandId){
+    public ResponseEntity<Object> getCalculatedDataByErrandId(String errandId){
         Map<String, Object> response = new HashMap<String, Object>();
         Optional<ErrandData> maybeErrandData = repository.findById(errandId);
 
@@ -67,6 +67,7 @@ public class ErrandDataService {
 
             response.put("errandMileage", roundPlaces(errandMileage, 2));
             response.put("errandDrivingTime", errandDrivingTimeString);
+            response.put("errandStartedTimestamp", errandData.getErrandStartedTimestamp());
             response.put("avgSpeed", roundPlaces(avgSpeed, 2));
             response.put("avgEnergyConsumption", roundPlaces(avgEnergyConsumption, 2));
             response.put("message", "Data calculated successfully");
@@ -94,7 +95,7 @@ public class ErrandDataService {
         else return new BigDecimal(value).setScale(places, RoundingMode.HALF_UP).doubleValue();
     }
 
-    public Double calculateErrandAvgEnergyConsumption(Long errandId){
+    public Double calculateErrandAvgEnergyConsumption(String errandId){
         ErrandData errandData = getByErrandId(errandId).orElseThrow(
                 () -> new IllegalStateException("errand data with that id does not exist")
         );
@@ -108,7 +109,7 @@ public class ErrandDataService {
         else return null;
     }
 
-    public String caluclateErrandDrivingTime(Long errandId){
+    public String caluclateErrandDrivingTime(String errandId){
         ErrandData errandData = getByErrandId(errandId).orElseThrow(
                 () -> new IllegalStateException("errand data with that id does not exist")
         );
@@ -121,7 +122,7 @@ public class ErrandDataService {
         else return null;
     }
 
-    private Optional<ErrandData> getByErrandId(Long errandId){
+    private Optional<ErrandData> getByErrandId(String errandId){
         return repository.findById(errandId);
     }
 
@@ -189,7 +190,7 @@ public class ErrandDataService {
         }
     }
 
-    public Long getActiveErrandDataForCarId(Long carId){
+    public String getActiveErrandDataForCarId(Long carId){
         Optional<ErrandData> activeErrandData = null;
         List<Errand> carErrandList = errandService.getByCarId(carId);
 
