@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +41,21 @@ public class DriverService {
 
     public Optional<Driver> getDriverById(Long drvId) {
         return driverRepository.findById(drvId);
+    }
+
+    public ResponseEntity<Object> getById(Long drvId){
+        Map<String, Object> response = new HashMap<String, Object>();
+        Optional<Driver> driver = driverRepository.findById(drvId);
+
+        if(driver.isEmpty()){
+            response.put("message", "Driver with that ID does not exist");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        else{
+            response.put("data", driver.get());
+            response.put("message", "Driver succesfully found");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
     }
 
 

@@ -78,6 +78,9 @@ public class DriverController {
     }
 
 
-
+    @GetMapping(path="Driver/GetById")
+    public ResponseEntity<Object> getById(@RequestParam(name = "drvId") Long drvId){
+        return driverService.getById(drvId);
+    }
 
 }
