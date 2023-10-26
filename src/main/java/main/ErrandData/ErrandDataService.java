@@ -127,7 +127,7 @@ public class ErrandDataService {
     }
 
     @Transactional
-    public ResponseEntity<Object> changeErrandStatus(Long errandId, ErrandStatus newStatus){
+    public ResponseEntity<Object> changeErrandStatus(String errandId, ErrandStatus newStatus){
         Map<String, Object> response = new HashMap<String, Object>();
         Optional<ErrandData> maybeManipulatedRecord = getByErrandId(errandId);
         Optional<Errand> maybeErrand = errandService.getByErrandId(errandId);
