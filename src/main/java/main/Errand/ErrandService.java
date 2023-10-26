@@ -184,4 +184,6 @@ public class ErrandService {
             //ErrandDataService.deleteDataById(errandId);   //usuwanie jest niepotrzebne. Jak usuwa sie obiekt klasy Errand, to ErrandData od razu jest usuwane
         }
     }
+
+
 }

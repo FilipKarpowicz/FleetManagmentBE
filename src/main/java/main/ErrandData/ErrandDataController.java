@@ -32,4 +32,9 @@ public class ErrandDataController {
     public List<ErrandData> getAll(@RequestParam(name = "batchNumber") Integer batchNumber){
         return service.getAll(batchNumber);
     }
+
+    @GetMapping(path = "getRoute")
+    public ResponseEntity<Object> findRoute(@RequestParam String errandId){
+        return service.findRoute(errandId);
+    }
 }
