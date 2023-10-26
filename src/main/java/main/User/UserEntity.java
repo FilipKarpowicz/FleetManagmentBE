@@ -23,8 +23,18 @@ public class UserEntity {
 
     private String Name;
 
-    public UserEntity(){
+    private String token;
 
+    public UserEntity() {
+
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public Long getUserId() {
@@ -75,6 +85,7 @@ public class UserEntity {
                 ", password='" + password + '\'' +
                 ", privilege='" + privilege + '\'' +
                 ", Name='" + Name + '\'' +
+                ", token='" + token + '\'' +
                 '}';
     }
 }

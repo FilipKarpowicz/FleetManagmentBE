@@ -6,8 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 public class UserController {
@@ -30,8 +29,8 @@ public class UserController {
     }
 
     @GetMapping(path = "login")
-    public Optional<UserEntity> login(@RequestParam("login") String login, @RequestParam("password") String password) {
-        return userService.loginUser(login, password);
+    public ResponseEntity<Object> login(@RequestParam("login") String login, @RequestParam("password") String password) {
+        return userService.loginUser(login,password);
     }
 
 

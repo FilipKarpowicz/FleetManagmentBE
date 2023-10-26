@@ -127,36 +127,43 @@ public class ErrandDataService {
     }
 
     @Transactional
-    public void changeErrandStatus(String errandId, ErrandStatus newStatus){
+    public ResponseEntity<Object> changeErrandStatus(String errandId, ErrandStatus newStatus){
+        Map<String, Object> response = new HashMap<String, Object>();
         Optional<ErrandData> maybeManipulatedRecord = getByErrandId(errandId);
         Optional<Errand> maybeErrand = errandService.getByErrandId(errandId);
         if(maybeManipulatedRecord.isPresent() && maybeErrand.isPresent()){
             ErrandData manipulatedRecord = maybeManipulatedRecord.get();
             Errand errand = maybeErrand.get();
-            if(newStatus == manipulatedRecord.getErrandStatus()){
-                throw new IllegalStateException("Status has not been changed");
-            }
-            else {
-                if (newStatus == ErrandStatus.IN_PROGRESS) {
-                    Optional<Car> maybeCar = carService.getCarById(errand.getCarId());
-                    Optional<CarData> maybeCarData = carDataRepository.findById(errand.getCarId());
-                    if (maybeCar.isPresent() && maybeCarData.isPresent()) {
-                        CarData carData = maybeCarData.get();
-                        Car car = maybeCar.get();
-                        manipulatedRecord.setErrandStartedTimestamp(LocalDateTime.now());
-                        manipulatedRecord.setErrandStartedMileage(carData.getOverallMileage());
-                        manipulatedRecord.setErrandStartedBatteryEnergy(car.getBattNominalCapacity() * ((double) carData.getBattSoh() / 100) * ((double) carData.getBattSoc() / 100) * carData.getBattVoltage());
-                    } else {
-                        throw new IllegalStateException("Car data for that errand is corrupted");
-                    }
-                } else if (newStatus == ErrandStatus.FINISHED) {
-                    Double errandAvgEnergyConsumption = calculateErrandAvgEnergyConsumption(errandId);
-                    if (errandAvgEnergyConsumption != null) editCarData(errand.getCarId(), errandAvgEnergyConsumption);
+            if(newStatus == ErrandStatus.IN_PROGRESS) {
+                Optional<Car> maybeCar = carService.getCarById(errand.getCarId());
+                Optional<CarData> maybeCarData = carDataRepository.findById(errand.getCarId());
+                if (maybeCar.isPresent() && maybeCarData.isPresent()) {
+                    CarData carData = maybeCarData.get();
+                    Car car = maybeCar.get();
+                    manipulatedRecord.setErrandStartedTimestamp(LocalDateTime.now());
+                    manipulatedRecord.setErrandStartedMileage(carData.getOverallMileage());
+                    manipulatedRecord.setErrandStartedBatteryEnergy(car.getBattNominalCapacity()*(carData.getBattSoh()/100)*(carData.getBattSoc()/100)*carData.getBattVoltage());
+                    response.put("status","SUCCESS");
+                    response.put("message","status changed to IN_PROGRESS");
                 }
-                manipulatedRecord.setErrandStatus(newStatus);
+                else{
+                    response.put("status","ERROR");
+                    response.put("message","Car data for that errand is corrupted");
+                }
             }
+            else if(newStatus == ErrandStatus.FINISHED) {
+                Double errandAvgEnergyConsumption = calculateErrandAvgEnergyConsumption(errandId);
+                if(errandAvgEnergyConsumption!=null) editCarData(errand.getCarId(), errandAvgEnergyConsumption);
+                response.put("status","SUCCESS");
+                response.put("message","status changed to IN_PROGRESS");
+            }
+            manipulatedRecord.setErrandStatus(newStatus);
         }
-        else throw new IllegalStateException("Errand data with that ID does not exist");
+        else{
+            response.put("status","ERROR");
+            response.put("message","Errand data with that ID does not exist");
+        }
+        return new ResponseEntity<Object>(response, HttpStatus.OK);
     }
 
     @Transactional

@@ -5,11 +5,11 @@ import main.Errand.Errand;
 import main.Errand.ErrandRepository;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -21,8 +21,32 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public Optional<UserEntity> loginUser(String login, String password) {
-        return userRepository.loginUser(login, password);
+    public ResponseEntity<Object> loginUser(String login, String password) {
+        Map<String, Object> response = new HashMap<String, Object>();
+        Optional<UserEntity> optionalUserEntity = userRepository.loginUser(login, password);
+        if(optionalUserEntity.isPresent()){
+            int leftLimit = 48; // numeral '0'
+            int rightLimit = 122; // letter 'z'
+            int targetStringLength = 10;
+            Random random = new Random();
+            String generatedString = random.ints(leftLimit, rightLimit + 1)
+                    .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+                    .limit(targetStringLength)
+                    .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                    .toString();
+            UserEntity newUser = optionalUserEntity.get();
+            newUser.setToken(generatedString);
+            userRepository.save(newUser);
+            response.put("token",generatedString);
+            response.put("privilege",newUser.getPrivilege());
+            response.put("name",newUser.getName());
+            response.put("status","SUCCESS");
+            response.put("message","Login succeed");
+        }else {
+            response.put("status","ERROR");
+            response.put("message","User does not exist");
+        }
+        return new ResponseEntity<Object>(response, HttpStatus.OK);
     }
 
     public List<UserEntity> getUsers() {
