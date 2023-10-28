@@ -60,17 +60,17 @@ public class CarController {
     }
 
     @PostMapping(path = "add")
-    public void registerNewCar(@RequestBody Car car){
-        carService.addNewCar(car);
+    public ResponseEntity<Object> registerNewCar(@RequestBody Car car){
+        return carService.addNewCar(car);
     }
 
     @DeleteMapping(path = "delete")
-    public void deleteCar(@RequestParam("carId") Long carId){
-        carService.deleteCar(carId);
+    public ResponseEntity<Object> deleteCar(@RequestParam("carId") Long carId){
+        return carService.deleteCar(carId);
     }
 
     @PutMapping(path = "update")
-    public void updateCar(
+    public ResponseEntity<Object> updateCar(
             @RequestParam(required = true, name = "carId") Long carId,
             @RequestParam(required = false) String make,
             @RequestParam(required = false) String model,
@@ -80,8 +80,9 @@ public class CarController {
             @RequestParam(required = false) String comment,
             @RequestParam(required = false) LocalDate serviceDate,
             @RequestParam(required = false) Long serviceMileage,
-            @RequestParam(required = false) Double battNominalCapacity){
-            carService.updateCar(carId,make,model,vin,plateNo,type,comment,serviceDate,serviceMileage, battNominalCapacity);
+            @RequestParam(required = false) Double battNominalCapacity,
+            @RequestParam(required = false) String devId){
+            return carService.updateCar(carId,make,model,vin,plateNo,type,comment,serviceDate,serviceMileage, battNominalCapacity, devId);
     }
 
     @GetMapping(path = "searchCars")

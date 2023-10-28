@@ -29,6 +29,7 @@ public class Car {
     private LocalDate serviceDate;
     private Long serviceMileage;
     private Double battNominalCapacity;   //Ah
+    private String devId;
 
     @OneToOne(mappedBy = "car", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
@@ -53,7 +54,7 @@ public class Car {
                 '}';
     }
 
-    public Car(String make, String model, String vin, String plateNo, String type, String comment, LocalDate serviceDate, Long serviceMileage, Double battNominalCapacity) {
+    public Car(String make, String model, String vin, String plateNo, String type, String comment, LocalDate serviceDate, Long serviceMileage, Double battNominalCapacity, String devId) {
         this.make = make;
         this.model = model;
         this.vin = vin;
@@ -63,6 +64,7 @@ public class Car {
         this.serviceDate = serviceDate;
         this.serviceMileage = serviceMileage;
         this.battNominalCapacity = battNominalCapacity;
+        this.devId = devId;
     }
 
     public Long getCarId() {
@@ -147,5 +149,13 @@ public class Car {
 
     public void setBattNominalCapacity(Double battNominalCapacity) {
         this.battNominalCapacity = battNominalCapacity;
+    }
+
+    public String getDevId() {
+        return devId;
+    }
+
+    public void setDevId(String devId) {
+        this.devId = devId;
     }
 }

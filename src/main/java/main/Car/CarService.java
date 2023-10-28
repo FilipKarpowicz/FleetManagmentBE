@@ -159,21 +159,36 @@ public class CarService {
         return carRepository.findAll();
     }
 
-    public void addNewCar(Car car) {
-        if(car.getMake() != null && car.getModel() != null && car.getVin() != null && car.getPlateNo() != null && car.getType() != null) {
+    public ResponseEntity<Object> addNewCar(Car car) {
+        Map<String, Object> response = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+
+        if(car.getMake() != null && car.getModel() != null && car.getVin() != null && car.getPlateNo() != null && car.getType() != null && car.getBattNominalCapacity() != null && car.getDevId() != null) {
             Optional<Car> carByVin = carRepository.findCarByVin(car.getVin());
             Optional<Car> carByPlate = carRepository.findCarByPlate(car.getPlateNo());
             if (carByVin.isPresent()) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Car with vin " + car.getVin() + " already exist");
+                response.put("status", "conflict-0001");
+                response.put("message", "Numer VIN" + car.getVin() + "należy już do innego pojazdu w bazie danych");
+                response.put("data", null);
+                return new ResponseEntity<>(response, HttpStatus.OK);
             } else if (carByPlate.isPresent()) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Car with plate number " + car.getPlateNo() + " already exist");
+                response.put("status", "conflict-0002");
+                response.put("message", "Numer rejestracyjny" + car.getPlateNo() + "należy już do innego pojazdu w bazie danych");
+                response.put("data", null);
+                return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
                 carRepository.save(car);
                 createNewCarDataRecord(car);
-                throw new ResponseStatusException(HttpStatus.CREATED, "The car was saved");
+                response.put("status", "success");
+                response.put("message", "Pojazd pomyślnie dodany do bazy");
+                response.put("data", car);
+                return new ResponseEntity<>(response, HttpStatus.OK);
             }
         }
-            else throw new ResponseStatusException(HttpStatus.CONFLICT, "Please fill in all required fields");
+        response.put("status", "conflict-0003");
+        response.put("message", "Proszę uzupełnić wszystkie wymagane pola");
+        response.put("data", null);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     private void createNewCarDataRecord(Car car){
@@ -182,65 +197,90 @@ public class CarService {
         carDataRepository.save(carData);
     }
 
-    public void deleteCar(Long carId) {
+    public ResponseEntity<Object> deleteCar(Long carId) {
+        Map<String, Object> response = new HashMap<>();
         boolean exists = carRepository.existsById(carId);
         if (!exists) {
-            throw new IllegalStateException("Car with id" + carId + "does not exists");
+            response.put("status", "record-not-found-0001");
+            response.put("message", "Pojazd z id" + carId + "nie istnieje w bazie. Operacja nieudana");
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
         else {
             carRepository.deleteById(carId);
+            response.put("status", "success");
+            response.put("message", "Pojazd pomyślnie usunięty");
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
     }
 
     @Transactional
-    public void updateCar(Long carId, String make, String model, String vin, String plateNo,String type,String comment,LocalDate serviceDate, Long serviceMileage, Double battNominalCapacity) {
-        Car carById = carRepository.findById(carId).orElseThrow(
-                () -> new IllegalStateException("Car with id " + carId + " does not exist")
-        );
-        int modifyFlag = 0;
-        List<String> validTypes = Arrays.asList("car","truck");
-        if(make != null && !Objects.equals(carById.getMake(),make)){
-            carById.setMake(make);
-            modifyFlag = 1;
-        }
+    public ResponseEntity<Object> updateCar(Long carId, String make, String model, String vin, String plateNo,String type,String comment,LocalDate serviceDate, Long serviceMileage, Double battNominalCapacity, String devId) {
+        Map<String, Object> response = new HashMap<>();
 
-        if(model != null && !Objects.equals(carById.getModel(),model)){
-            carById.setModel(model);
-            modifyFlag = 1;
+        Optional<Car> maybeCarById = carRepository.findById(carId);
+        if(maybeCarById.isEmpty()){
+            response.put("status", "record-not-found-0002");
+            response.put("message", "Pojazd z id" + carId + "nie istnieje w bazie. Operacja nieudana");
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
+        else {
+            Car carById = maybeCarById.get();
+            int modifyFlag = 0;
+            List<String> validTypes = Arrays.asList("car", "truck");
+            if (make != null && !Objects.equals(carById.getMake(), make)) {
+                carById.setMake(make);
+                modifyFlag = 1;
+            }
 
-        if(vin != null && !Objects.equals(carById.getVin(),vin)){
-            carById.setVin(vin);
-            modifyFlag = 1;
-        }
+            if (model != null && !Objects.equals(carById.getModel(), model)) {
+                carById.setModel(model);
+                modifyFlag = 1;
+            }
 
-        if(plateNo != null && !Objects.equals(carById.getPlateNo(),plateNo)){
-            carById.setPlateNo(plateNo);
-            modifyFlag = 1;
-        }
-        if(type != null && !Objects.equals(carById.getType(),type) && validTypes.contains(type)){
-            carById.setType(type);
-            modifyFlag = 1;
-        }
-        if(comment != null && !Objects.equals(carById.getComment(),comment)){
-            carById.setComment(comment);
-            modifyFlag = 1;
-        }
-        if(serviceDate != null && !Objects.equals(carById.getServiceDate(),serviceDate)){
-            carById.setServiceDate(serviceDate);
-            modifyFlag = 1;
-        }
-        if(serviceMileage != null && !Objects.equals(carById.getServiceMileage(),serviceMileage)){
-            carById.setServiceMileage(serviceMileage);
-            modifyFlag = 1;
-        }
-        if(battNominalCapacity != null && !Objects.equals(carById.getBattNominalCapacity(), battNominalCapacity)){
-            carById.setBattNominalCapacity(battNominalCapacity);
-            modifyFlag = 1;
-        }
+            if (vin != null && !Objects.equals(carById.getVin(), vin)) {
+                carById.setVin(vin);
+                modifyFlag = 1;
+            }
 
-        if(modifyFlag == 0){
-            throw new IllegalStateException("None of values was changed");
+            if (plateNo != null && !Objects.equals(carById.getPlateNo(), plateNo)) {
+                carById.setPlateNo(plateNo);
+                modifyFlag = 1;
+            }
+            if (type != null && !Objects.equals(carById.getType(), type) && validTypes.contains(type)) {
+                carById.setType(type);
+                modifyFlag = 1;
+            }
+            if (comment != null && !Objects.equals(carById.getComment(), comment)) {
+                carById.setComment(comment);
+                modifyFlag = 1;
+            }
+            if (serviceDate != null && !Objects.equals(carById.getServiceDate(), serviceDate)) {
+                carById.setServiceDate(serviceDate);
+                modifyFlag = 1;
+            }
+            if (serviceMileage != null && !Objects.equals(carById.getServiceMileage(), serviceMileage)) {
+                carById.setServiceMileage(serviceMileage);
+                modifyFlag = 1;
+            }
+            if (battNominalCapacity != null && !Objects.equals(carById.getBattNominalCapacity(), battNominalCapacity)) {
+                carById.setBattNominalCapacity(battNominalCapacity);
+                modifyFlag = 1;
+            }
+            if (devId != null && !Objects.equals(carById.getDevId(), devId)) {
+                carById.setDevId(devId);
+                modifyFlag = 1;
+            }
+
+            if (modifyFlag == 0) {
+                response.put("status", "conflict-0004");
+                response.put("message", "Żadna z wartości nie została zmieniona");
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            }
+            else{
+                response.put("status", "success");
+                response.put("message", "Pomyślnie zaktualizowano pojazd");
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            }
         }
 
     }
@@ -249,6 +289,8 @@ public class CarService {
         List<Car> allCars = carRepository.findAll();
         List<Car> matchedCars = new ArrayList<Car>();
         List<Car> responseCarList = new ArrayList<Car>();
+        Map<String, Object> response = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
 
         if(makePart == null)    makePart = "";
         if(modelPart == null)   modelPart = "";
@@ -282,7 +324,12 @@ public class CarService {
             if (carMatchesSearch) matchedCars.add(car);
         }
 
-        if(matchedCars.isEmpty())    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No results found");
+        if(matchedCars.isEmpty()){
+            response.put("status", "success");
+            response.put("message", null);
+            response.put("data", null);
+            return new ResponseEntity<Object>(response, HttpStatus.OK);
+        }
         else {
             Collections.sort(matchedCars, new Comparator<Car>() {
                 public int compare(Car o1, Car o2) {
@@ -297,20 +344,28 @@ public class CarService {
             } else if (matchedCars.size() > startIndex) {
                 responseCarList = matchedCars.subList(startIndex, matchedCars.size());
             } else {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Batch is empty");
+                response.put("status", "empty-0002");
+                response.put("message", "Pakiet danych pusty");
+                response.put("data", null);
+                return new ResponseEntity<Object>(response, HttpStatus.OK);
             }
         }
 
         Integer numberOfBatches = (Integer) (matchedCars.size()/10) + 1;
 
-        Map<String, Object> response = new HashMap<String, Object>();
         try{
-            response.put("cars", matchedCars);
-            response.put("size", numberOfBatches);
+            data.put("cars", matchedCars);
+            data.put("size", numberOfBatches);
+            response.put("status", "success");
+            response.put("message", null);
+            response.put("data", data);
             return new ResponseEntity<Object>(response, HttpStatus.OK);
         }
         catch (Exception e){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown error");
+            response.put("status", "unknown-0002");
+            response.put("message", "Unknown error");
+            response.put("data", null);
+            return new ResponseEntity<Object>(response, HttpStatus.OK);
         }
     }
 }

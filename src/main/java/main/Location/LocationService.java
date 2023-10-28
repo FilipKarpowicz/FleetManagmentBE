@@ -31,11 +31,21 @@ public class LocationService {
     }
 
     public ResponseEntity<Object> addNewLocation(Location location) {
-        repository.save(location);
+        Location newLocation = new Location();
         Map<String, Object> response = new HashMap<String, Object>();
-        response.put("status", "SUCCESS");
-        response.put("message", "Point added!");
-        response.put("pointId", location.getLocationId());
+        Map<String, Object> data = new HashMap<String, Object>();
+        newLocation = repository.save(location);
+
+        if(newLocation.getLocationId() == null){
+            response.put("status", "FAILED");
+            response.put("message", "Unable to add point");
+        }
+        else {
+            data.put("pointId", location.getLocationId());
+            response.put("status", "SUCCESS");
+            response.put("message", "Point added");
+        }
+        response.put("data", data);
         return new ResponseEntity<Object>(response, HttpStatus.OK);
     }
 

@@ -49,7 +49,7 @@ public class ErrandService {
         generateNewDataRecord(errand);
         Map<String, Object> response = new HashMap<String, Object>();
         response.put("status", "SUCCESS");
-        response.put("message", "Errand added!");
+        response.put("message", "Errand added");
         response.put("plannedRoute", errand.getErrandId());
         return new ResponseEntity<Object>(response, HttpStatus.OK);
 
@@ -119,6 +119,8 @@ public class ErrandService {
         List<Errand> allErrands = repository.findAll();
         List<Errand> matchedErrands = new ArrayList<Errand>();
         List<Errand> responseErrandList = new ArrayList<Errand>();
+        Map<String, Object> response = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
 
         if(firstNamePart == null)   firstNamePart = "";
         if(lastNamePart == null)    lastNamePart = "";
@@ -138,7 +140,12 @@ public class ErrandService {
             }
         }
 
-        if(matchedErrands.isEmpty())    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No results found");
+        if(matchedErrands.isEmpty()){
+            response.put("status", "success");
+            response.put("message", null);
+            response.put("data", null);
+            return new ResponseEntity<Object>(response, HttpStatus.OK);
+        }
         else {
             Integer startIndex = batchNumber * 10 - 10;
             Integer endIndex = batchNumber * 10;
@@ -147,13 +154,15 @@ public class ErrandService {
             } else if (matchedErrands.size() > startIndex) {
                 responseErrandList = matchedErrands.subList(startIndex, matchedErrands.size());
             } else {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Batch is empty");
+                response.put("status", "empty-0001");
+                response.put("message", "Pakiet danych pusty");
+                response.put("data", null);
+                return new ResponseEntity<Object>(response, HttpStatus.OK);
             }
         }
 
         Integer numberOfBatches = (Integer) (matchedErrands.size()/10) + 1;
 
-        Map<String, Object> response = new HashMap<String, Object>();
         List<Object> listOfErrands = new ArrayList<Object>();
         try{
             for(Errand errand : responseErrandList){
@@ -163,12 +172,18 @@ public class ErrandService {
                 singleErrandFields.put("errandStatus", errandDataRepository.findById(errand.getErrandId()).get().getErrandStatus());
                 listOfErrands.add(singleErrandFields);
             }
-            response.put("errands", listOfErrands);
-            response.put("size", numberOfBatches);
+            response.put("status", "success");
+            response.put("message", null);
+            data.put("errands", listOfErrands);
+            data.put("size", numberOfBatches);
+            response.put("data", data);
             return new ResponseEntity<Object>(response, HttpStatus.OK);
         }
         catch (Exception e){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown error");
+            response.put("status", "unknown-0001");
+            response.put("message", "Błąd wewnętrzny serwera");
+            response.put("data", null);
+            return new ResponseEntity<Object>(response, HttpStatus.OK);
         }
     }
 
