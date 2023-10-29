@@ -15,7 +15,7 @@ public class Driver {
             allocationSize = 1
     )
     @GeneratedValue(
-            strategy = GenerationType.IDENTITY,
+            strategy = GenerationType.SEQUENCE,
             generator = "driver_sequence"
     )
     private Long drvId;

@@ -40,20 +40,26 @@ public class ErrandService {
     }
 
     public ResponseEntity<Object> addNewErrand(Errand errand) {
-        if (!isDrvIdValid(errand.getDrvId()))
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Driver with that ID does not exist");
-        if (!isCarIdValid(errand.getCarId()))
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Car with that ID does not exist");
-        System.out.println(errand.getPlannedRoute());
-        repository.save(errand);
-        generateNewDataRecord(errand);
         Map<String, Object> response = new HashMap<String, Object>();
-        response.put("status", "SUCCESS");
-        response.put("message", "Errand added");
-        response.put("plannedRoute", errand.getErrandId());
+        Map<String, Object> data = new HashMap<>();
+
+        if (!isDrvIdValid(errand.getDrvId())) {
+            response.put("status", "data-not-found-0017");
+            response.put("message", "Kierowca o numerze ID " + errand.getDrvId() + " nie istnieje w bazie danych. Zlecenie nie zostało utworzone");
+        }
+        else if (!isCarIdValid(errand.getCarId())) {
+            response.put("status", "data-not-found-0018");
+            response.put("message", "Pojazd o numerze ID " + errand.getCarId() + " nie istnieje w bazie danych. Zlecenie nie zostało utworzone");
+        }
+        else {
+            Errand newErrand = repository.save(errand);
+            generateNewDataRecord(errand);
+            response.put("status", "success");
+            response.put("message", "Nowe zlecenie o numerze " + newErrand.getErrandId() + " zostało utworzone");
+            data.put("plannedRoute", errand.getErrandId());
+            response.put("data", data);
+        }
         return new ResponseEntity<Object>(response, HttpStatus.OK);
-
-
     }
 
     List<Errand> getByDrvId(Long drvId){
@@ -189,15 +195,18 @@ public class ErrandService {
 
     public ResponseEntity<Object> deleteErrandById(String errandId) {
         Map<String, Object> response = new HashMap<String, Object>();
-        if (!getByErrandId(errandId).isPresent()) throw new IllegalStateException("Errand with that id does not exist");
+        if (!getByErrandId(errandId).isPresent()){
+            response.put("status", "record-not-found-0011");
+            response.put("message", "Zlecenie o numerze ID " + errandId + " nie istnieje w bazie danych");
+        }
         else {
             //dodac usuwanie lokalizacji plannedRoute i allLocations
             repository.deleteById(errandId);
-            response.put("status", "SUCCESS");
-            response.put("message", "Errand deleted!");
-            return new ResponseEntity<Object>(response, HttpStatus.OK);
+            response.put("status", "success");
+            response.put("message", "Zlecenie o numerze " + errandId + " zostało usunięte");
             //ErrandDataService.deleteDataById(errandId);   //usuwanie jest niepotrzebne. Jak usuwa sie obiekt klasy Errand, to ErrandData od razu jest usuwane
         }
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 

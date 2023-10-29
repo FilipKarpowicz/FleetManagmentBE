@@ -3,6 +3,7 @@ package main.User;
 import jakarta.transaction.Transactional;
 import main.Errand.Errand;
 import main.Errand.ErrandRepository;
+import org.h2.engine.User;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,7 +54,7 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public JSONObject findUsers(String name, String login, String privilege, Integer batch) {
+    public ResponseEntity<Object> findUsers(String name, String login, String privilege, Integer batch) {
         List<UserEntity> users;
         if (privilege != null) {
             if (name != null) {
@@ -95,77 +96,120 @@ public class UserService {
         int from = batch * 10 - 10;
         int to = Math.min(batch * 10, users.size());
         int size = users.size() / 10 + 1;
-        JSONObject response = new JSONObject();
-        response.put("size", size);
-        response.put("data", users.subList(from, to));
-        System.out.println(response);
-        return response;
+
+        Map<String, Object> response = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+        data.put("size", size);
+        data.put("users", users.subList(from, to));
+        response.put("data", data);
+        response.put("status", "success");
+        response.put("message", "Dane przekazane poprawnie");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Transactional
-    public void updatePassword(Long userId, String newPassword, String oldPassword) {
-        System.out.println("update");
-        UserEntity user = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalStateException("User with this id doesnt exist")
-        );
-        if (Objects.equals(user.getPassword(), oldPassword)) {
-            user.setPassword(newPassword);
-        } else {
-            throw new IllegalStateException("Incorrect password");
-        }
+    public ResponseEntity<Object> updatePassword(Long userId, String newPassword, String oldPassword) {
+        Map<String, Object> response = new HashMap<>();
 
+        Optional<UserEntity> maybeUser = userRepository.findById(userId);
+        if(maybeUser.isEmpty()){
+            response.put("status", "record-not-found-0014");
+            response.put("message", "Użytkownik o numerze ID " + userId + " nie istnieje w bazie danych");
+        }
+        else if(newPassword != null && oldPassword != null){
+            UserEntity user = maybeUser.get();
+            if (Objects.equals(user.getPassword(), oldPassword)) {
+                user.setPassword(newPassword);
+                response.put("status", "success");
+                response.put("message", "Hasło zostało zmienione");
+            } else {
+                response.put("status", "conflict-0007");
+                response.put("message", "Podano nieprawidłowe stare hasło");
+            }
+        }
+        else{
+            response.put("status", "conflict-0006");
+            response.put("message", "Proszę uzupełnić wszystkie wymagane pola");
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Transactional
-    public UserEntity updateUser(Long userId, String login, String name, String password, String privilege) {
-        UserEntity userById = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalStateException("User with that id does not exist")
-        );
+    public ResponseEntity<Object> updateUser(Long userId, String login, String name, String password, String privilege) {
+        Map<String, Object> response = new HashMap<>();
+        Optional<UserEntity> maybeUserById = userRepository.findById(userId);
 
-        if (login != null && !Objects.equals(login, userById.getLogin())) {
-            userById.setLogin(login);
+        if(maybeUserById.isEmpty()){
+            response.put("status", "record-not-found-0013");
+            response.put("message", "Użytkownik o id " + userId + " nie istnieje w bazie danych");
         }
+        else {
+            UserEntity userById = maybeUserById.get();
+            boolean modifyFlag = false;
+            if (login != null && !Objects.equals(login, userById.getLogin())) {
+                userById.setLogin(login);
+                modifyFlag = true;
+            }
 
-        if (name != null && !Objects.equals(name, userById.getName())) {
-            userById.setName(name);
-        }
+            if (name != null && !Objects.equals(name, userById.getName())) {
+                userById.setName(name);
+                modifyFlag = true;
+            }
 
-        if (password != null && !Objects.equals(password, userById.getPassword())) {
-            userById.setPassword(password);
-        }
+            if (password != null && !Objects.equals(password, userById.getPassword())) {
+                userById.setPassword(password);
+                modifyFlag = true;
+            }
 
-        if (privilege != null && !Objects.equals(privilege, userById.getPrivilege())) {
-            userById.setPrivilege(privilege);
+            if (privilege != null && !Objects.equals(privilege, userById.getPrivilege())) {
+                userById.setPrivilege(privilege);
+                modifyFlag = true;
+            }
+
+            if(modifyFlag == false){
+                response.put("status", "conflict-0009");
+                response.put("message", "Żadna wartość nie została zmieniona");
+            }
+            else{
+                response.put("status", "success");
+                response.put("message", "Dane użytkownika zostały pomyślnie zmienione");
+            }
         }
-        return userById;
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    public JSONObject addNewUser(UserEntity user) {
+    public ResponseEntity<Object> addNewUser(UserEntity user) {
+        Map<String, Object> response = new HashMap<>();
         Optional<UserEntity> userByLogin = userRepository.findUserEntityByLogin(user.getLogin());
-        JSONObject response = new JSONObject();
-        if (userByLogin.isPresent()) {
-            response.put("status", "ERROR");
-            response.put("message", "User with that login already exists");
-        } else {
-            userRepository.save(user);
-            response.put("status", "SUCCESS");
-            response.put("message", "User added");
+        if(user.getLogin() != null && user.getName() != null && user.getPassword() != null && user.getPrivilege() != null) {
+            if (userByLogin.isPresent()) {
+                response.put("status", "conflict-0006");
+                response.put("message", "Użytkownik w loginem " + user.getLogin() + " już istnieje w bazie danych");
+            } else {
+                userRepository.save(user);
+                response.put("status", "success");
+                response.put("message", "Użytkownik dodany do bazy");
+            }
         }
-        return response;
+        else{
+            response.put("status", "conflict-0007");
+            response.put("message", "Proszę uzupełnić wszystkie wymagane pola");
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
 
     }
 
-    public JSONObject deleteUser(Long userId) {
+    public ResponseEntity<Object> deleteUser(Long userId) {
+        Map<String, Object> response = new HashMap<>();
         Optional<UserEntity> user = userRepository.findById(userId);
-        JSONObject response = new JSONObject();
         if (user.isPresent()) {
             userRepository.deleteById(userId);
-            response.put("status", "SUCCESS");
-            response.put("message", "User deleted");
+            response.put("status", "success");
+            response.put("message", "Użytkownik został usunięty");
         } else {
-            response.put("status", "ERROR");
-            response.put("message", "User with that id does not exist");
+            response.put("status", "record-not-found-0012");
+            response.put("message", "Użytkownik o numerze ID " + userId + " nie istnieje w bazie danych");
         }
-        return response;
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

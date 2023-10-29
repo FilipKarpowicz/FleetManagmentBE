@@ -38,36 +38,68 @@ public class CarDataService {
 
     public ResponseEntity<Object> getResponse(Long carId){
         Map<String, Object> response = new HashMap<String, Object>();
-        CarData carData = getByCarId(carId).orElseThrow(
-                () -> new IllegalStateException("car data with that id does not exist")
-        );
-        Car car = carRepository.findById(carId).orElseThrow(
-                () -> new IllegalStateException("car with that id does not exist")
-        );
+        Map<String, Object> data = new HashMap<>();
 
-        Double battEnergy = car.getBattNominalCapacity() * ((double) carData.getBattSoh()/100) * ((double) carData.getBattSoc()/100) * carData.getBattVoltage();
-        String activeErrandId = errandDataService.getActiveErrandDataForCarId(carId);
-        Double remainingRange = null;
-        if(activeErrandId != null) {
-            if(errandDataService.calculateErrandAvgEnergyConsumption(activeErrandId) != null){
-                remainingRange = battEnergy / errandDataService.calculateErrandAvgEnergyConsumption(activeErrandId);
-            }
+        Optional<CarData> maybeCarData = getByCarId(carId);
+        Optional<Car> maybeCar = carRepository.findById(carId);
+
+        if(maybeCarData.isEmpty()){
+            response.put("status", "record-not-found-0004");
+            response.put("message", "Brak informacji w tabeli CarData dla ID pojazdu " + carId);
+            data.put("overallMileage", null);
+            data.put("battSoc", null);
+            data.put("battSoh", null);
+            data.put("battVoltage", null);
+            data.put("lastUpdate", null);
+            data.put("lastLocationId", null);
+            data.put("remainingRange", null);
+            response.put("data", data);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        else{
-            if(carData.getLastErrandAvgEnergyConsumption() != null && carData.getLastErrandAvgEnergyConsumption() > 0){
-                remainingRange = battEnergy / carData.getLastErrandAvgEnergyConsumption();
-            }
+        if(maybeCar.isEmpty()){
+            response.put("status", "record-not-found-0005");
+            response.put("message", "Brak informacji w tabeli Car dla ID pojazdu " + carId);
+            data.put("overallMileage", null);
+            data.put("battSoc", null);
+            data.put("battSoh", null);
+            data.put("battVoltage", null);
+            data.put("lastUpdate", null);
+            data.put("lastLocationId", null);
+            data.put("remainingRange", null);
+            response.put("data", data);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
+        else {
+            Car car = maybeCar.get();
+            CarData carData = maybeCarData.get();
 
-        response.put("overallMileage", roundPlaces(carData.getOverallMileage(), 2));
-        response.put("battSoc", carData.getBattSoc());
-        response.put("battSoh", carData.getBattSoh());
-        response.put("battVoltage", carData.getBattVoltage());
-        response.put("lastUpdate", carData.getLastUpdate());
-        response.put("lastLocationId", carData.getLastLocation());
-        response.put("remainingRange", roundPlaces(remainingRange, 2));
+            Double battEnergy = car.getBattNominalCapacity() * ((double) carData.getBattSoh() / 100) * ((double) carData.getBattSoc() / 100) * carData.getBattVoltage();
+            String activeErrandId = errandDataService.getActiveErrandDataForCarId(carId);
+            Double remainingRange = null;
 
-        return new ResponseEntity<Object>(response, HttpStatus.OK);
+            if (activeErrandId != null) {
+                if (errandDataService.calculateErrandAvgEnergyConsumption(activeErrandId) != null) {
+                    remainingRange = battEnergy / errandDataService.calculateErrandAvgEnergyConsumption(activeErrandId);
+                }
+            } else {
+                if (carData.getLastErrandAvgEnergyConsumption() != null && carData.getLastErrandAvgEnergyConsumption() > 0) {
+                    remainingRange = battEnergy / carData.getLastErrandAvgEnergyConsumption();
+                }
+            }
+
+            data.put("overallMileage", roundPlaces(carData.getOverallMileage(), 2));
+            data.put("battSoc", carData.getBattSoc());
+            data.put("battSoh", carData.getBattSoh());
+            data.put("battVoltage", carData.getBattVoltage());
+            data.put("lastUpdate", carData.getLastUpdate());
+            data.put("lastLocationId", carData.getLastLocation());
+            data.put("remainingRange", roundPlaces(remainingRange, 2));
+            response.put("status", "success");
+            response.put("message", "Dane przekazane poprawnie");
+            response.put("data", data);
+
+            return new ResponseEntity<Object>(response, HttpStatus.OK);
+        }
     }
 
     private Object roundPlaces(Double value, int places){

@@ -37,13 +37,13 @@ public class LocationService {
         newLocation = repository.save(location);
 
         if(newLocation.getLocationId() == null){
-            response.put("status", "FAILED");
-            response.put("message", "Unable to add point");
+            response.put("status", "unknown-0003");
+            response.put("message", "Nie udało się dodać punktu do trasy zlecenia");
         }
         else {
             data.put("pointId", location.getLocationId());
-            response.put("status", "SUCCESS");
-            response.put("message", "Point added");
+            response.put("status", "success");
+            response.put("message", "Punkt został poprawnie dodany");
         }
         response.put("data", data);
         return new ResponseEntity<Object>(response, HttpStatus.OK);
@@ -105,15 +105,15 @@ public class LocationService {
             if(temp.isPresent()){
                 data.add(temp.get());
             }else{
-
-                response.put("status", "ERROR");
-                response.put("message", "Location does not exist");
+                response.put("status", "record-not-found-0009");
+                response.put("message", "Lokalizacja o numerze ID " + id + " nie istnieje w bazie danych");
                 response.put("locationId", list[i]);
-                return new ResponseEntity<Object>(response, HttpStatus.NOT_EXTENDED);
+                return new ResponseEntity<Object>(response, HttpStatus.OK);
             }
         }
-        response.put("status", "SUCCESS");
+        response.put("status", "success");
         response.put("data", data);
+        response.put("message", "Dane przekazane poprawnie");
         return new ResponseEntity<Object>(response,HttpStatus.OK);
     }
 }

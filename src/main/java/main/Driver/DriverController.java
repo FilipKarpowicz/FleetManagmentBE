@@ -21,46 +21,30 @@ public class DriverController {
     }
 
     @DeleteMapping(path = {"driver/delete"})
-    public ResponseEntity<String> deleteDriverById(@RequestParam("drvId") Long drvId) {
-        JSONObject response = driverService.deleteDriverById(drvId);
-        if (response.get("status") == "SUCCESS"){
-            return ResponseEntity.ok(response.toString());
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.toString());
-        }
+    public ResponseEntity<Object> deleteDriverById(@RequestParam("drvId") Long drvId) {
+        return driverService.deleteDriverById(drvId);
     }
 
     @PostMapping(path = "driver/add")
-    public ResponseEntity<String> registerNewDriver(@RequestBody Driver driver) {
-        JSONObject response = driverService.addNewDriver(driver);
-        if (response.get("status") == "SUCCESS"){
-            return ResponseEntity.ok(response.toString());
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.toString());
-        }
+    public ResponseEntity<Object> registerNewDriver(@RequestBody Driver driver) {
+        return driverService.addNewDriver(driver);
     }
 
 
     @PutMapping(path = "driver/modify")
-    public ResponseEntity<String> updateDriver(
+    public ResponseEntity<Object> updateDriver(
             @RequestParam Long drvId,
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) LocalDate birthdate,
             @RequestParam(required = false) Long pesel,
             @RequestParam(required = false) String drvLicNo,
-            @RequestParam(required = false) Integer overallDrvRating
-    ) {
-        JSONObject response = driverService.updateDriver(drvId, firstName, lastName, birthdate, pesel, drvLicNo, overallDrvRating);
-        if (response.get("status") == "SUCCESS"){
-            return ResponseEntity.ok(response.toString());
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.toString());
-        }
+            @RequestParam(required = false) Integer overallDrvRating) {
+        return driverService.updateDriver(drvId, firstName, lastName, birthdate, pesel, drvLicNo, overallDrvRating);
     }
 
     @GetMapping(path = "drivers")
-    public ResponseEntity<String> findDrivers(
+    public ResponseEntity<Object> findDrivers(
             @RequestParam Integer batch,
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
@@ -68,13 +52,7 @@ public class DriverController {
             @RequestParam(required = false) String drvLicNo,
             @RequestParam(required = false) String moreOrLess,
             @RequestParam(required = false) Integer overallDrvRating) {
-        JSONObject response =  driverService.findDrivers(firstName,lastName,pesel,drvLicNo,overallDrvRating,moreOrLess,batch);
-        if (response.get("status") == "SUCCESS"){
-            return ResponseEntity.ok(response.toString());
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.toString());
-        }
-
+        return driverService.findDrivers(firstName,lastName,pesel,drvLicNo,overallDrvRating,moreOrLess,batch);
     }
 
 

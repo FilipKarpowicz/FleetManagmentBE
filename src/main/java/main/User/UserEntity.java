@@ -13,7 +13,7 @@ public class UserEntity {
             allocationSize = 1
     )
     @GeneratedValue(
-            strategy = GenerationType.IDENTITY,
+            strategy = GenerationType.SEQUENCE,
             generator = "user_sequence"
     )
     private Long userId;

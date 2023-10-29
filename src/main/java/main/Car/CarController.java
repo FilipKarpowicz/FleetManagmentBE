@@ -49,8 +49,8 @@ public class CarController {
     }
 
     @GetMapping(path = "GetById")
-    Optional<Car> getCarById(@RequestParam(name = "carId") Long carId){
-        return carService.getCarById(carId);
+    ResponseEntity<Object> getCarById(@RequestParam(name = "carId") Long carId){
+        return carService.getCarResponse(carId);
     }
 
 

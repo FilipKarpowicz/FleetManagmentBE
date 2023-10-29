@@ -45,6 +45,7 @@ public class ErrandDataService {
 
     public ResponseEntity<Object> getCalculatedDataByErrandId(String errandId) {
         Map<String, Object> response = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         Optional<ErrandData> maybeErrandData = repository.findById(errandId);
 
         Double avgEnergyConsumption = null;
@@ -53,8 +54,9 @@ public class ErrandDataService {
         Double avgSpeed = null;
 
         if (maybeErrandData.isEmpty()) {
-            response.put("message", "No data available for this errand ID");
-            response.put("status", "DATA NOT AVAILABLE!");
+            response.put("message", "Brak danych w bazie dla id zlecenia " + errandId);
+            response.put("status", "record-not-found-0006");
+            response.put("data", null);
         } else {
             ErrandData errandData = maybeErrandData.get();
             if (errandData.getErrandLastMileage() != null && errandData.getErrandStartedMileage() != null) {
@@ -69,26 +71,48 @@ public class ErrandDataService {
             errandDrivingTimeString = caluclateErrandDrivingTime(errandId);
             avgEnergyConsumption = calculateErrandAvgEnergyConsumption(errandId);
 
-            response.put("errandMileage", roundPlaces(errandMileage, 2));
-            response.put("errandDrivingTime", errandDrivingTimeString);
-            response.put("errandStartedTimestamp", errandData.getErrandStartedTimestamp());
-            response.put("avgSpeed", roundPlaces(avgSpeed, 2));
-            response.put("avgEnergyConsumption", roundPlaces(avgEnergyConsumption, 2));
-            response.put("message", "Data calculated successfully");
-            response.put("status", "SUCCESS!");
-            response.put("errandStatus", errandData.getErrandStatus());
+            data.put("errandMileage", roundPlaces(errandMileage, 2));
+            data.put("errandDrivingTime", errandDrivingTimeString);
+            data.put("errandStartedTimestamp", errandData.getErrandStartedTimestamp());
+            data.put("avgSpeed", roundPlaces(avgSpeed, 2));
+            data.put("avgEnergyConsumption", roundPlaces(avgEnergyConsumption, 2));
+            data.put("errandStatus", errandData.getErrandStatus());
+            response.put("message", "Dane przekazane poprawnie");
+            response.put("status", "success");
+            response.put("data", data);
 
             if (errandData.getErrandStatus() == ErrandStatus.WAITING) {
-                response.put("message", "Errand status is waiting");
-                response.put("status", "DATA NOT CALCULATED!");
+                response.put("message", "Zlecenie ma status OCZEKUJĄCE, nie można policzyć danych");
+                response.put("status", "success");
+                data.put("errandMileage", null);
+                data.put("errandDrivingTime", null);
+                data.put("errandStartedTimestamp", null);
+                data.put("avgSpeed", null);
+                data.put("avgEnergyConsumption", null);
+                data.put("errandStatus", null);
+                response.put("data", data);
             }
-            if (errandData.getErrandStartedMileage() == null || errandData.getErrandStartedBatteryEnergy() == null || errandData.getErrandStartedTimestamp() == null) {
-                response.put("message", "Errand initial conditions are null");
-                response.put("status", "DATA NOT FULLY CALCULATED!");
+            else if (errandData.getErrandLastMileage() == null || errandData.getErrandLastBatteryEnergy() == null || errandData.getErrandLastTimestamp() == null) {
+                response.put("message", "Brak aktualnych danych zlecenia, nie można policzyć danych");
+                response.put("status", "errand-last-conditions-unknown");
+                data.put("errandMileage", null);
+                data.put("errandDrivingTime", null);
+                data.put("errandStartedTimestamp", null);
+                data.put("avgSpeed", null);
+                data.put("avgEnergyConsumption", null);
+                data.put("errandStatus", null);
+                response.put("data", data);
             }
-            if (errandData.getErrandLastMileage() == null || errandData.getErrandLastBatteryEnergy() == null || errandData.getErrandLastTimestamp() == null) {
-                response.put("message", "Errand last conditions are null");
-                response.put("status", "DATA NOT FULLY CALCULATED!");
+            else if (errandData.getErrandStartedMileage() == null || errandData.getErrandStartedBatteryEnergy() == null || errandData.getErrandStartedTimestamp() == null) {
+                response.put("message", "Brak danych początkowych zlecenia, nie można policzyć danych");
+                response.put("status", "errand-initial-conditions-null");
+                data.put("errandMileage", null);
+                data.put("errandDrivingTime", null);
+                data.put("errandStartedTimestamp", null);
+                data.put("avgSpeed", null);
+                data.put("avgEnergyConsumption", null);
+                data.put("errandStatus", null);
+                response.put("data", data);
             }
         }
         return new ResponseEntity<Object>(response, HttpStatus.OK);
@@ -145,34 +169,43 @@ public class ErrandDataService {
                     manipulatedRecord.setErrandStartedTimestamp(LocalDateTime.now());
                     manipulatedRecord.setErrandStartedMileage(carData.getOverallMileage());
                     manipulatedRecord.setErrandStartedBatteryEnergy(car.getBattNominalCapacity() * (carData.getBattSoh() / 100) * (carData.getBattSoc() / 100) * carData.getBattVoltage());
-                    response.put("status", "SUCCESS");
-                    response.put("message", "status changed to IN_PROGRESS");
+                    response.put("status", "success");
+                    response.put("message", "Status zlecenia nr " + errandId + " został zmieniony na W TRAKCIE");
                 } else {
-                    response.put("status", "ERROR");
-                    response.put("message", "Car data for that errand is corrupted");
+                    response.put("status", "data-not-found-0015");
+                    response.put("message", "Dane pojazdu o numerze ID " + errand.getCarId() + " nie istnieją w bazie danych. Nie udało się zakończyć zlecenia");
                 }
             } else if (newStatus == ErrandStatus.FINISHED) {
                 Double errandAvgEnergyConsumption = calculateErrandAvgEnergyConsumption(errandId);
-                if (errandAvgEnergyConsumption != null) editCarData(errand.getCarId(), errandAvgEnergyConsumption);
-                response.put("status", "SUCCESS");
-                response.put("message", "status changed to IN_PROGRESS");
+                if (errandAvgEnergyConsumption != null){
+                    if(editCarData(errand.getCarId(), errandAvgEnergyConsumption) == "success"){
+                        response.put("status", "success");
+                        response.put("message", "Status zlecenia nr " + errandId + " został zmieniony na ZAKOŃCZONE");
+                    }
+                    else{
+                        response.put("status", "data-not-found-0016");
+                        response.put("message", "Pojazd o numerze ID " + errand.getCarId() + ", przypisany do tego zlecenia, nie istnieje w bazie danych. Nie udało się zakończyć zlecenia");
+                    }
+                }
             }
             manipulatedRecord.setErrandStatus(newStatus);
         } else {
-            response.put("status", "ERROR");
-            response.put("message", "Errand data with that ID does not exist");
+            response.put("status", "record-not-found-0014");
+            response.put("message", "Zlecenie o numerze ID " + errandId + " nie istnieje w bazie danych. Nie udało się zakończyć zlecenia");
         }
         return new ResponseEntity<Object>(response, HttpStatus.OK);
     }
 
     @Transactional
-    public void editCarData(Long carId, Double lastErrandAvgEnergyConsumption) {
-        CarData manipulatedData = carDataRepository.findById(carId).orElseThrow(
-                () -> new IllegalStateException("Car data for that id does not exist")
-        );
-        if (lastErrandAvgEnergyConsumption != null)
+    public String editCarData(Long carId, Double lastErrandAvgEnergyConsumption) {
+        Optional<CarData> maybeManipulatedData = carDataRepository.findById(carId);
+        if(maybeManipulatedData.isEmpty()) return "failed";
+        else if (lastErrandAvgEnergyConsumption != null) {
+            CarData manipulatedData = maybeManipulatedData.get();
             manipulatedData.setLastErrandAvgEnergyConsumption(lastErrandAvgEnergyConsumption);
-        else throw new IllegalStateException("Energy consumption needs to be provided in order to update car data");
+            return "success";
+        }
+        else return "failed";
     }
 
     public List<ErrandData> getAll(Integer batchNumber) {
@@ -209,12 +242,20 @@ public class ErrandDataService {
     public ResponseEntity<Object> findRoute(String errandId) {
         Optional<ErrandData> potentialErrand = repository.findById(errandId);
         if (potentialErrand.isPresent()) {
-            ResponseEntity<Object> route = locationService.findLocationList(potentialErrand.get().getAllLocations());
-            return route;
+            if(potentialErrand.get().getAllLocations() != null) {
+                ResponseEntity<Object> route = locationService.findLocationList(potentialErrand.get().getAllLocations());
+                return route;
+            }
+            else{
+                Map<String, Object> response = new HashMap<String, Object>();
+                response.put("status", "record-not-found-0009");
+                response.put("message", "Brak lokalizacji dla zlecenia o numerze ID " + errandId);
+                return new ResponseEntity<>(response,HttpStatus.OK);
+            }
         } else {
             Map<String, Object> response = new HashMap<String, Object>();
-            response.put("status", "SUCCESS");
-            response.put("message", "errand with that id does not exist");
+            response.put("status", "record-not-found-0008");
+            response.put("message", "Brak danych dla zlecenia o numerze ID " + errandId);
             return new ResponseEntity<>(response,HttpStatus.OK);
         }
     }

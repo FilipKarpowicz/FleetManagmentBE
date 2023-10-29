@@ -19,13 +19,13 @@ public class UserController {
     }
 
     @GetMapping(path = "users")
-    public String getAllUsers(
+    public ResponseEntity<Object> getAllUsers(
             @RequestParam Integer batch,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String login,
             @RequestParam(required = false) String privilege
     ) {
-        return userService.findUsers(name, login, privilege, batch).toString();
+        return userService.findUsers(name, login, privilege, batch);
     }
 
     @GetMapping(path = "login")
@@ -35,42 +35,30 @@ public class UserController {
 
 
     @PutMapping(path = "user/setPassword")
-    public void updatePassword(
+    public ResponseEntity<Object> updatePassword(
             @RequestHeader String newPassword,
             @RequestHeader String oldPassword,
             @RequestHeader Long userId
     ) {
-        userService.updatePassword(userId, newPassword, oldPassword);
+        return userService.updatePassword(userId, newPassword, oldPassword);
     }
 
     @PutMapping(path = "user/modify")
-    public ResponseEntity<UserEntity> updateUser(@RequestParam Long userId,
+    public ResponseEntity<Object> updateUser(@RequestParam Long userId,
                                                  @RequestParam(required = false) String login,
                                                  @RequestParam(required = false) String password,
                                                  @RequestParam(required = false) String name,
                                                  @RequestParam(required = false) String privilege) {
-        UserEntity user = userService.updateUser(userId, login, name, password, privilege);
-        return ResponseEntity.ok(user);
+        return userService.updateUser(userId, login, name, password, privilege);
     }
 
     @PostMapping(path = "user/add")
-    public ResponseEntity<String> addUser(@RequestBody UserEntity user) {
-        JSONObject response = userService.addNewUser(user);
-        String status = response.getString("status");
-        if (Objects.equals(status, "SUCCESS")) {
-            return ResponseEntity.ok(response.toString());
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response.toString());
-        }
+    public ResponseEntity<Object> addUser(@RequestBody UserEntity user) {
+        return userService.addNewUser(user);
     }
 
     @DeleteMapping(path = "user/delete")
-    public ResponseEntity<String> deleteUser(@RequestParam Long userId) {
-        JSONObject response = userService.deleteUser(userId);
-        if (Objects.equals(response.getString("status"), "SUCCESS")) {
-            return ResponseEntity.ok(response.toString());
-        }else{
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response.toString());
-        }
+    public ResponseEntity<Object> deleteUser(@RequestParam Long userId) {
+        return userService.deleteUser(userId);
     }
 }

@@ -53,6 +53,24 @@ public class CarService {
         return carRepository.findCarByCarId(carId);
     }
 
+    public ResponseEntity<Object> getCarResponse(Long carId){
+        Map<String, Object> response = new HashMap<>();
+        Optional<Car> maybeCar = carRepository.findCarByCarId(carId);
+
+        if(maybeCar.isEmpty()){
+            response.put("status", "record-not-found-0006");
+            response.put("message", "Pojazd z id " + carId + " nie istnieje w bazie danych");
+            response.put("data", new Car());
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        else{
+            response.put("status", "success");
+            response.put("message", "Dane przekazane poprawnie");
+            response.put("data", maybeCar.get());
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+    }
+
     public List<Car> getBatchCarsSorted(String sortingType,String column,Integer batchNumber){
         List<Car> table = carRepository.findAll();
         if (sortingType.equals("ascending")){
@@ -66,7 +84,7 @@ public class CarService {
                 case "comment" -> table.sort(Comparator.comparing(Car::getComment));
                 case "serviceDate" -> table.sort(Comparator.comparing(Car::getServiceDate));
                 case "serviceMileage" -> table.sort(Comparator.comparing(Car::getServiceMileage));
-                default -> throw new IllegalStateException("There is no column named '" + column + "' in Car table");
+                default -> throw new IllegalStateException("There is no column named " + column + " in Car table");
             }
         }else if (sortingType.equals("descending")){
             switch (column) {
@@ -161,33 +179,28 @@ public class CarService {
 
     public ResponseEntity<Object> addNewCar(Car car) {
         Map<String, Object> response = new HashMap<>();
-        Map<String, Object> data = new HashMap<>();
 
         if(car.getMake() != null && car.getModel() != null && car.getVin() != null && car.getPlateNo() != null && car.getType() != null && car.getBattNominalCapacity() != null && car.getDevId() != null) {
             Optional<Car> carByVin = carRepository.findCarByVin(car.getVin());
             Optional<Car> carByPlate = carRepository.findCarByPlate(car.getPlateNo());
             if (carByVin.isPresent()) {
                 response.put("status", "conflict-0001");
-                response.put("message", "Numer VIN" + car.getVin() + "należy już do innego pojazdu w bazie danych");
-                response.put("data", null);
+                response.put("message", "Numer VIN " + car.getVin() + " należy już do innego pojazdu w bazie danych");
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else if (carByPlate.isPresent()) {
                 response.put("status", "conflict-0002");
-                response.put("message", "Numer rejestracyjny" + car.getPlateNo() + "należy już do innego pojazdu w bazie danych");
-                response.put("data", null);
+                response.put("message", "Numer rejestracyjny " + car.getPlateNo() + " należy już do innego pojazdu w bazie danych");
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
                 carRepository.save(car);
                 createNewCarDataRecord(car);
                 response.put("status", "success");
                 response.put("message", "Pojazd pomyślnie dodany do bazy");
-                response.put("data", car);
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
         }
         response.put("status", "conflict-0003");
         response.put("message", "Proszę uzupełnić wszystkie wymagane pola");
-        response.put("data", null);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -202,7 +215,7 @@ public class CarService {
         boolean exists = carRepository.existsById(carId);
         if (!exists) {
             response.put("status", "record-not-found-0001");
-            response.put("message", "Pojazd z id" + carId + "nie istnieje w bazie. Operacja nieudana");
+            response.put("message", "Pojazd z id " + carId + " nie istnieje w bazie. Operacja nieudana");
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         else {
@@ -220,7 +233,7 @@ public class CarService {
         Optional<Car> maybeCarById = carRepository.findById(carId);
         if(maybeCarById.isEmpty()){
             response.put("status", "record-not-found-0002");
-            response.put("message", "Pojazd z id" + carId + "nie istnieje w bazie. Operacja nieudana");
+            response.put("message", "Pojazd z id " + carId + " nie istnieje w bazie. Operacja nieudana");
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         else {
@@ -326,7 +339,7 @@ public class CarService {
 
         if(matchedCars.isEmpty()){
             response.put("status", "success");
-            response.put("message", null);
+            response.put("message", "No results found");
             response.put("data", null);
             return new ResponseEntity<Object>(response, HttpStatus.OK);
         }
@@ -357,7 +370,7 @@ public class CarService {
             data.put("cars", matchedCars);
             data.put("size", numberOfBatches);
             response.put("status", "success");
-            response.put("message", null);
+            response.put("message", "Search successful");
             response.put("data", data);
             return new ResponseEntity<Object>(response, HttpStatus.OK);
         }
