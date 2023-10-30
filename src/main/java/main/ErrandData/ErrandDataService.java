@@ -124,9 +124,7 @@ public class ErrandDataService {
     }
 
     public Double calculateErrandAvgEnergyConsumption(String errandId) {
-        ErrandData errandData = getByErrandId(errandId).orElseThrow(
-                () -> new IllegalStateException("errand data with that id does not exist")
-        );
+        ErrandData errandData = getByErrandId(errandId).get();
         Double errandMileage = null;
         if (errandData.getErrandStartedMileage() != null && errandData.getErrandLastMileage() != null) {
             errandMileage = errandData.getErrandLastMileage() - errandData.getErrandStartedMileage();
@@ -137,9 +135,7 @@ public class ErrandDataService {
     }
 
     public String caluclateErrandDrivingTime(String errandId) {
-        ErrandData errandData = getByErrandId(errandId).orElseThrow(
-                () -> new IllegalStateException("errand data with that id does not exist")
-        );
+        ErrandData errandData = getByErrandId(errandId).get();
         if (errandData.getErrandLastTimestamp() != null && errandData.getErrandStartedTimestamp() != null) {
             Double hours = (double) ChronoUnit.HOURS.between(errandData.getErrandStartedTimestamp(), errandData.getErrandLastTimestamp());
             Double minutes = (double) ChronoUnit.MINUTES.between(errandData.getErrandStartedTimestamp(), errandData.getErrandLastTimestamp()) - hours * 60;

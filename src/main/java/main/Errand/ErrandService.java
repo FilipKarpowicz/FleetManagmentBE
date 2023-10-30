@@ -200,7 +200,8 @@ public class ErrandService {
             response.put("message", "Zlecenie o numerze ID " + errandId + " nie istnieje w bazie danych");
         }
         else {
-            //dodac usuwanie lokalizacji plannedRoute i allLocations
+            deletePlannedRouteLocations(errandId);
+            deleteAllLocations(errandId);
             repository.deleteById(errandId);
             response.put("status", "success");
             response.put("message", "Zlecenie o numerze " + errandId + " zostało usunięte");
@@ -209,5 +210,17 @@ public class ErrandService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    public void deletePlannedRouteLocations(String errandId){
+        List<Long> listOfLocations = getByErrandId(errandId).get().getPlannedRouteAsList();
+        for(Long id : listOfLocations){
+            locationService.deleteLocationById(id);
+        }
+    }
 
+    public void deleteAllLocations(String errandId){
+        List<Long> listOfLocations = errandDataRepository.findById(errandId).get().getAllLocationsAsList();
+        for(Long id : listOfLocations){
+            locationService.deleteLocationById(id);
+        }
+    }
 }

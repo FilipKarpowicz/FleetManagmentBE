@@ -118,6 +118,17 @@ public class ErrandData {
         return allLocations;
     }
 
+    public List<Long> getAllLocationsAsList(){
+        if (this.allLocations != null) {
+            List<String> locationsStringList = new ArrayList<String>(Arrays.asList(this.allLocations.split("-")));  //convert String to List<String>
+            List<Long> locationList = locationsStringList.stream().map(s -> Long.parseLong(s)).collect(Collectors.toList());   //convert List<String> to List<Long>
+            return locationList;
+        }
+        else{
+            return new ArrayList<Long>();
+        }
+    }
+
     public void setAllLocations(String allLocations) {
         this.allLocations = allLocations;
     }
