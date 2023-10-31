@@ -350,8 +350,8 @@ public class CarService {
                     return o1.getCarId().compareTo(o2.getCarId());
                 }
             });
-            Integer startIndex = batchNumber * 10 - 10;
-            Integer endIndex = batchNumber * 10;
+            Integer startIndex = batchNumber * 9 - 9;
+            Integer endIndex = batchNumber * 9;
             if (matchedCars.size() > startIndex + endIndex && matchedCars.size() > startIndex) {
                 responseCarList = matchedCars.subList(startIndex, endIndex);
             } else if (matchedCars.size() > startIndex) {
@@ -364,10 +364,10 @@ public class CarService {
             }
         }
 
-        Integer numberOfBatches = (Integer) (matchedCars.size()/10) + 1;
+        Integer numberOfBatches = (Integer) (matchedCars.size()/9) + 1;
 
         try{
-            data.put("cars", matchedCars);
+            data.put("cars", responseCarList);
             data.put("size", numberOfBatches);
             response.put("status", "success");
             response.put("message", "Search successful");
