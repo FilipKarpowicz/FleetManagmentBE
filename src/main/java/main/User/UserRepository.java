@@ -1,5 +1,6 @@
 package main.User;
 
+import org.h2.engine.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -40,5 +41,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     @Query("SELECT s FROM UserEntity s WHERE s.login=?1")
     Optional<UserEntity> findUserEntityByLogin(String login);
+
+    @Query("SELECT s FROM UserEntity s WHERE s.token=?1")
+    Optional<UserEntity> findUserEntityByToken(String token);
 
 }

@@ -212,4 +212,18 @@ public class UserService {
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    public ResponseEntity<Object> deleteUserById(String token) {
+        Map<String, Object> response = new HashMap<>();
+        Optional<UserEntity> user = userRepository.findUserEntityByToken(token);
+        if (user.isPresent()) {
+            userRepository.deleteById(user.get().getUserId());
+            response.put("status", "success");
+            response.put("message", "Użytkownik został usunięty");
+        } else {
+            response.put("status", "record-not-found-0012");
+            response.put("message", "Użytkownik nie istnieje w bazie danych");
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

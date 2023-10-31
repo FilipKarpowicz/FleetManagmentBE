@@ -61,4 +61,9 @@ public class UserController {
     public ResponseEntity<Object> deleteUser(@RequestParam Long userId) {
         return userService.deleteUser(userId);
     }
+
+    @DeleteMapping(path = "user/deleteByToken")
+    public ResponseEntity<Object> deleteByToken(@RequestParam String token) {
+        return userService.deleteUserById(token);
+    }
 }
