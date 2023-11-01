@@ -162,19 +162,27 @@ public class ErrandDataService {
                 if (maybeCar.isPresent() && maybeCarData.isPresent()) {
                     CarData carData = maybeCarData.get();
                     Car car = maybeCar.get();
-                    manipulatedRecord.setErrandStartedTimestamp(LocalDateTime.now());
-                    manipulatedRecord.setErrandStartedMileage(carData.getOverallMileage());
-                    manipulatedRecord.setErrandStartedBatteryEnergy(car.getBattNominalCapacity() * (carData.getBattSoh() / 100) * (carData.getBattSoc() / 100) * carData.getBattVoltage());
-                    response.put("status", "success");
-                    response.put("message", "Status zlecenia nr " + errandId + " został zmieniony na W TRAKCIE");
+                    if(carData.getBattSoh() != null && car.getBattNominalCapacity() != null && carData.getOverallMileage() != null && carData.getBattSoc() != null && carData.getBattVoltage() != null) {
+                        manipulatedRecord.setErrandStartedTimestamp(LocalDateTime.now());
+                        manipulatedRecord.setErrandStartedMileage(carData.getOverallMileage());
+                        manipulatedRecord.setErrandStartedBatteryEnergy(car.getBattNominalCapacity() * (carData.getBattSoh() / 100) * (carData.getBattSoc() / 100) * carData.getBattVoltage());
+                        manipulatedRecord.setErrandStatus(newStatus);
+                        response.put("status", "success");
+                        response.put("message", "Status zlecenia nr " + errandId + " został zmieniony na W TRAKCIE");
+                    }
+                    else{
+                        response.put("status", "data-not-found-0020");
+                        response.put("message", "Brak wystarczających danych dla pojazdu o numerze ID " + errand.getCarId() + " aby obliczyć parametry początkowe zlecenia. Nie udało się rozpocząć zlecenia");
+                    }
                 } else {
                     response.put("status", "data-not-found-0015");
-                    response.put("message", "Dane pojazdu o numerze ID " + errand.getCarId() + " nie istnieją w bazie danych. Nie udało się zakończyć zlecenia");
+                    response.put("message", "Dane pojazdu o numerze ID " + errand.getCarId() + " nie istnieją w bazie danych. Nie udało się rozpocząć zlecenia");
                 }
             } else if (newStatus == ErrandStatus.FINISHED) {
                 Double errandAvgEnergyConsumption = calculateErrandAvgEnergyConsumption(errandId);
                 if (errandAvgEnergyConsumption != null){
                     if(editCarData(errand.getCarId(), errandAvgEnergyConsumption) == "success"){
+                        manipulatedRecord.setErrandStatus(newStatus);
                         response.put("status", "success");
                         response.put("message", "Status zlecenia nr " + errandId + " został zmieniony na ZAKOŃCZONE");
                     }
@@ -184,7 +192,6 @@ public class ErrandDataService {
                     }
                 }
             }
-            manipulatedRecord.setErrandStatus(newStatus);
         } else {
             response.put("status", "record-not-found-0014");
             response.put("message", "Zlecenie o numerze ID " + errandId + " nie istnieje w bazie danych. Nie udało się zakończyć zlecenia");
