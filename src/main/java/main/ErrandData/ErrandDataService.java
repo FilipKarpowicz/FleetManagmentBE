@@ -56,6 +56,12 @@ public class ErrandDataService {
         if (maybeErrandData.isEmpty()) {
             response.put("message", "Brak danych w bazie dla id zlecenia " + errandId);
             response.put("status", "record-not-found-0006");
+            data.put("errandMileage", null);
+            data.put("errandDrivingTime", null);
+            data.put("errandStartedTimestamp", null);
+            data.put("avgSpeed", null);
+            data.put("avgEnergyConsumption", null);
+            data.put("errandStatus", null);
             response.put("data", null);
         } else {
             ErrandData errandData = maybeErrandData.get();
@@ -84,35 +90,10 @@ public class ErrandDataService {
             if (errandData.getErrandStatus() == ErrandStatus.WAITING) {
                 response.put("message", "Zlecenie ma status OCZEKUJĄCE, nie można policzyć danych");
                 response.put("status", "success");
-                data.put("errandMileage", null);
-                data.put("errandDrivingTime", null);
-                data.put("errandStartedTimestamp", null);
-                data.put("avgSpeed", null);
-                data.put("avgEnergyConsumption", null);
-                data.put("errandStatus", null);
-                response.put("data", data);
             }
             else if (errandData.getErrandLastMileage() == null || errandData.getErrandLastBatteryEnergy() == null || errandData.getErrandLastTimestamp() == null) {
                 response.put("message", "Brak aktualnych danych zlecenia, nie można policzyć danych");
                 response.put("status", "errand-last-conditions-unknown");
-                data.put("errandMileage", null);
-                data.put("errandDrivingTime", null);
-                data.put("errandStartedTimestamp", null);
-                data.put("avgSpeed", null);
-                data.put("avgEnergyConsumption", null);
-                data.put("errandStatus", null);
-                response.put("data", data);
-            }
-            else if (errandData.getErrandStartedMileage() == null || errandData.getErrandStartedBatteryEnergy() == null || errandData.getErrandStartedTimestamp() == null) {
-                response.put("message", "Brak danych początkowych zlecenia, nie można policzyć danych");
-                response.put("status", "errand-initial-conditions-null");
-                data.put("errandMileage", null);
-                data.put("errandDrivingTime", null);
-                data.put("errandStartedTimestamp", null);
-                data.put("avgSpeed", null);
-                data.put("avgEnergyConsumption", null);
-                data.put("errandStatus", null);
-                response.put("data", data);
             }
         }
         return new ResponseEntity<Object>(response, HttpStatus.OK);
@@ -180,17 +161,16 @@ public class ErrandDataService {
                 }
             } else if (newStatus == ErrandStatus.FINISHED) {
                 Double errandAvgEnergyConsumption = calculateErrandAvgEnergyConsumption(errandId);
-                if (errandAvgEnergyConsumption != null){
-                    if(editCarData(errand.getCarId(), errandAvgEnergyConsumption) == "success"){
-                        manipulatedRecord.setErrandStatus(newStatus);
-                        response.put("status", "success");
-                        response.put("message", "Status zlecenia nr " + errandId + " został zmieniony na ZAKOŃCZONE");
-                    }
-                    else{
+                response.put("status", "success");
+                response.put("message", "Status zlecenia nr " + errandId + " został zmieniony na ZAKOŃCZONE");
+                if(errandAvgEnergyConsumption != null) {
+                    if(setCarAvgConsumption(errand.getCarId(), errandAvgEnergyConsumption) != "success") {
                         response.put("status", "data-not-found-0016");
                         response.put("message", "Pojazd o numerze ID " + errand.getCarId() + ", przypisany do tego zlecenia, nie istnieje w bazie danych. Nie udało się zakończyć zlecenia");
                     }
+                    else manipulatedRecord.setErrandStatus(newStatus);
                 }
+                else manipulatedRecord.setErrandStatus(newStatus);
             }
         } else {
             response.put("status", "record-not-found-0014");
@@ -200,15 +180,14 @@ public class ErrandDataService {
     }
 
     @Transactional
-    public String editCarData(Long carId, Double lastErrandAvgEnergyConsumption) {
+    public String setCarAvgConsumption(Long carId, Double lastErrandAvgEnergyConsumption) {
         Optional<CarData> maybeManipulatedData = carDataRepository.findById(carId);
         if(maybeManipulatedData.isEmpty()) return "failed";
-        else if (lastErrandAvgEnergyConsumption != null) {
+        else {
             CarData manipulatedData = maybeManipulatedData.get();
             manipulatedData.setLastErrandAvgEnergyConsumption(lastErrandAvgEnergyConsumption);
             return "success";
         }
-        else return "failed";
     }
 
     public List<ErrandData> getAll(Integer batchNumber) {

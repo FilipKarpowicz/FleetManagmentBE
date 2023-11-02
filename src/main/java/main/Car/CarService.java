@@ -340,7 +340,7 @@ public class CarService {
         if(matchedCars.isEmpty()){
             response.put("status", "success");
             response.put("message", "No results found");
-            response.put("data", null);
+            response.put("data", responseCarList);
             return new ResponseEntity<Object>(response, HttpStatus.OK);
         }
         else {
@@ -359,7 +359,7 @@ public class CarService {
             } else {
                 response.put("status", "empty-0002");
                 response.put("message", "Pakiet danych pusty");
-                response.put("data", null);
+                response.put("data", responseCarList);
                 return new ResponseEntity<Object>(response, HttpStatus.OK);
             }
         }
@@ -377,7 +377,7 @@ public class CarService {
         catch (Exception e){
             response.put("status", "unknown-0002");
             response.put("message", "Unknown error");
-            response.put("data", null);
+            response.put("data", responseCarList);
             return new ResponseEntity<Object>(response, HttpStatus.OK);
         }
     }
