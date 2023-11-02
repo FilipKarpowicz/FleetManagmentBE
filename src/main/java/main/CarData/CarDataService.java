@@ -48,6 +48,8 @@ public class CarDataService {
         data.put("lastLocationId", null);
         data.put("remainingRange", null);
 
+        Double battEnergy = null;
+
         Optional<CarData> maybeCarData = getByCarId(carId);
         Optional<Car> maybeCar = carRepository.findById(carId);
 
@@ -65,37 +67,32 @@ public class CarDataService {
             Car car = maybeCar.get();
             CarData carData = maybeCarData.get();
 
-            if(car.getBattNominalCapacity() == null || carData.getBattSoh() == null || carData.getBattSoc() == null || carData.getBattVoltage() == null){
-                response.put("status", "record-not-found-0006");
-                response.put("message", "Brak wystarczających informacji dla ID pojazdu " + carId);
-                response.put("data", data);
+            if(car.getBattNominalCapacity() != null && carData.getBattSoh() != null && carData.getBattSoc() != null && carData.getBattVoltage() != null) {
+                battEnergy = car.getBattNominalCapacity() * ((double) carData.getBattSoh() / 100) * ((double) carData.getBattSoc() / 100) * carData.getBattVoltage();
             }
-            else {
-                Double battEnergy = car.getBattNominalCapacity() * ((double) carData.getBattSoh() / 100) * ((double) carData.getBattSoc() / 100) * carData.getBattVoltage();
-                String activeErrandId = errandDataService.getActiveErrandDataForCarId(carId);
-                Double remainingRange = null;
+            String activeErrandId = errandDataService.getActiveErrandDataForCarId(carId);
+            Double remainingRange = null;
 
-                if (activeErrandId != null) {
-                    if (errandDataService.calculateErrandAvgEnergyConsumption(activeErrandId) != null) {
-                        remainingRange = battEnergy / errandDataService.calculateErrandAvgEnergyConsumption(activeErrandId);
-                    }
-                } else {
-                    if (carData.getLastErrandAvgEnergyConsumption() != null && carData.getLastErrandAvgEnergyConsumption() > 0) {
-                        remainingRange = battEnergy / carData.getLastErrandAvgEnergyConsumption();
-                    }
+            if (activeErrandId != null && battEnergy != null) {
+                if (errandDataService.calculateErrandAvgEnergyConsumption(activeErrandId) != null) {
+                    remainingRange = battEnergy / errandDataService.calculateErrandAvgEnergyConsumption(activeErrandId);
                 }
-
-                data.put("overallMileage", roundPlaces(carData.getOverallMileage(), 2));
-                data.put("battSoc", carData.getBattSoc());
-                data.put("battSoh", carData.getBattSoh());
-                data.put("battVoltage", carData.getBattVoltage());
-                data.put("lastUpdate", carData.getLastUpdate());
-                data.put("lastLocationId", carData.getLastLocation());
-                data.put("remainingRange", roundPlaces(remainingRange, 2));
-                response.put("status", "success");
-                response.put("message", "Dane przekazane poprawnie");
-                response.put("data", data);
+            } else if (battEnergy != null){
+                if (carData.getLastErrandAvgEnergyConsumption() != null && carData.getLastErrandAvgEnergyConsumption() > 0) {
+                    remainingRange = battEnergy / carData.getLastErrandAvgEnergyConsumption();
+                }
             }
+
+            data.put("overallMileage", roundPlaces(carData.getOverallMileage(), 2));
+            data.put("battSoc", carData.getBattSoc());
+            data.put("battSoh", carData.getBattSoh());
+            data.put("battVoltage", carData.getBattVoltage());
+            data.put("lastUpdate", carData.getLastUpdate());
+            data.put("lastLocationId", carData.getLastLocation());
+            data.put("remainingRange", roundPlaces(remainingRange, 2));
+            response.put("status", "success");
+            response.put("message", "Dane przekazane poprawnie");
+            response.put("data", data);
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

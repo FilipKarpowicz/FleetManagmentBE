@@ -2,6 +2,7 @@ package main.Car;
 
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import main.CarData.CarData;
 import main.CarData.CarDataRepository;
 import main.CarData.CarDataService;
@@ -55,18 +56,47 @@ public class CarService {
 
     public ResponseEntity<Object> getCarResponse(Long carId){
         Map<String, Object> response = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
         Optional<Car> maybeCar = carRepository.findCarByCarId(carId);
+        Optional<CarData> maybeCarData = carDataRepository.findById(carId);
+        data.put("carId", null);
+        data.put("make", null);
+        data.put("model", null);
+        data.put("vin", null);
+        data.put("plateNo", null);
+        data.put("type", null);
+        data.put("comment", null);
+        data.put("serviceDate", null);
+        data.put("serviceMileage", null);
+        data.put("battNominalCapacity", null);
+        data.put("devId", null);
+        data.put("mileageToService", null);
 
-        if(maybeCar.isEmpty()){
+
+        if(maybeCar.isEmpty() || maybeCarData.isEmpty()){
             response.put("status", "record-not-found-0006");
             response.put("message", "Pojazd z id " + carId + " nie istnieje w bazie danych");
-            response.put("data", new Car());
+            response.put("data", data);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         else{
+            Car car = maybeCar.get();
+            CarData carData = maybeCarData.get();
+            data.put("carId", car.getCarId());
+            data.put("make", car.getMake());
+            data.put("model", car.getModel());
+            data.put("vin", car.getVin());
+            data.put("plateNo", car.getPlateNo());
+            data.put("type", car.getType());
+            data.put("comment", car.getComment());
+            data.put("serviceDate", car.getServiceDate());
+            data.put("serviceMileage", car.getServiceMileage());
+            data.put("battNominalCapacity", car.getBattNominalCapacity());
+            data.put("devId", car.getDevId());
+            data.put("mileageToService", car.getServiceMileage() - carData.getOverallMileage());
             response.put("status", "success");
             response.put("message", "Dane przekazane poprawnie");
-            response.put("data", maybeCar.get());
+            response.put("data", data);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
     }
@@ -298,7 +328,10 @@ public class CarService {
 
     }
 
-    public ResponseEntity<Object> searchCars(String makePart, String modelPart, String vinPart, String plateNumberPart, String typePart, Long serviceMileageLowerThreshold, Long serviceMileageUpperThreshold, LocalDate serviceDateLowerThreshold, LocalDate serviceDateUpperThreshold, Integer batchNumber){
+    public ResponseEntity<Object> searchCars(String makePart, String modelPart, String vinPart, String plateNumberPart,
+                                             String typePart, Long serviceMileageLowerThreshold, Long serviceMileageUpperThreshold,
+                                             LocalDate serviceDateLowerThreshold, LocalDate serviceDateUpperThreshold, Double carMileageThreshold,
+                                             String carMileageLessOrMore, Integer battSoc, String battSocLessOrMore, Integer batchNumber){
         List<Car> allCars = carRepository.findAll();
         List<Car> matchedCars = new ArrayList<Car>();
         List<Car> responseCarList = new ArrayList<Car>();
@@ -313,25 +346,46 @@ public class CarService {
 
         for(Car car : allCars){
             Boolean carMatchesSearch = false;
+            CarData carData = carDataRepository.findById(car.getCarId()).get();
 
             carMatchesSearch = car.getMake().contains(makePart) && car.getModel().contains(modelPart) && car.getVin().contains(vinPart)
                             && car.getPlateNo().contains(plateNumberPart) && car.getType().contains(typePart);
 
-            if(car.getServiceDate() != null) {
-                if (serviceDateLowerThreshold != null) {
-                    carMatchesSearch = carMatchesSearch && car.getServiceDate().isAfter(serviceDateLowerThreshold);
-                }
-                if (serviceDateUpperThreshold != null) {
-                    carMatchesSearch = carMatchesSearch && car.getServiceDate().isBefore(serviceDateUpperThreshold);
-                }
+            if (serviceDateLowerThreshold != null) {
+                if(car.getServiceDate() != null) carMatchesSearch = carMatchesSearch && car.getServiceDate().isAfter(serviceDateLowerThreshold);
+                else carMatchesSearch = false;
             }
-            if(car.getServiceMileage() != null) {
-                if (serviceMileageLowerThreshold != null) {
-                    carMatchesSearch = carMatchesSearch && car.getServiceMileage() > serviceMileageLowerThreshold;
+            if (serviceDateUpperThreshold != null) {
+                if(car.getServiceDate() != null) carMatchesSearch = carMatchesSearch && car.getServiceDate().isBefore(serviceDateUpperThreshold);
+                else carMatchesSearch = false;
+            }
+            if (serviceMileageLowerThreshold != null) {
+                if(car.getServiceMileage() != null) carMatchesSearch = carMatchesSearch && car.getServiceMileage() > serviceMileageLowerThreshold;
+                else carMatchesSearch = false;
+            }
+            if (serviceMileageUpperThreshold != null) {
+                if(car.getServiceMileage() != null) carMatchesSearch = carMatchesSearch && car.getServiceMileage() < serviceMileageUpperThreshold;
+                else carMatchesSearch = false;
+            }
+            if (carMileageThreshold != null){
+                if(carData.getOverallMileage() != null){
+                    switch (carMileageLessOrMore){
+                        case "Less" -> {carMatchesSearch = carMatchesSearch && carData.getOverallMileage() < carMileageThreshold;}
+                        case "More" -> {carMatchesSearch = carMatchesSearch && carData.getOverallMileage() > carMileageThreshold;}
+                        default -> {}
+                    }
                 }
-                if (serviceMileageUpperThreshold != null) {
-                    carMatchesSearch = carMatchesSearch && car.getServiceMileage() < serviceMileageUpperThreshold;
+                else carMatchesSearch = false;
+            }
+            if (battSoc != null){
+                if(carData.getBattSoc() != null){
+                    switch (battSocLessOrMore){
+                        case "Less" -> {carMatchesSearch = carMatchesSearch && carData.getBattSoc() < battSoc;}
+                        case "More" -> {carMatchesSearch = carMatchesSearch && carData.getBattSoc() > battSoc;}
+                        default -> {}
+                    }
                 }
+                else carMatchesSearch = false;
             }
 
             if (carMatchesSearch) matchedCars.add(car);

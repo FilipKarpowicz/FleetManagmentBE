@@ -95,7 +95,11 @@ public class CarController {
                                                 @RequestParam(required = false) Long serviceMileageUpperThreshold,
                                                 @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate serviceDateLowerThreshold,
                                                 @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate serviceDateUpperThreshold,
+                                                @RequestParam(required = false) Double carMileageThreshold,
+                                                @RequestParam(required = false) String carMileageLessOrMore,
+                                                @RequestParam(required = false) Integer battSocThreshold,
+                                                @RequestParam(required = false) String battSocLessOrMore,
                                                 @RequestParam(required = true) Integer batch){
-        return carService.searchCars(makePart, modelPart, vinPart, plateNumberPart, typePart, serviceMileageLowerThreshold, serviceMileageUpperThreshold, serviceDateLowerThreshold, serviceDateUpperThreshold, batch);
+        return carService.searchCars(makePart, modelPart, vinPart, plateNumberPart, typePart, serviceMileageLowerThreshold, serviceMileageUpperThreshold, serviceDateLowerThreshold, serviceDateUpperThreshold, carMileageThreshold, carMileageLessOrMore, battSocThreshold, battSocLessOrMore, batch);
     }
 }
