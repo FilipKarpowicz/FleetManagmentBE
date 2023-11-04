@@ -20,20 +20,6 @@ public class DriverService {
 
     private final DriverRepository driverRepository;
 
-    private List<Driver> calculateBatch(Integer batchNumber, List<Driver> table) {
-        int from = 15 * (batchNumber - 1);
-        int to = 15 * batchNumber;
-        if (table.size() > from + to && table.size() > from) {
-            table = table.subList(from, to);
-        } else if (table.size() > from) {
-            table = table.subList(from, table.size());
-        } else {
-            throw new IllegalStateException("batch is empty");
-        }
-        return table;
-    }
-
-
     @Autowired
     public DriverService(DriverRepository driverRepository) {
         this.driverRepository = driverRepository;

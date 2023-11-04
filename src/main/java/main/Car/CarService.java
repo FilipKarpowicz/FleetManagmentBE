@@ -93,7 +93,7 @@ public class CarService {
             data.put("serviceMileage", car.getServiceMileage());
             data.put("battNominalCapacity", car.getBattNominalCapacity());
             data.put("devId", car.getDevId());
-            data.put("mileageToService", car.getServiceMileage() - carData.getOverallMileage());
+            data.put("mileageToService", (carData.getOverallMileage() != null && car.getServiceMileage() != null) ? car.getServiceMileage() - carData.getOverallMileage() : null);
             response.put("status", "success");
             response.put("message", "Dane przekazane poprawnie");
             response.put("data", data);
@@ -406,7 +406,7 @@ public class CarService {
             });
             Integer startIndex = batchNumber * 9 - 9;
             Integer endIndex = batchNumber * 9;
-            if (matchedCars.size() > startIndex + endIndex && matchedCars.size() > startIndex) {
+            if (matchedCars.size() > endIndex) {
                 responseCarList = matchedCars.subList(startIndex, endIndex);
             } else if (matchedCars.size() > startIndex) {
                 responseCarList = matchedCars.subList(startIndex, matchedCars.size());
@@ -418,7 +418,7 @@ public class CarService {
             }
         }
 
-        Integer numberOfBatches = (Integer) (matchedCars.size()/9) + 1;
+        Integer numberOfBatches = (Integer) ((matchedCars.size()-1)/9) + 1;
 
         try{
             data.put("cars", responseCarList);

@@ -153,9 +153,9 @@ public class ErrandService {
             return new ResponseEntity<Object>(response, HttpStatus.OK);
         }
         else {
-            Integer startIndex = batchNumber * 10 - 10;
-            Integer endIndex = batchNumber * 10;
-            if (matchedErrands.size() > startIndex + endIndex && matchedErrands.size() > startIndex) {
+            Integer startIndex = batchNumber * 15 - 15;
+            Integer endIndex = batchNumber * 15;
+            if (matchedErrands.size() > endIndex) {
                 responseErrandList = matchedErrands.subList(startIndex, endIndex);
             } else if (matchedErrands.size() > startIndex) {
                 responseErrandList = matchedErrands.subList(startIndex, matchedErrands.size());
@@ -167,7 +167,7 @@ public class ErrandService {
             }
         }
 
-        Integer numberOfBatches = (Integer) (matchedErrands.size()/10) + 1;
+        Integer numberOfBatches = (Integer) (matchedErrands.size()/15) + 1;
 
         List<Object> listOfErrands = new ArrayList<Object>();
         try{

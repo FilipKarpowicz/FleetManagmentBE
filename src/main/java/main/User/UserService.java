@@ -95,7 +95,7 @@ public class UserService {
         }
         int from = batch * 10 - 10;
         int to = Math.min(batch * 10, users.size());
-        int size = users.size() / 10 + 1;
+        int size = (users.size() - 1)/ 10 + 1;
 
         Map<String, Object> response = new HashMap<>();
         Map<String, Object> data = new HashMap<>();

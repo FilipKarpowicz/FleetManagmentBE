@@ -207,7 +207,7 @@ public class ErrandDataService {
         Integer startIndex = batchNumber * 15 - 15;
         Integer endIndex = batchNumber * 15;
 
-        if (allData.size() > startIndex + endIndex && allData.size() > startIndex) {
+        if (allData.size() > endIndex) {
             return allData.subList(startIndex, endIndex);
         } else if (allData.size() > startIndex) {
             return allData.subList(startIndex, allData.size());

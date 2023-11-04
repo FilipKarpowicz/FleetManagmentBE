@@ -55,7 +55,7 @@ public class LocationService {
         Integer startIndex = batchNumber*15 - 15;
         Integer endIndex = batchNumber*15;
 
-        if(allLocations.size() > startIndex + endIndex && allLocations.size() > startIndex){
+        if(allLocations.size() > endIndex){
             return allLocations.subList(startIndex, endIndex);
         } else if (allLocations.size() > startIndex) {
             return allLocations.subList(startIndex, allLocations.size());
