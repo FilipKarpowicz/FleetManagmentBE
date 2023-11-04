@@ -138,26 +138,37 @@ public class ErrandDataService {
             ErrandData manipulatedRecord = maybeManipulatedRecord.get();
             Errand errand = maybeErrand.get();
             if (newStatus == ErrandStatus.IN_PROGRESS) {
-                Optional<Car> maybeCar = carService.getCarById(errand.getCarId());
-                Optional<CarData> maybeCarData = carDataRepository.findById(errand.getCarId());
-                if (maybeCar.isPresent() && maybeCarData.isPresent()) {
-                    CarData carData = maybeCarData.get();
-                    Car car = maybeCar.get();
-                    if(carData.getBattSoh() != null && car.getBattNominalCapacity() != null && carData.getOverallMileage() != null && carData.getBattSoc() != null && carData.getBattVoltage() != null) {
-                        manipulatedRecord.setErrandStartedTimestamp(LocalDateTime.now());
-                        manipulatedRecord.setErrandStartedMileage(carData.getOverallMileage());
-                        manipulatedRecord.setErrandStartedBatteryEnergy(car.getBattNominalCapacity() * (carData.getBattSoh() / 100) * (carData.getBattSoc() / 100) * carData.getBattVoltage());
-                        manipulatedRecord.setErrandStatus(newStatus);
-                        response.put("status", "success");
-                        response.put("message", "Status zlecenia nr " + errandId + " został zmieniony na W TRAKCIE");
+                if(getActiveErrandDataForDrvId(errand.getDrvId()) == null && getActiveErrandDataForCarId(errand.getCarId()) == null) {
+                    Optional<Car> maybeCar = carService.getCarById(errand.getCarId());
+                    Optional<CarData> maybeCarData = carDataRepository.findById(errand.getCarId());
+                    if (maybeCar.isPresent() && maybeCarData.isPresent()) {
+                        CarData carData = maybeCarData.get();
+                        Car car = maybeCar.get();
+                        if (carData.getBattSoh() != null && car.getBattNominalCapacity() != null && carData.getOverallMileage() != null && carData.getBattSoc() != null && carData.getBattVoltage() != null) {
+                            manipulatedRecord.setErrandStartedTimestamp(LocalDateTime.now());
+                            manipulatedRecord.setErrandStartedMileage(carData.getOverallMileage());
+                            manipulatedRecord.setErrandStartedBatteryEnergy(car.getBattNominalCapacity() * ((double) carData.getBattSoh() / 100) * ((double) carData.getBattSoc() / 100) * carData.getBattVoltage());
+                            manipulatedRecord.setErrandStatus(newStatus);
+                            response.put("status", "success");
+                            response.put("message", "Status zlecenia nr " + errandId + " został zmieniony na W TRAKCIE");
+                        } else {
+                            response.put("status", "data-not-found-0020");
+                            response.put("message", "Brak wystarczających danych dla pojazdu o numerze ID " + errand.getCarId() + " aby obliczyć parametry początkowe zlecenia. Nie udało się rozpocząć zlecenia");
+                        }
+                    } else {
+                        response.put("status", "data-not-found-0015");
+                        response.put("message", "Dane pojazdu o numerze ID " + errand.getCarId() + " nie istnieją w bazie danych. Nie udało się rozpocząć zlecenia");
                     }
-                    else{
-                        response.put("status", "data-not-found-0020");
-                        response.put("message", "Brak wystarczających danych dla pojazdu o numerze ID " + errand.getCarId() + " aby obliczyć parametry początkowe zlecenia. Nie udało się rozpocząć zlecenia");
+                }
+                else{
+                    if(getActiveErrandDataForCarId(errand.getCarId()) != null){
+                        response.put("status", "conflict-0010");
+                        response.put("message", "Nie można rozpocząć tego zlecenia, ponieważ pojazd o numerze ID " + errand.getCarId() + " uczestniczy już w innym, aktywnym zleceniu (" + getActiveErrandDataForCarId(errand.getCarId()) + ")");
                     }
-                } else {
-                    response.put("status", "data-not-found-0015");
-                    response.put("message", "Dane pojazdu o numerze ID " + errand.getCarId() + " nie istnieją w bazie danych. Nie udało się rozpocząć zlecenia");
+                    else if(getActiveErrandDataForDrvId(errand.getDrvId()) != null){
+                        response.put("status", "conflict-0011");
+                        response.put("message", "Nie można rozpocząć tego zlecenia, ponieważ kierowca o numerze ID " + errand.getDrvId() + " uczestniczy już w innym, aktywnym zleceniu (" + getActiveErrandDataForDrvId(errand.getDrvId()) + ")");
+                    }
                 }
             } else if (newStatus == ErrandStatus.FINISHED) {
                 Double errandAvgEnergyConsumption = calculateErrandAvgEnergyConsumption(errandId);
@@ -210,6 +221,21 @@ public class ErrandDataService {
         List<Errand> carErrandList = errandService.getByCarId(carId);
 
         for (Errand errand : carErrandList) {
+            Optional<ErrandData> errandData = getByErrandId(errand.getErrandId());
+            if (errandData.isPresent()) {
+                if (errandData.get().getErrandStatus() == ErrandStatus.IN_PROGRESS) activeErrandData = errandData;
+            }
+        }
+
+        if (activeErrandData != null) return activeErrandData.get().getId();
+        else return null;
+    }
+
+    public String getActiveErrandDataForDrvId(Long drvId) {
+        Optional<ErrandData> activeErrandData = null;
+        List<Errand> driverErrandList = errandService.getByDrvId(drvId);
+
+        for (Errand errand : driverErrandList) {
             Optional<ErrandData> errandData = getByErrandId(errand.getErrandId());
             if (errandData.isPresent()) {
                 if (errandData.get().getErrandStatus() == ErrandStatus.IN_PROGRESS) activeErrandData = errandData;
