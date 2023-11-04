@@ -33,6 +33,11 @@ public class UserController {
         return userService.loginUser(login,password);
     }
 
+    @GetMapping(path = "getUser")
+    public ResponseEntity<Object> login(@RequestParam("token") String token) {
+        return userService.getUser(token);
+    }
+
 
     @PutMapping(path = "user/setPassword")
     public ResponseEntity<Object> updatePassword(
