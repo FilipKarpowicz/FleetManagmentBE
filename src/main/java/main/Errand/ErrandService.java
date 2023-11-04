@@ -62,7 +62,7 @@ public class ErrandService {
         return new ResponseEntity<Object>(response, HttpStatus.OK);
     }
 
-    List<Errand> getByDrvId(Long drvId){
+    public List<Errand> getByDrvId(Long drvId){
         return repository.findByDrvId(drvId);
     }
 
