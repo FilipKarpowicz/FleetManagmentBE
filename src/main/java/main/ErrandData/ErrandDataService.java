@@ -59,6 +59,7 @@ public class ErrandDataService {
             data.put("errandMileage", null);
             data.put("errandDrivingTime", null);
             data.put("errandStartedTimestamp", null);
+            data.put("errandLastTimestamp", null);
             data.put("avgSpeed", null);
             data.put("avgEnergyConsumption", null);
             data.put("errandStatus", null);
@@ -80,6 +81,7 @@ public class ErrandDataService {
             data.put("errandMileage", roundPlaces(errandMileage, 2));
             data.put("errandDrivingTime", errandDrivingTimeString);
             data.put("errandStartedTimestamp", errandData.getErrandStartedTimestamp());
+            data.put("errandLastTimestamp", errandData.getErrandLastTimestamp());
             data.put("avgSpeed", roundPlaces(avgSpeed, 2));
             data.put("avgEnergyConsumption", roundPlaces(avgEnergyConsumption, 2));
             data.put("errandStatus", errandData.getErrandStatus());
