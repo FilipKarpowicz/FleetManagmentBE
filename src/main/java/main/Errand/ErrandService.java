@@ -167,7 +167,7 @@ public class ErrandService {
             }
         }
 
-        Integer numberOfBatches = (Integer) (matchedErrands.size()/15) + 1;
+        Integer numberOfBatches = (Integer) ((matchedErrands.size() -1 )/15) + 1;
 
         List<Object> listOfErrands = new ArrayList<Object>();
         try{
