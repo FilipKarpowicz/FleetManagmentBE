@@ -166,7 +166,7 @@ public class UserService {
                 modifyFlag = true;
             }
 
-            if(modifyFlag == false){
+            if(!modifyFlag){
                 response.put("status", "conflict-0009");
                 response.put("message", "Żadna wartość nie została zmieniona");
             }
@@ -237,6 +237,43 @@ public class UserService {
         } else {
             response.put("status", "record-not-found-0012");
             response.put("message", "Użytkownik nie istnieje w bazie danych");
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Transactional
+    public ResponseEntity<Object> modifyUserByToken(String token, String login, String name) {
+        Map<String, Object> response = new HashMap<>();
+        Optional<UserEntity> optionalUserEntity = userRepository.findUserEntityByToken(token);
+        boolean modifyFlag = false;
+        boolean duplicateflag = false;
+        if(optionalUserEntity.isEmpty()){
+            response.put("status","record-not-found-0239");
+            response.put("message","Twoje konto nie istnieje w bazie danych");
+        }else{
+            UserEntity user = optionalUserEntity.get();
+            if(login != null && !Objects.equals(login,user.getLogin())){
+                if(userRepository.findUserEntityByLogin(login).isPresent()){
+                    duplicateflag = true;
+                    response.put("status","data-not-changed-0002");
+                    response.put("message","Podany login jest już zajęty.");
+                }else{
+                    user.setLogin(login);
+                    modifyFlag = true;
+                }
+            }
+            if(name != null && !Objects.equals(name,user.getName())){
+                user.setName(name);
+                modifyFlag = true;
+            }
+            if(!modifyFlag && !duplicateflag){
+                response.put("status","data-not-changed-0001");
+                response.put("message","Wprowadzono niepoprawne dane.");
+            }else if(!duplicateflag){
+                response.put("status","success");
+                response.put("message","Dane uzytkownika zmienione!");
+                response.put("data",user);
+            }
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

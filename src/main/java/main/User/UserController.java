@@ -71,4 +71,9 @@ public class UserController {
     public ResponseEntity<Object> deleteByToken(@RequestParam String token) {
         return userService.deleteUserById(token);
     }
+
+    @PutMapping(path = "account/modify")
+    public ResponseEntity<Object> updateAccount(@RequestParam String token, @RequestParam(required = false) String login, @RequestParam(required = false) String name){
+        return userService.modifyUserByToken(token,login,name);
+    }
 }
