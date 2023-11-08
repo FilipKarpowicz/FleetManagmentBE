@@ -213,14 +213,14 @@ public class ErrandService {
     public void deletePlannedRouteLocations(String errandId){
         List<Long> listOfLocations = getByErrandId(errandId).get().getPlannedRouteAsList();
         for(Long id : listOfLocations){
-            locationService.deleteLocationById(id);
+            if(locationService.getByLocationId(id).isPresent()) locationService.deleteLocationById(id);
         }
     }
 
     public void deleteAllLocations(String errandId){
         List<Long> listOfLocations = errandDataRepository.findById(errandId).get().getAllLocationsAsList();
         for(Long id : listOfLocations){
-            locationService.deleteLocationById(id);
+            if(locationService.getByLocationId(id).isPresent()) locationService.deleteLocationById(id);
         }
     }
 }
