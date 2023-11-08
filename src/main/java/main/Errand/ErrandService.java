@@ -44,11 +44,11 @@ public class ErrandService {
         Map<String, Object> data = new HashMap<>();
 
         if (!isDrvIdValid(errand.getDrvId())) {
-            response.put("status", "data-not-found-0017");
+            response.put("status", "data-not-found-0004");
             response.put("message", "Kierowca o numerze ID " + errand.getDrvId() + " nie istnieje w bazie danych. Zlecenie nie zostało utworzone");
         }
         else if (!isCarIdValid(errand.getCarId())) {
-            response.put("status", "data-not-found-0018");
+            response.put("status", "data-not-found-0005");
             response.put("message", "Pojazd o numerze ID " + errand.getCarId() + " nie istnieje w bazie danych. Zlecenie nie zostało utworzone");
         }
         else {
@@ -186,7 +186,7 @@ public class ErrandService {
             return new ResponseEntity<Object>(response, HttpStatus.OK);
         }
         catch (Exception e){
-            response.put("status", "unknown-0001");
+            response.put("status", "unknown-0003");
             response.put("message", "Błąd wewnętrzny serwera");
             response.put("data", null);
             return new ResponseEntity<Object>(response, HttpStatus.OK);
@@ -196,7 +196,7 @@ public class ErrandService {
     public ResponseEntity<Object> deleteErrandById(String errandId) {
         Map<String, Object> response = new HashMap<String, Object>();
         if (!getByErrandId(errandId).isPresent()){
-            response.put("status", "record-not-found-0011");
+            response.put("status", "data-not-found-0006");
             response.put("message", "Zlecenie o numerze ID " + errandId + " nie istnieje w bazie danych");
         }
         else {

@@ -9,6 +9,7 @@ import main.CarData.CarDataService;
 import main.Driver.Driver;
 import main.Driver.DriverService;
 import main.Errand.Errand;
+import main.Errand.ErrandRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +25,13 @@ public class CarService {
 
     private final CarRepository carRepository;
     private CarDataRepository carDataRepository;
+    private ErrandRepository errandRepository;
 
     @Autowired
-    public CarService(CarRepository carRepository, CarDataRepository carDataRepository) {
+    public CarService(CarRepository carRepository, CarDataRepository carDataRepository, ErrandRepository errandRepository) {
         this.carRepository = carRepository;
         this.carDataRepository = carDataRepository;
+        this.errandRepository = errandRepository;
     }
 
     private List<Car> calculateBatch(Integer batchNumber,List<Car> table){
@@ -240,20 +243,33 @@ public class CarService {
         carDataRepository.save(carData);
     }
 
+    private String carIsAssignedToErrand(Long carId){
+        String errandId = null;
+        List<Errand> listOfErrands = errandRepository.findAll();
+        for(Errand errand:listOfErrands){
+            if(errand.getCarId().equals(carId)) errandId = errand.getErrandId();
+        }
+        return errandId;
+    }
+
     public ResponseEntity<Object> deleteCar(Long carId) {
         Map<String, Object> response = new HashMap<>();
         boolean exists = carRepository.existsById(carId);
+        String carErrandId = carIsAssignedToErrand(carId);
         if (!exists) {
             response.put("status", "record-not-found-0001");
             response.put("message", "Pojazd z id " + carId + " nie istnieje w bazie. Operacja nieudana");
-            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        else if(carErrandId != null){
+            response.put("status", "conflict-0004");
+            response.put("message", "Pojazd z id " + carId + " jest przypisany do zlecenia " + carErrandId + ". Nie można usunąć pojazdu");
         }
         else {
             carRepository.deleteById(carId);
             response.put("status", "success");
             response.put("message", "Pojazd pomyślnie usunięty");
-            return new ResponseEntity<>(response, HttpStatus.OK);
         }
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Transactional
@@ -315,7 +331,7 @@ public class CarService {
             }
 
             if (modifyFlag == 0) {
-                response.put("status", "conflict-0004");
+                response.put("status", "conflict-0005");
                 response.put("message", "Żadna z wartości nie została zmieniona");
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }

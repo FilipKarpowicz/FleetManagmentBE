@@ -1,5 +1,8 @@
 package main.Driver;
 
+import main.Errand.Errand;
+import main.Errand.ErrandRepository;
+import main.Errand.ErrandService;
 import org.apache.catalina.User;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +22,12 @@ import java.util.*;
 public class DriverService {
 
     private final DriverRepository driverRepository;
+    private ErrandRepository errandRepository;
 
     @Autowired
-    public DriverService(DriverRepository driverRepository) {
+    public DriverService(DriverRepository driverRepository, ErrandRepository errandRepository) {
         this.driverRepository = driverRepository;
+        this.errandRepository = errandRepository;
     }
 
     public Optional<Driver> getDriverById(Long drvId) {
@@ -34,7 +39,7 @@ public class DriverService {
         Optional<Driver> driver = driverRepository.findById(drvId);
 
         if(driver.isEmpty()){
-            response.put("status", "record-not-found-0007");
+            response.put("status", "data-not-found-0001");
             response.put("message", "Kierowca z ID " + drvId + " nie istnieje w bazie");
             response.put("data", null);
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -47,17 +52,31 @@ public class DriverService {
         }
     }
 
+    private String drvIsAssignedToErrand(Long drvId){
+        String errandId = null;
+        List<Errand> listOfErrands = errandRepository.findAll();
+        for(Errand errand:listOfErrands){
+            if(errand.getDrvId().equals(drvId)) errandId = errand.getErrandId();
+        }
+        return errandId;
+    }
 
     public ResponseEntity<Object> deleteDriverById(Long drvId) {
         Map<String, Object> response = new HashMap<>();
         Optional<Driver> driverById = driverRepository.findById(drvId);
-        if(driverById.isPresent()){
+        String drvErrandId = drvIsAssignedToErrand(drvId);
+        if(!driverById.isPresent()){
+            response.put("status","data-not-found-0002");
+            response.put("message","Kierowca z id " + drvId + " nie istnieje w bazie");
+        }
+        else if(drvErrandId != null){
+            response.put("status","conflict-0006");
+            response.put("message","Kierowca z id " + drvId + " jest przypisany do zlecenia " + drvErrandId + ". Nie można usunąć kierowcy");
+        }
+        else{
             driverRepository.deleteById(drvId);
             response.put("status","success");
             response.put("message","Kierowca został usunięty z bazy");
-        }else{
-            response.put("status","record-not-found-0010");
-            response.put("message","Kierowca z id " + drvId + " nie istnieje w bazie");
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -67,7 +86,7 @@ public class DriverService {
 
         Optional<Driver> driverByPeselOptional = driverRepository.findDriverByPesel(driver.getPesel());
         if (driverByPeselOptional.isPresent()) {
-            response.put("status","conflict-0009");
+            response.put("status","conflict-0007");
             response.put("message","Kierowca z numerem PESEL " + driver.getPesel() + " już istnieje w bazie danych");
         } else if(driver.getFirstName() != null && driver.getLastName() != null && driver.getPesel() != null && driver.getDrvLicNo() != null && driver.getBirthdate() != null){
             driverRepository.save(driver);
@@ -75,7 +94,7 @@ public class DriverService {
             response.put("message","Kierowca " + driver.getFirstName() + " " + driver.getLastName() + " został dodany do bazy danych");
         }
         else{
-            response.put("status", "conflict-0010");
+            response.put("status", "conflict-0008");
             response.put("message", "Proszę uzupełnić wszystkie wymagane pola");
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -87,7 +106,7 @@ public class DriverService {
 
         Optional<Driver> driverById = driverRepository.findById(drvId);
         if(driverById.isEmpty()){
-            response.put("status","record-not-found-0015");
+            response.put("status","data-not-found-0003");
             response.put("message","Kierowca z numerem ID " + drvId + " nie istnieje w bazie danych");
         }else{
             Driver driver = driverById.get();
@@ -124,7 +143,7 @@ public class DriverService {
             }
 
             if(modifyFlag == false){
-                response.put("status", "conflict-0010");
+                response.put("status", "conflict-0009");
                 response.put("message", "Żadna z wartości nie została zmieniona");
             }
             else {
@@ -160,7 +179,7 @@ public class DriverService {
                     response.put("data", data);
                 }
                 default -> {
-                    response.put("status", "unknown-0002");
+                    response.put("status", "unknown-0001");
                     response.put("message", "Invalid overallDrvRating operator");
                 }
             }

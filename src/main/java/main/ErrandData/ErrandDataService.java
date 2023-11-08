@@ -9,6 +9,7 @@ import main.Errand.Errand;
 import main.Errand.ErrandService;
 import main.Location.Location;
 import main.Location.LocationService;
+import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,7 @@ public class ErrandDataService {
 
         if (maybeErrandData.isEmpty()) {
             response.put("message", "Brak danych w bazie dla id zlecenia " + errandId);
-            response.put("status", "record-not-found-0006");
+            response.put("status", "data-not-found-0007");
             data.put("errandMileage", null);
             data.put("errandDrivingTime", null);
             data.put("errandStartedTimestamp", null);
@@ -154,11 +155,11 @@ public class ErrandDataService {
                             response.put("status", "success");
                             response.put("message", "Status zlecenia nr " + errandId + " został zmieniony na W TRAKCIE");
                         } else {
-                            response.put("status", "data-not-found-0020");
+                            response.put("status", "data-not-found-0008");
                             response.put("message", "Brak wystarczających danych dla pojazdu o numerze ID " + errand.getCarId() + " aby obliczyć parametry początkowe zlecenia. Nie udało się rozpocząć zlecenia");
                         }
                     } else {
-                        response.put("status", "data-not-found-0015");
+                        response.put("status", "data-not-found-0009");
                         response.put("message", "Dane pojazdu o numerze ID " + errand.getCarId() + " nie istnieją w bazie danych. Nie udało się rozpocząć zlecenia");
                     }
                 }
@@ -178,15 +179,21 @@ public class ErrandDataService {
                 response.put("message", "Status zlecenia nr " + errandId + " został zmieniony na ZAKOŃCZONE");
                 if(errandAvgEnergyConsumption != null) {
                     if(setCarAvgConsumption(errand.getCarId(), errandAvgEnergyConsumption) != "success") {
-                        response.put("status", "data-not-found-0016");
+                        response.put("status", "data-not-found-0010");
                         response.put("message", "Pojazd o numerze ID " + errand.getCarId() + ", przypisany do tego zlecenia, nie istnieje w bazie danych. Nie udało się zakończyć zlecenia");
                     }
-                    else manipulatedRecord.setErrandStatus(newStatus);
+                    else {
+                        manipulatedRecord.setErrandLastTimestamp(LocalDateTime.now());
+                        manipulatedRecord.setErrandStatus(newStatus);
+                    }
                 }
-                else manipulatedRecord.setErrandStatus(newStatus);
+                else {
+                    manipulatedRecord.setErrandLastTimestamp(LocalDateTime.now());
+                    manipulatedRecord.setErrandStatus(newStatus);
+                }
             }
         } else {
-            response.put("status", "record-not-found-0014");
+            response.put("status", "data-not-found-0011");
             response.put("message", "Zlecenie o numerze ID " + errandId + " nie istnieje w bazie danych. Nie udało się zakończyć zlecenia");
         }
         return new ResponseEntity<Object>(response, HttpStatus.OK);
@@ -258,13 +265,13 @@ public class ErrandDataService {
             }
             else{
                 Map<String, Object> response = new HashMap<String, Object>();
-                response.put("status", "record-not-found-0009");
+                response.put("status", "data-not-found-0012");
                 response.put("message", "Brak lokalizacji dla zlecenia o numerze ID " + errandId);
                 return new ResponseEntity<>(response,HttpStatus.OK);
             }
         } else {
             Map<String, Object> response = new HashMap<String, Object>();
-            response.put("status", "record-not-found-0008");
+            response.put("status", "data-not-found-0013");
             response.put("message", "Brak danych dla zlecenia o numerze ID " + errandId);
             return new ResponseEntity<>(response,HttpStatus.OK);
         }

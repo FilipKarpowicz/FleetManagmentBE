@@ -123,12 +123,12 @@ public class UserService {
                 response.put("status", "success");
                 response.put("message", "Hasło zostało zmienione");
             } else {
-                response.put("status", "conflict-0007");
+                response.put("status", "conflict-0012");
                 response.put("message", "Podano nieprawidłowe stare hasło");
             }
         }
         else{
-            response.put("status", "conflict-0006");
+            response.put("status", "conflict-0013");
             response.put("message", "Proszę uzupełnić wszystkie wymagane pola");
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -167,7 +167,7 @@ public class UserService {
             }
 
             if(!modifyFlag){
-                response.put("status", "conflict-0009");
+                response.put("status", "conflict-0014");
                 response.put("message", "Żadna wartość nie została zmieniona");
             }
             else{
@@ -183,7 +183,7 @@ public class UserService {
         Optional<UserEntity> userByLogin = userRepository.findUserEntityByLogin(user.getLogin());
         if(user.getLogin() != null && user.getName() != null && user.getPassword() != null && user.getPrivilege() != null) {
             if (userByLogin.isPresent()) {
-                response.put("status", "conflict-0006");
+                response.put("status", "conflict-0015");
                 response.put("message", "Użytkownik w loginem " + user.getLogin() + " już istnieje w bazie danych");
             } else {
                 userRepository.save(user);
@@ -192,7 +192,7 @@ public class UserService {
             }
         }
         else{
-            response.put("status", "conflict-0007");
+            response.put("status", "conflict-0016");
             response.put("message", "Proszę uzupełnić wszystkie wymagane pola");
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -255,7 +255,7 @@ public class UserService {
             if(login != null && !Objects.equals(login,user.getLogin())){
                 if(userRepository.findUserEntityByLogin(login).isPresent()){
                     duplicateflag = true;
-                    response.put("status","data-not-changed-0002");
+                    response.put("status","conflict-0017");
                     response.put("message","Podany login jest już zajęty.");
                 }else{
                     user.setLogin(login);
@@ -267,7 +267,7 @@ public class UserService {
                 modifyFlag = true;
             }
             if(!modifyFlag && !duplicateflag){
-                response.put("status","data-not-changed-0001");
+                response.put("status","conflict-0018");
                 response.put("message","Wprowadzono niepoprawne dane.");
             }else if(!duplicateflag){
                 response.put("status","success");

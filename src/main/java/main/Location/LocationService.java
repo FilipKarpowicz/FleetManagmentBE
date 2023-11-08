@@ -37,7 +37,7 @@ public class LocationService {
         newLocation = repository.save(location);
 
         if(newLocation.getLocationId() == null){
-            response.put("status", "unknown-0003");
+            response.put("status", "unknown-0004");
             response.put("message", "Nie udało się dodać punktu do trasy zlecenia");
         }
         else {
