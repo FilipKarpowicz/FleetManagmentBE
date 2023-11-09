@@ -216,6 +216,7 @@ public class CarService {
         if(car.getMake() != null && car.getModel() != null && car.getVin() != null && car.getPlateNo() != null && car.getType() != null && car.getBattNominalCapacity() != null && car.getDevId() != null) {
             Optional<Car> carByVin = carRepository.findCarByVin(car.getVin());
             Optional<Car> carByPlate = carRepository.findCarByPlate(car.getPlateNo());
+            Optional<Car> carByDevId = carRepository.findCarByDevId(car.getDevId());
             if (carByVin.isPresent()) {
                 response.put("status", "conflict-0001");
                 response.put("message", "Numer VIN " + car.getVin() + " należy już do innego pojazdu w bazie danych");
@@ -223,6 +224,10 @@ public class CarService {
             } else if (carByPlate.isPresent()) {
                 response.put("status", "conflict-0002");
                 response.put("message", "Numer rejestracyjny " + car.getPlateNo() + " należy już do innego pojazdu w bazie danych");
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else if (carByDevId.isPresent()){
+                response.put("status", "conflict-0019");
+                response.put("message", "ID urządzenia " + car.getDevId() + " należy już do innego pojazdu w bazie danych");
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
                 carRepository.save(car);
@@ -275,6 +280,9 @@ public class CarService {
     @Transactional
     public ResponseEntity<Object> updateCar(Long carId, String make, String model, String vin, String plateNo,String type,String comment,LocalDate serviceDate, Long serviceMileage, Double battNominalCapacity, String devId) {
         Map<String, Object> response = new HashMap<>();
+        Optional<Car> carByPlateNo = carRepository.findCarByPlate(plateNo);
+        Optional<Car> carByVin = carRepository.findCarByVin(vin);
+        Optional<Car> carByDevId = carRepository.findCarByDevId(devId);
 
         Optional<Car> maybeCarById = carRepository.findById(carId);
         if(maybeCarById.isEmpty()){
@@ -297,13 +305,23 @@ public class CarService {
             }
 
             if (vin != null && !Objects.equals(carById.getVin(), vin)) {
-                carById.setVin(vin);
-                modifyFlag = 1;
+                if(carByVin.isPresent()){
+                    response.put("status", "conflict-0020");
+                    response.put("message", "Numer VIN " + vin + " jest już przypisany do innego pojazdu w bazie");
+                } else {
+                    carById.setVin(vin);
+                    modifyFlag = 1;
+                }
             }
 
             if (plateNo != null && !Objects.equals(carById.getPlateNo(), plateNo)) {
-                carById.setPlateNo(plateNo);
-                modifyFlag = 1;
+                if(carByPlateNo.isPresent()){
+                    response.put("status", "conflict-0021");
+                    response.put("message", "Numer rejestracyjny " + plateNo + " jest już przypisany do innego pojazdu w bazie");
+                } else {
+                    carById.setPlateNo(plateNo);
+                    modifyFlag = 1;
+                }
             }
             if (type != null && !Objects.equals(carById.getType(), type) && validTypes.contains(type)) {
                 carById.setType(type);
@@ -326,8 +344,13 @@ public class CarService {
                 modifyFlag = 1;
             }
             if (devId != null && !Objects.equals(carById.getDevId(), devId)) {
-                carById.setDevId(devId);
-                modifyFlag = 1;
+                if(carByDevId.isPresent()){
+                    response.put("status", "conflict-0022");
+                    response.put("message", "ID urządzenia " + devId + " jest już przypisany do innego pojazdu w bazie");
+                } else {
+                    carById.setDevId(devId);
+                    modifyFlag = 1;
+                }
             }
 
             if (modifyFlag == 0) {

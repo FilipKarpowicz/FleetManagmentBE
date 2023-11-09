@@ -17,6 +17,9 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     @Query("SELECT s FROM Car s WHERE s.vin LIKE %?1%")
     Optional<Car> findCarByVin(String vin);
 
+    @Query("SELECT s FROM Car s WHERE s.devId LIKE %?1%")
+    Optional<Car> findCarByDevId(String devId);
+
     @Query("SELECT s FROM Car s WHERE s.make LIKE %?1%")
     List<Car> findCarsByMake(String pattern);
 
