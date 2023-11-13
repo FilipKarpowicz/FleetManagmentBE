@@ -77,7 +77,7 @@ public class CarService {
 
 
         if(maybeCar.isEmpty() || maybeCarData.isEmpty()){
-            response.put("status", "record-not-found-0006");
+            response.put("status", "data-not-found-0008");
             response.put("message", "Pojazd z id " + carId + " nie istnieje w bazie danych");
             response.put("data", data);
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -262,7 +262,7 @@ public class CarService {
         boolean exists = carRepository.existsById(carId);
         String carErrandId = carIsAssignedToErrand(carId);
         if (!exists) {
-            response.put("status", "record-not-found-0001");
+            response.put("status", "data-not-found-0009");
             response.put("message", "Pojazd z id " + carId + " nie istnieje w bazie. Operacja nieudana");
         }
         else if(carErrandId != null){
@@ -286,7 +286,7 @@ public class CarService {
 
         Optional<Car> maybeCarById = carRepository.findById(carId);
         if(maybeCarById.isEmpty()){
-            response.put("status", "record-not-found-0002");
+            response.put("status", "data-not-found-0010");
             response.put("message", "Pojazd z id " + carId + " nie istnieje w bazie. Operacja nieudana");
             return new ResponseEntity<>(response, HttpStatus.OK);
         }

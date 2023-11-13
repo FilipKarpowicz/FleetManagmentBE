@@ -39,7 +39,7 @@ public class DriverService {
         Optional<Driver> driver = driverRepository.findById(drvId);
 
         if(driver.isEmpty()){
-            response.put("status", "data-not-found-0001");
+            response.put("status", "data-not-found-0013");
             response.put("message", "Kierowca z ID " + drvId + " nie istnieje w bazie");
             response.put("data", null);
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -66,7 +66,7 @@ public class DriverService {
         Optional<Driver> driverById = driverRepository.findById(drvId);
         String drvErrandId = drvIsAssignedToErrand(drvId);
         if(!driverById.isPresent()){
-            response.put("status","data-not-found-0002");
+            response.put("status","data-not-found-0014");
             response.put("message","Kierowca z id " + drvId + " nie istnieje w bazie");
         }
         else if(drvErrandId != null){
@@ -106,7 +106,7 @@ public class DriverService {
 
         Optional<Driver> driverById = driverRepository.findById(drvId);
         if(driverById.isEmpty()){
-            response.put("status","data-not-found-0003");
+            response.put("status","data-not-found-0015");
             response.put("message","Kierowca z numerem ID " + drvId + " nie istnieje w bazie danych");
         }else{
             Driver driver = driverById.get();

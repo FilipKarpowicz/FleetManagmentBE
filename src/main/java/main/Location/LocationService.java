@@ -105,7 +105,7 @@ public class LocationService {
             if(temp.isPresent()){
                 data.add(temp.get());
             }else{
-                response.put("status", "record-not-found-0009");
+                response.put("status", "data-not-found-0019");
                 response.put("message", "Lokalizacja o numerze ID " + id + " nie istnieje w bazie danych");
                 response.put("locationId", list[i]);
                 return new ResponseEntity<Object>(response, HttpStatus.OK);

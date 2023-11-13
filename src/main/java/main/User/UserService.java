@@ -113,7 +113,7 @@ public class UserService {
 
         Optional<UserEntity> maybeUser = userRepository.findById(userId);
         if(maybeUser.isEmpty()){
-            response.put("status", "record-not-found-0014");
+            response.put("status", "data-not-found-0020");
             response.put("message", "Użytkownik o numerze ID " + userId + " nie istnieje w bazie danych");
         }
         else if(newPassword != null && oldPassword != null){
@@ -140,7 +140,7 @@ public class UserService {
         Optional<UserEntity> maybeUserById = userRepository.findById(userId);
 
         if(maybeUserById.isEmpty()){
-            response.put("status", "record-not-found-0013");
+            response.put("status", "data-not-found-0021");
             response.put("message", "Użytkownik o id " + userId + " nie istnieje w bazie danych");
         }
         else {
@@ -207,7 +207,7 @@ public class UserService {
             response.put("status", "success");
             response.put("message", "Użytkownik został usunięty");
         } else {
-            response.put("status", "record-not-found-0012");
+            response.put("status", "data-not-found-0022");
             response.put("message", "Użytkownik o numerze ID " + userId + " nie istnieje w bazie danych");
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -221,7 +221,7 @@ public class UserService {
             response.put("status", "success");
             response.put("message", "Użytkownik został usunięty");
         } else {
-            response.put("status", "record-not-found-0012");
+            response.put("status", "data-not-found-0023");
             response.put("message", "Użytkownik nie istnieje w bazie danych");
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -235,7 +235,7 @@ public class UserService {
             response.put("message", "Znaleziono użytkownika");
             response.put("data",user.get());
         } else {
-            response.put("status", "record-not-found-0012");
+            response.put("status", "data-not-found-0024");
             response.put("message", "Użytkownik nie istnieje w bazie danych");
         }
         return new ResponseEntity<>(response, HttpStatus.OK);

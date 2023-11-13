@@ -44,11 +44,11 @@ public class ErrandService {
         Map<String, Object> data = new HashMap<>();
 
         if (!isDrvIdValid(errand.getDrvId())) {
-            response.put("status", "data-not-found-0004");
+            response.put("status", "data-not-found-0016");
             response.put("message", "Kierowca o numerze ID " + errand.getDrvId() + " nie istnieje w bazie danych. Zlecenie nie zostało utworzone");
         }
         else if (!isCarIdValid(errand.getCarId())) {
-            response.put("status", "data-not-found-0005");
+            response.put("status", "data-not-found-0017");
             response.put("message", "Pojazd o numerze ID " + errand.getCarId() + " nie istnieje w bazie danych. Zlecenie nie zostało utworzone");
         }
         else {
@@ -196,7 +196,7 @@ public class ErrandService {
     public ResponseEntity<Object> deleteErrandById(String errandId) {
         Map<String, Object> response = new HashMap<String, Object>();
         if (!getByErrandId(errandId).isPresent()){
-            response.put("status", "data-not-found-0006");
+            response.put("status", "data-not-found-0018");
             response.put("message", "Zlecenie o numerze ID " + errandId + " nie istnieje w bazie danych");
         }
         else {

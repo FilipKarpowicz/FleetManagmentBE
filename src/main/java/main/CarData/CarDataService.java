@@ -54,12 +54,12 @@ public class CarDataService {
         Optional<Car> maybeCar = carRepository.findById(carId);
 
         if(maybeCarData.isEmpty()){
-            response.put("status", "record-not-found-0004");
+            response.put("status", "data-not-found-0011");
             response.put("message", "Brak informacji w tabeli CarData dla ID pojazdu " + carId);
             response.put("data", data);
         }
         else if(maybeCar.isEmpty()){
-            response.put("status", "record-not-found-0005");
+            response.put("status", "data-not-found-0012");
             response.put("message", "Brak informacji w tabeli Car dla ID pojazdu " + carId);
             response.put("data", data);
         }
