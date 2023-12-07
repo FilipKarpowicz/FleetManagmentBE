@@ -195,6 +195,31 @@ public class DriverService {
     }
 
 
+    public ResponseEntity<Object> getDriversByName(String name) {
+        List<Driver> drivers;
+        if(name != null){
+            drivers = driverRepository.findDriverByName(name);
+        }
+        else{
+            Pageable pages = PageRequest.of(0,8, Sort.by("drvId"));
+            Page<Driver> driversPage = driverRepository.get8Drivers(pages);
+            drivers = driversPage.getContent();
 
-
+        }
+        if(drivers.size() > 8){
+            drivers.subList(0, 8);
+        }
+        Map<String, Object> response = new HashMap<>();
+        List<Object> data = new ArrayList<>();
+        for(Driver driver : drivers){
+            Map<String, Object> driverObject = new HashMap<>();
+            driverObject.put("id",driver.getDrvId());
+            driverObject.put("firstName",driver.getFirstName());
+            driverObject.put("lastName",driver.getLastName());
+            data.add(driverObject);
+        }
+        response.put("data",data);
+        response.put("status","success");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

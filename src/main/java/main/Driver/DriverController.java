@@ -55,6 +55,13 @@ public class DriverController {
         return driverService.findDrivers(firstName,lastName,pesel,drvLicNo,overallDrvRating,moreOrLess,batch);
     }
 
+    @GetMapping(path = "drivers-names")
+    public ResponseEntity<Object> findDriversNames(
+            @RequestParam(required = false) String name
+    ){
+        return driverService.getDriversByName(name);
+    }
+
 
     @GetMapping(path="Driver/GetById")
     public ResponseEntity<Object> getById(@RequestParam(name = "drvId") Long drvId){

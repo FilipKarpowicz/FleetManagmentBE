@@ -1,5 +1,7 @@
 package main.Car;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -64,4 +66,10 @@ public interface CarRepository extends JpaRepository<Car, Long> {
 
     @Query("SELECT s from Car s WHERE s.carId=?1")
     Optional<Car> findCarByCarId(Long carId);
+
+    @Query("SELECT s FROM Car s")
+    Page<Car> get8Cars(Pageable pages);
+
+    @Query("SELECT s FROM Car s WHERE s.make LIKE %?1% OR s.model LIKE %?1%")
+    List<Car> findDriverByName(String name);
 }

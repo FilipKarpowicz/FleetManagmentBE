@@ -33,4 +33,9 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
             "AND (?4 IS NULL OR s.drvLicNo LIKE %?4%) AND (?5 IS NULL OR s.overallDrvRating > ?5)")
     Page<Driver>findDriversMore(Long pesel, String firstName, String lastName, String drvLicNo, Integer overallDrvRating, Pageable pageable);
 
+    @Query("SELECT s FROM Driver s WHERE s.firstName LIKE %?1% OR s.lastName LIKE %?1%")
+    List<Driver> findDriverByName(String name);
+
+    @Query("SELECT s FROM Driver s")
+    Page<Driver> get8Drivers(Pageable pages);
 }

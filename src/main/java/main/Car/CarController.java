@@ -102,4 +102,12 @@ public class CarController {
                                                 @RequestParam(required = true) Integer batch){
         return carService.searchCars(makePart, modelPart, vinPart, plateNumberPart, typePart, serviceMileageLowerThreshold, serviceMileageUpperThreshold, serviceDateLowerThreshold, serviceDateUpperThreshold, carMileageThreshold, carMileageLessOrMore, battSocThreshold, battSocLessOrMore, batch);
     }
+
+    @GetMapping(path = "cars-names")
+    public ResponseEntity<Object> carsByNames(
+            @RequestParam(required = false) String name
+    ){
+        return carService.carsByNames(name);
+    }
+
 }

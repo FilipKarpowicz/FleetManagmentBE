@@ -1,7 +1,6 @@
 package main.Car;
 
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import main.CarData.CarData;
 import main.CarData.CarDataRepository;
@@ -11,6 +10,10 @@ import main.Driver.DriverService;
 import main.Errand.Errand;
 import main.Errand.ErrandRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -34,10 +37,10 @@ public class CarService {
         this.errandRepository = errandRepository;
     }
 
-    private List<Car> calculateBatch(Integer batchNumber,List<Car> table){
+    private List<Car> calculateBatch(Integer batchNumber, List<Car> table) {
         int from = 15 * (batchNumber - 1);
         int to = 15 * batchNumber;
-        if(table.size() > from + to && table.size() > from){
+        if (table.size() > from + to && table.size() > from) {
             table = table.subList(from, to);
         } else if (table.size() > from) {
             table = table.subList(from, table.size());
@@ -48,16 +51,16 @@ public class CarService {
     }
 
 
-    public List<Car> getCarsBatch(Integer batchNumber){
+    public List<Car> getCarsBatch(Integer batchNumber) {
         List<Car> table = carRepository.findAll();
         return calculateBatch(batchNumber, table);
     }
 
-    public Optional<Car> getCarById(Long carId){
+    public Optional<Car> getCarById(Long carId) {
         return carRepository.findCarByCarId(carId);
     }
 
-    public ResponseEntity<Object> getCarResponse(Long carId){
+    public ResponseEntity<Object> getCarResponse(Long carId) {
         Map<String, Object> response = new HashMap<>();
         Map<String, Object> data = new HashMap<>();
         Optional<Car> maybeCar = carRepository.findCarByCarId(carId);
@@ -76,13 +79,12 @@ public class CarService {
         data.put("mileageToService", null);
 
 
-        if(maybeCar.isEmpty() || maybeCarData.isEmpty()){
+        if (maybeCar.isEmpty() || maybeCarData.isEmpty()) {
             response.put("status", "data-not-found-0008");
             response.put("message", "Pojazd z id " + carId + " nie istnieje w bazie danych");
             response.put("data", data);
             return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-        else{
+        } else {
             Car car = maybeCar.get();
             CarData carData = maybeCarData.get();
             data.put("carId", car.getCarId());
@@ -104,9 +106,9 @@ public class CarService {
         }
     }
 
-    public List<Car> getBatchCarsSorted(String sortingType,String column,Integer batchNumber){
+    public List<Car> getBatchCarsSorted(String sortingType, String column, Integer batchNumber) {
         List<Car> table = carRepository.findAll();
-        if (sortingType.equals("ascending")){
+        if (sortingType.equals("ascending")) {
             switch (column) {
                 case "carId" -> table.sort(Comparator.comparing(Car::getCarId));
                 case "make" -> table.sort(Comparator.comparing(Car::getMake));
@@ -119,7 +121,7 @@ public class CarService {
                 case "serviceMileage" -> table.sort(Comparator.comparing(Car::getServiceMileage));
                 default -> throw new IllegalStateException("There is no column named " + column + " in Car table");
             }
-        }else if (sortingType.equals("descending")){
+        } else if (sortingType.equals("descending")) {
             switch (column) {
                 case "carId" -> table.sort(Comparator.comparing(Car::getCarId).reversed());
                 case "make" -> table.sort(Comparator.comparing(Car::getMake).reversed());
@@ -132,7 +134,7 @@ public class CarService {
                 case "serviceMileage" -> table.sort(Comparator.comparing(Car::getServiceMileage).reversed());
                 default -> throw new IllegalStateException("There is no column named '" + column + "' in Car table");
             }
-        }else {
+        } else {
             throw new IllegalStateException("Sorting type named '" + sortingType + "' is invalid");
         }
         return table;
@@ -140,10 +142,11 @@ public class CarService {
 
     public List<Car> findCarByServiceMileage(Long value, Integer batchNumber) {
         List<Car> table = carRepository.findCarsByServiceMileage(value);
-        return calculateBatch(batchNumber,table);
+        return calculateBatch(batchNumber, table);
 
     }
-    public List<Car> findCarsByPattern(String column, String pattern,Integer batchNumber) {
+
+    public List<Car> findCarsByPattern(String column, String pattern, Integer batchNumber) {
         List<Car> table;
         switch (column) {
             case "make" -> {
@@ -166,43 +169,43 @@ public class CarService {
             }
             default -> throw new IllegalStateException("Column '" + column + "'is not valid for searching by pattern");
         }
-        return calculateBatch(batchNumber,table);
+        return calculateBatch(batchNumber, table);
     }
 
     public List<Car> findCarsByServiceDate(Integer batchNumber, Integer day, Integer month, Integer year) {
         List<Car> table;
-        if(year != null){
-            if(month != null){
-                if(day != null){
-                    LocalDate date = LocalDate.of(year,month,day);
+        if (year != null) {
+            if (month != null) {
+                if (day != null) {
+                    LocalDate date = LocalDate.of(year, month, day);
                     table = carRepository.findCarsByServiceDate(date);
-                }else{
+                } else {
                     table = carRepository.findCarsByMonthYear(month, year);
                 }
-            }else{
-                if(day != null){
-                    table = carRepository.findCarsByDayYear(day,year);
-                }else{
+            } else {
+                if (day != null) {
+                    table = carRepository.findCarsByDayYear(day, year);
+                } else {
                     table = carRepository.findCarsByYear(year);
                 }
             }
-        }else{
-            if(month != null){
-                if(day != null){
-                    table = carRepository.findCarsByMonthDay(day,month);
-                }else{
+        } else {
+            if (month != null) {
+                if (day != null) {
+                    table = carRepository.findCarsByMonthDay(day, month);
+                } else {
                     table = carRepository.findCarsByMonth(month);
                 }
-            }else{
-                if(day != null){
+            } else {
+                if (day != null) {
                     table = carRepository.findCarsByDay(day);
-                }else{
+                } else {
                     table = carRepository.findAll();
                 }
             }
         }
 
-        return calculateBatch(batchNumber,table);
+        return calculateBatch(batchNumber, table);
     }
 
 
@@ -213,7 +216,7 @@ public class CarService {
     public ResponseEntity<Object> addNewCar(Car car) {
         Map<String, Object> response = new HashMap<>();
 
-        if(car.getMake() != null && car.getModel() != null && car.getVin() != null && car.getPlateNo() != null && car.getType() != null && car.getBattNominalCapacity() != null && car.getDevId() != null) {
+        if (car.getMake() != null && car.getModel() != null && car.getVin() != null && car.getPlateNo() != null && car.getType() != null && car.getBattNominalCapacity() != null && car.getDevId() != null) {
             Optional<Car> carByVin = carRepository.findCarByVin(car.getVin());
             Optional<Car> carByPlate = carRepository.findCarByPlate(car.getPlateNo());
             Optional<Car> carByDevId = carRepository.findCarByDevId(car.getDevId());
@@ -225,7 +228,7 @@ public class CarService {
                 response.put("status", "conflict-0002");
                 response.put("message", "Numer rejestracyjny " + car.getPlateNo() + " należy już do innego pojazdu w bazie danych");
                 return new ResponseEntity<>(response, HttpStatus.OK);
-            } else if (carByDevId.isPresent()){
+            } else if (carByDevId.isPresent()) {
                 response.put("status", "conflict-0019");
                 response.put("message", "ID urządzenia " + car.getDevId() + " należy już do innego pojazdu w bazie danych");
                 return new ResponseEntity<>(response, HttpStatus.OK);
@@ -242,17 +245,17 @@ public class CarService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    private void createNewCarDataRecord(Car car){
+    private void createNewCarDataRecord(Car car) {
         CarData carData = new CarData(car);
         car.setCarData(carData);
         carDataRepository.save(carData);
     }
 
-    private String carIsAssignedToErrand(Long carId){
+    private String carIsAssignedToErrand(Long carId) {
         String errandId = null;
         List<Errand> listOfErrands = errandRepository.findAll();
-        for(Errand errand:listOfErrands){
-            if(errand.getCarId().equals(carId)) errandId = errand.getErrandId();
+        for (Errand errand : listOfErrands) {
+            if (errand.getCarId().equals(carId)) errandId = errand.getErrandId();
         }
         return errandId;
     }
@@ -264,12 +267,10 @@ public class CarService {
         if (!exists) {
             response.put("status", "data-not-found-0009");
             response.put("message", "Pojazd z id " + carId + " nie istnieje w bazie. Operacja nieudana");
-        }
-        else if(carErrandId != null){
+        } else if (carErrandId != null) {
             response.put("status", "conflict-0004");
             response.put("message", "Pojazd z id " + carId + " jest przypisany do zlecenia " + carErrandId + ". Nie można usunąć pojazdu");
-        }
-        else {
+        } else {
             carRepository.deleteById(carId);
             response.put("status", "success");
             response.put("message", "Pojazd pomyślnie usunięty");
@@ -278,19 +279,18 @@ public class CarService {
     }
 
     @Transactional
-    public ResponseEntity<Object> updateCar(Long carId, String make, String model, String vin, String plateNo,String type,String comment,LocalDate serviceDate, Long serviceMileage, Double battNominalCapacity, String devId) {
+    public ResponseEntity<Object> updateCar(Long carId, String make, String model, String vin, String plateNo, String type, String comment, LocalDate serviceDate, Long serviceMileage, Double battNominalCapacity, String devId) {
         Map<String, Object> response = new HashMap<>();
         Optional<Car> carByPlateNo = carRepository.findCarByPlate(plateNo);
         Optional<Car> carByVin = carRepository.findCarByVin(vin);
         Optional<Car> carByDevId = carRepository.findCarByDevId(devId);
 
         Optional<Car> maybeCarById = carRepository.findById(carId);
-        if(maybeCarById.isEmpty()){
+        if (maybeCarById.isEmpty()) {
             response.put("status", "data-not-found-0010");
             response.put("message", "Pojazd z id " + carId + " nie istnieje w bazie. Operacja nieudana");
             return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-        else {
+        } else {
             Car carById = maybeCarById.get();
             int modifyFlag = 0;
             List<String> validTypes = Arrays.asList("car", "truck");
@@ -305,7 +305,7 @@ public class CarService {
             }
 
             if (vin != null && !Objects.equals(carById.getVin(), vin)) {
-                if(carByVin.isPresent()){
+                if (carByVin.isPresent()) {
                     response.put("status", "conflict-0020");
                     response.put("message", "Numer VIN " + vin + " jest już przypisany do innego pojazdu w bazie");
                 } else {
@@ -315,7 +315,7 @@ public class CarService {
             }
 
             if (plateNo != null && !Objects.equals(carById.getPlateNo(), plateNo)) {
-                if(carByPlateNo.isPresent()){
+                if (carByPlateNo.isPresent()) {
                     response.put("status", "conflict-0021");
                     response.put("message", "Numer rejestracyjny " + plateNo + " jest już przypisany do innego pojazdu w bazie");
                 } else {
@@ -344,7 +344,7 @@ public class CarService {
                 modifyFlag = 1;
             }
             if (devId != null && !Objects.equals(carById.getDevId(), devId)) {
-                if(carByDevId.isPresent()){
+                if (carByDevId.isPresent()) {
                     response.put("status", "conflict-0022");
                     response.put("message", "ID urządzenia " + devId + " jest już przypisany do innego pojazdu w bazie");
                 } else {
@@ -357,8 +357,7 @@ public class CarService {
                 response.put("status", "conflict-0005");
                 response.put("message", "Żadna z wartości nie została zmieniona");
                 return new ResponseEntity<>(response, HttpStatus.OK);
-            }
-            else{
+            } else {
                 response.put("status", "success");
                 response.put("message", "Pomyślnie zaktualizowano pojazd");
                 return new ResponseEntity<>(response, HttpStatus.OK);
@@ -370,73 +369,84 @@ public class CarService {
     public ResponseEntity<Object> searchCars(String makePart, String modelPart, String vinPart, String plateNumberPart,
                                              String typePart, Long serviceMileageLowerThreshold, Long serviceMileageUpperThreshold,
                                              LocalDate serviceDateLowerThreshold, LocalDate serviceDateUpperThreshold, Double carMileageThreshold,
-                                             String carMileageLessOrMore, Integer battSoc, String battSocLessOrMore, Integer batchNumber){
+                                             String carMileageLessOrMore, Integer battSoc, String battSocLessOrMore, Integer batchNumber) {
         List<Car> allCars = carRepository.findAll();
         List<Car> matchedCars = new ArrayList<Car>();
         List<Car> responseCarList = new ArrayList<Car>();
         Map<String, Object> response = new HashMap<String, Object>();
         Map<String, Object> data = new HashMap<>();
 
-        if(makePart == null)    makePart = "";
-        if(modelPart == null)   modelPart = "";
-        if(vinPart == null) vinPart = "";
-        if(plateNumberPart == null) plateNumberPart = "";
-        if(typePart == null)    typePart = "";
+        if (makePart == null) makePart = "";
+        if (modelPart == null) modelPart = "";
+        if (vinPart == null) vinPart = "";
+        if (plateNumberPart == null) plateNumberPart = "";
+        if (typePart == null) typePart = "";
 
-        for(Car car : allCars){
+        for (Car car : allCars) {
             Boolean carMatchesSearch = false;
             CarData carData = carDataRepository.findById(car.getCarId()).get();
 
             carMatchesSearch = car.getMake().contains(makePart) && car.getModel().contains(modelPart) && car.getVin().contains(vinPart)
-                            && car.getPlateNo().contains(plateNumberPart) && car.getType().contains(typePart);
+                    && car.getPlateNo().contains(plateNumberPart) && car.getType().contains(typePart);
 
             if (serviceDateLowerThreshold != null) {
-                if(car.getServiceDate() != null) carMatchesSearch = carMatchesSearch && car.getServiceDate().isAfter(serviceDateLowerThreshold);
+                if (car.getServiceDate() != null)
+                    carMatchesSearch = carMatchesSearch && car.getServiceDate().isAfter(serviceDateLowerThreshold);
                 else carMatchesSearch = false;
             }
             if (serviceDateUpperThreshold != null) {
-                if(car.getServiceDate() != null) carMatchesSearch = carMatchesSearch && car.getServiceDate().isBefore(serviceDateUpperThreshold);
+                if (car.getServiceDate() != null)
+                    carMatchesSearch = carMatchesSearch && car.getServiceDate().isBefore(serviceDateUpperThreshold);
                 else carMatchesSearch = false;
             }
             if (serviceMileageLowerThreshold != null) {
-                if(car.getServiceMileage() != null) carMatchesSearch = carMatchesSearch && car.getServiceMileage() > serviceMileageLowerThreshold;
+                if (car.getServiceMileage() != null)
+                    carMatchesSearch = carMatchesSearch && car.getServiceMileage() > serviceMileageLowerThreshold;
                 else carMatchesSearch = false;
             }
             if (serviceMileageUpperThreshold != null) {
-                if(car.getServiceMileage() != null) carMatchesSearch = carMatchesSearch && car.getServiceMileage() < serviceMileageUpperThreshold;
+                if (car.getServiceMileage() != null)
+                    carMatchesSearch = carMatchesSearch && car.getServiceMileage() < serviceMileageUpperThreshold;
                 else carMatchesSearch = false;
             }
-            if (carMileageThreshold != null){
-                if(carData.getOverallMileage() != null){
-                    switch (carMileageLessOrMore){
-                        case "Less" -> {carMatchesSearch = carMatchesSearch && carData.getOverallMileage() < carMileageThreshold;}
-                        case "More" -> {carMatchesSearch = carMatchesSearch && carData.getOverallMileage() > carMileageThreshold;}
-                        default -> {}
+            if (carMileageThreshold != null) {
+                if (carData.getOverallMileage() != null) {
+                    switch (carMileageLessOrMore) {
+                        case "Less" -> {
+                            carMatchesSearch = carMatchesSearch && carData.getOverallMileage() < carMileageThreshold;
+                        }
+                        case "More" -> {
+                            carMatchesSearch = carMatchesSearch && carData.getOverallMileage() > carMileageThreshold;
+                        }
+                        default -> {
+                        }
                     }
-                }
-                else carMatchesSearch = false;
+                } else carMatchesSearch = false;
             }
-            if (battSoc != null){
-                if(carData.getBattSoc() != null){
-                    switch (battSocLessOrMore){
-                        case "Less" -> {carMatchesSearch = carMatchesSearch && carData.getBattSoc() < battSoc;}
-                        case "More" -> {carMatchesSearch = carMatchesSearch && carData.getBattSoc() > battSoc;}
-                        default -> {}
+            if (battSoc != null) {
+                if (carData.getBattSoc() != null) {
+                    switch (battSocLessOrMore) {
+                        case "Less" -> {
+                            carMatchesSearch = carMatchesSearch && carData.getBattSoc() < battSoc;
+                        }
+                        case "More" -> {
+                            carMatchesSearch = carMatchesSearch && carData.getBattSoc() > battSoc;
+                        }
+                        default -> {
+                        }
                     }
-                }
-                else carMatchesSearch = false;
+                } else carMatchesSearch = false;
             }
 
             if (carMatchesSearch) matchedCars.add(car);
         }
 
-        if(matchedCars.isEmpty()){
+        if (matchedCars.isEmpty()) {
             response.put("status", "success");
             response.put("message", "No results found");
             response.put("data", responseCarList);
             return new ResponseEntity<Object>(response, HttpStatus.OK);
-        }
-        else {
+        } else {
             Collections.sort(matchedCars, new Comparator<Car>() {
                 public int compare(Car o1, Car o2) {
                     // compare two instance of `Car` and return `int` as result.
@@ -457,21 +467,48 @@ public class CarService {
             }
         }
 
-        Integer numberOfBatches = (Integer) ((matchedCars.size()-1)/9) + 1;
+        Integer numberOfBatches = (Integer) ((matchedCars.size() - 1) / 9) + 1;
 
-        try{
+        try {
             data.put("cars", responseCarList);
             data.put("size", numberOfBatches);
             response.put("status", "success");
             response.put("message", "Search successful");
             response.put("data", data);
             return new ResponseEntity<Object>(response, HttpStatus.OK);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             response.put("status", "unknown-0002");
             response.put("message", "Unknown error");
             response.put("data", responseCarList);
             return new ResponseEntity<Object>(response, HttpStatus.OK);
         }
     }
+
+    public ResponseEntity<Object> carsByNames(String name) {
+        List<Car> cars;
+        if (name != null) {
+            cars = carRepository.findDriverByName(name);
+        } else {
+            Pageable pages = PageRequest.of(0, 8, Sort.by("carId"));
+            Page<Car> carsPage = carRepository.get8Cars(pages);
+            cars = carsPage.getContent();
+
+        }
+        if (cars.size() > 8) {
+            cars.subList(0, 8);
+        }
+        Map<String, Object> response = new HashMap<>();
+        List<Object> data = new ArrayList<>();
+        for (Car car : cars) {
+            Map<String, Object> carObject = new HashMap<>();
+            carObject.put("id", car.getCarId());
+            carObject.put("make", car.getMake());
+            carObject.put("model", car.getModel());
+            data.add(carObject);
+        }
+        response.put("data", data);
+        response.put("status", "success");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }
