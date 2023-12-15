@@ -484,15 +484,14 @@ public class CarService {
         }
     }
 
-    public ResponseEntity<Object> carsByNames(String name) {
+    public ResponseEntity<Object> carsByName(String name) {
         List<Car> cars;
         if (name != null) {
-            cars = carRepository.findDriverByName(name);
+            cars = carRepository.findCarByName(name);
         } else {
             Pageable pages = PageRequest.of(0, 8, Sort.by("carId"));
             Page<Car> carsPage = carRepository.get8Cars(pages);
             cars = carsPage.getContent();
-
         }
         if (cars.size() > 8) {
             cars.subList(0, 8);
@@ -508,6 +507,7 @@ public class CarService {
         }
         response.put("data", data);
         response.put("status", "success");
+        response.put("message", "Search successful");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

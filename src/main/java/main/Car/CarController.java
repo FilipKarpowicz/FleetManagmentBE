@@ -23,40 +23,43 @@ public class CarController {
         this.carService = carService;
     }
 
-    @GetMapping(path = "BatchCars/{batchNumber}")
+    @GetMapping(path = "batchCars/{batchNumber}")
     public List<Car> getCarsBatch(@PathVariable("batchNumber") Integer batchNumber){
         return carService.getCarsBatch(batchNumber);
     }
 
-    @GetMapping(path = "SortCarsBy/{column}/{sortingType}/")
+    @GetMapping(path = "sortCarsBy/{column}/{sortingType}/")
     public List<Car> sortCarsBy(@PathVariable("column") String column,@PathVariable("sortingType") String sortingType,@RequestParam Integer batchNumber){
         return carService.getBatchCarsSorted(sortingType,column,batchNumber);
     }
 
-    @GetMapping(path = "FindCarsByServiceMileage")
+    @GetMapping(path = "findCarsByServiceMileage")
     public List<Car> findCarsByServiceMileage(@RequestParam Long value, @RequestParam Integer batchNumnber){
         return carService.findCarByServiceMileage(value, batchNumnber);
     }
 
-    @GetMapping(path = "FindCarsByPattern/{column}")
+    @GetMapping(path = "findCarsByPattern/{column}")
     List<Car> findCarsByPattern(@PathVariable("column") String column,@RequestParam String pattern, @RequestParam Integer batchNumber){
         return carService.findCarsByPattern(column, pattern, batchNumber);
     }
 
-    @GetMapping(path = "FindCarsByServiceDate")
+    @GetMapping(path = "findCarsByServiceDate")
     List<Car> findCarsByServiceDate(@RequestParam Integer batchNumber,@RequestParam(required = false) Integer day,@RequestParam(required = false) Integer month, @RequestParam(required = false) Integer year){
         return carService.findCarsByServiceDate(batchNumber, day, month, year);
     }
 
-    @GetMapping(path = "GetById")
-    ResponseEntity<Object> getCarById(@RequestParam(name = "carId") Long carId){
-        return carService.getCarResponse(carId);
-    }
-
-
     @GetMapping
     public List<Car> getCars() {
         return carService.getCars();
+    }
+
+    /*
+    UZYWANE ENDPOINTY vvvv
+     */
+
+    @GetMapping(path = "getById")
+    ResponseEntity<Object> getCarById(@RequestParam(name = "carId") Long carId){
+        return carService.getCarResponse(carId);
     }
 
     @PostMapping(path = "add")
@@ -69,7 +72,7 @@ public class CarController {
         return carService.deleteCar(carId);
     }
 
-    @PutMapping(path = "update")
+    @PutMapping(path = "modify")
     public ResponseEntity<Object> updateCar(
             @RequestParam(required = true, name = "carId") Long carId,
             @RequestParam(required = false) String make,
@@ -103,11 +106,11 @@ public class CarController {
         return carService.searchCars(makePart, modelPart, vinPart, plateNumberPart, typePart, serviceMileageLowerThreshold, serviceMileageUpperThreshold, serviceDateLowerThreshold, serviceDateUpperThreshold, carMileageThreshold, carMileageLessOrMore, battSocThreshold, battSocLessOrMore, batch);
     }
 
-    @GetMapping(path = "cars-names")
+    @GetMapping(path = "getByName")
     public ResponseEntity<Object> carsByNames(
             @RequestParam(required = false) String name
     ){
-        return carService.carsByNames(name);
+        return carService.carsByName(name);
     }
 
 }

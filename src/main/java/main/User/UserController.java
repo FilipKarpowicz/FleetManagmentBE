@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
+@RequestMapping(path = "user")
 public class UserController {
 
     private final UserService userService;
@@ -18,7 +19,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping(path = "users")
+    @GetMapping(path = "searchUsers")
     public ResponseEntity<Object> getAllUsers(
             @RequestParam Integer batch,
             @RequestParam(required = false) String name,
@@ -33,13 +34,13 @@ public class UserController {
         return userService.loginUser(login,password);
     }
 
-    @GetMapping(path = "getUser")
+    @GetMapping(path = "getUserByToken")
     public ResponseEntity<Object> login(@RequestParam("token") String token) {
         return userService.getUser(token);
     }
 
 
-    @PutMapping(path = "user/setPassword")
+    @PutMapping(path = "setPassword")
     public ResponseEntity<Object> updatePassword(
             @RequestHeader String newPassword,
             @RequestHeader String oldPassword,
@@ -48,7 +49,7 @@ public class UserController {
         return userService.updatePassword(userId, newPassword, oldPassword);
     }
 
-    @PutMapping(path = "user/modify")
+    @PutMapping(path = "modifyById")
     public ResponseEntity<Object> updateUser(@RequestParam Long userId,
                                                  @RequestParam(required = false) String login,
                                                  @RequestParam(required = false) String password,
@@ -57,22 +58,22 @@ public class UserController {
         return userService.updateUser(userId, login, name, password, privilege);
     }
 
-    @PostMapping(path = "user/add")
+    @PostMapping(path = "add")
     public ResponseEntity<Object> addUser(@RequestBody UserEntity user) {
         return userService.addNewUser(user);
     }
 
-    @DeleteMapping(path = "user/delete")
+    @DeleteMapping(path = "deleteById")
     public ResponseEntity<Object> deleteUser(@RequestParam Long userId) {
         return userService.deleteUser(userId);
     }
 
-    @DeleteMapping(path = "user/deleteByToken")
+    @DeleteMapping(path = "deleteByToken")
     public ResponseEntity<Object> deleteByToken(@RequestParam String token) {
         return userService.deleteUserById(token);
     }
 
-    @PutMapping(path = "account/modify")
+    @PutMapping(path = "modifyByToken")
     public ResponseEntity<Object> updateAccount(@RequestParam String token, @RequestParam(required = false) String login, @RequestParam(required = false) String name){
         return userService.modifyUserByToken(token,login,name);
     }

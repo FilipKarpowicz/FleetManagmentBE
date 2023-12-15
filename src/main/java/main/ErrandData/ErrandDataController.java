@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(path = "ErrandData")
+@RequestMapping(path = "errandData")
 public class ErrandDataController {
     private final ErrandDataService service;
 
@@ -17,20 +17,24 @@ public class ErrandDataController {
         this.service = service;
     }
 
-    @GetMapping(path = "Get")
+    @GetMapping(path = "GetAll")
+    public List<ErrandData> getAll(@RequestParam(name = "batchNumber") Integer batchNumber){
+        return service.getAll(batchNumber);
+    }
+
+    /*
+    UZYWANE ENDPOINTY vvvv
+     */
+
+    @GetMapping(path = "getById")
     public ResponseEntity<Object> getErrandDataById(@RequestParam(name = "errandId") String errandId){
         return service.getCalculatedDataByErrandId(errandId);
     }
 
-    @PutMapping(path = "ChangeStatus/{errandId}")
+    @PutMapping(path = "changeStatus/{errandId}")
     public ResponseEntity<Object> changeErrandStatus(@PathVariable(name = "errandId") String errandId,
                                    @RequestParam(name = "newStatus") ErrandStatus newStatus){
         return service.changeErrandStatus(errandId, newStatus);
-    }
-
-    @GetMapping(path = "GetAll")
-    public List<ErrandData> getAll(@RequestParam(name = "batchNumber") Integer batchNumber){
-        return service.getAll(batchNumber);
     }
 
     @GetMapping(path = "getRoute")

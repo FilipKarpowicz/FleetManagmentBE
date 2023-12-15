@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(path = "api/Location")
+@RequestMapping(path = "location")
 public class LocationController {
     private final LocationService service;
 
@@ -23,19 +23,9 @@ public class LocationController {
         return service.getByLocationId(locationId);
     }
 
-    @GetMapping(path = "GetErrandLocations")
-    ResponseEntity<Object> getLocationList(@RequestParam(name = "route") String route){
-        return service.findLocationList(route);
-    }
-
     @GetMapping(path = "GetAll")
     List<Location> getAll(@RequestParam(name = "batchNumber") Integer batchNumber){
         return service.findAll(batchNumber);
-    }
-
-    @PostMapping(path = "Add")
-    public ResponseEntity<Object> addNewLocation(@RequestBody Location location){
-        return service.addNewLocation(location);
     }
 
     @PutMapping(path = "Update/{LocationId}")
@@ -48,5 +38,19 @@ public class LocationController {
     @DeleteMapping(path = "Delete/{LocationId}")
     void deleteLocation(@PathVariable(name = "LocationId") Long locationId){
         service.deleteLocationById(locationId);
+    }
+
+    /*
+    UZYWANE ENDPOINTY vvvv
+     */
+
+    @PostMapping(path = "add")
+    public ResponseEntity<Object> addNewLocation(@RequestBody Location location){
+        return service.addNewLocation(location);
+    }
+
+    @GetMapping(path = "getErrandLocations")
+    ResponseEntity<Object> getLocationList(@RequestParam(name = "route") String route){
+        return service.findLocationList(route);
     }
 }

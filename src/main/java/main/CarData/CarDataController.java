@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(path = "CarData")
+@RequestMapping(path = "carData")
 public class CarDataController {
     private final CarDataService service;
 
@@ -16,7 +16,7 @@ public class CarDataController {
         this.service = service;
     }
 
-    @GetMapping(path = "Get")
+    @GetMapping(path = "getById")
     public ResponseEntity<Object> getCarDataById(@RequestParam(name = "carId") Long carId){
         return service.getResponse(carId);
     }

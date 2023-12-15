@@ -8,17 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "Errand")
+@RequestMapping(path = "errand")
 public class ErrandController {
     private final ErrandService service;
 
     public ErrandController(ErrandService service) {
         this.service = service;
-    }
-
-    @PostMapping(path = "Add")
-    public ResponseEntity<Object> addNewErrand(@RequestBody Errand errand){
-        return service.addNewErrand(errand);
     }
 
     @GetMapping(path = "GetBy/DrvId")
@@ -43,7 +38,11 @@ public class ErrandController {
         service.editErrand(errandId, carId, drvId, newRoute);
     }
 
-    @GetMapping(path = "SearchErrands")
+    /*
+    UZYWANE ENDPOINTY vvvv
+     */
+
+    @GetMapping(path = "searchErrands")
     public ResponseEntity<Object> searchErrands(@RequestParam(required = false) String firstNamePart,
                                                 @RequestParam(required = false) String lastNamePart,
                                                 @RequestParam(required = false) String makePart,
@@ -52,10 +51,13 @@ public class ErrandController {
         return service.searchErrands(firstNamePart, lastNamePart, makePart, modelPart, batchNumber);
     }
 
-    @DeleteMapping(path = "Delete/{ErrandId}")
+    @DeleteMapping(path = "delete/{ErrandId}")
     public ResponseEntity<Object> deleteErrand(@PathVariable(name = "ErrandId") String errandId){
         return service.deleteErrandById(errandId);
     }
 
-
+    @PostMapping(path = "add")
+    public ResponseEntity<Object> addNewErrand(@RequestBody Errand errand){
+        return service.addNewErrand(errand);
+    }
 }

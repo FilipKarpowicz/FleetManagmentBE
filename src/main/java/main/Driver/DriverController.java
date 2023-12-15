@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
+@RequestMapping(path = "driver")
 public class DriverController {
 
     private final DriverService driverService;
@@ -20,18 +21,18 @@ public class DriverController {
         this.driverService = driverService;
     }
 
-    @DeleteMapping(path = {"driver/delete"})
+    @DeleteMapping(path = {"delete"})
     public ResponseEntity<Object> deleteDriverById(@RequestParam("drvId") Long drvId) {
         return driverService.deleteDriverById(drvId);
     }
 
-    @PostMapping(path = "driver/add")
+    @PostMapping(path = "add")
     public ResponseEntity<Object> registerNewDriver(@RequestBody Driver driver) {
         return driverService.addNewDriver(driver);
     }
 
 
-    @PutMapping(path = "driver/modify")
+    @PutMapping(path = "modify")
     public ResponseEntity<Object> updateDriver(
             @RequestParam Long drvId,
             @RequestParam(required = false) String firstName,
@@ -43,7 +44,7 @@ public class DriverController {
         return driverService.updateDriver(drvId, firstName, lastName, birthdate, pesel, drvLicNo, overallDrvRating);
     }
 
-    @GetMapping(path = "drivers")
+    @GetMapping(path = "searchDrivers")
     public ResponseEntity<Object> findDrivers(
             @RequestParam Integer batch,
             @RequestParam(required = false) String firstName,
@@ -55,7 +56,7 @@ public class DriverController {
         return driverService.findDrivers(firstName,lastName,pesel,drvLicNo,overallDrvRating,moreOrLess,batch);
     }
 
-    @GetMapping(path = "drivers-names")
+    @GetMapping(path = "getByName")
     public ResponseEntity<Object> findDriversNames(
             @RequestParam(required = false) String name
     ){
@@ -63,7 +64,7 @@ public class DriverController {
     }
 
 
-    @GetMapping(path="Driver/GetById")
+    @GetMapping(path="getById")
     public ResponseEntity<Object> getById(@RequestParam(name = "drvId") Long drvId){
         return driverService.getById(drvId);
     }

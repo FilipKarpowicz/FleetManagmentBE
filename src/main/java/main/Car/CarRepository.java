@@ -71,5 +71,5 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     Page<Car> get8Cars(Pageable pages);
 
     @Query("SELECT s FROM Car s WHERE s.make LIKE %?1% OR s.model LIKE %?1%")
-    List<Car> findDriverByName(String name);
+    List<Car> findCarByName(String name);
 }
