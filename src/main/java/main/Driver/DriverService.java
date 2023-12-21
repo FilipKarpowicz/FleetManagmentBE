@@ -111,38 +111,48 @@ public class DriverService {
         }else{
             Driver driver = driverById.get();
             boolean modifyFlag = false;
+            boolean peselRepeatedFlag = false;
 
-            if (firstName != null && !Objects.equals(firstName, driver.getFirstName())) {
+            if (pesel != null && !Objects.equals(pesel, driver.getPesel())) {
+                Optional<Driver> driverByPesel = driverRepository.findDriverByPesel(pesel);
+                if(driverByPesel.isPresent()){
+                    peselRepeatedFlag = true;
+                } else {
+                    driver.setPesel(pesel);
+                    modifyFlag = true;
+                }
+            }
+
+            if (firstName != null && !Objects.equals(firstName, driver.getFirstName()) && !peselRepeatedFlag) {
                 driver.setFirstName(firstName);
                 modifyFlag = true;
             }
 
-            if (lastName != null && !Objects.equals(lastName, driver.getLastName())) {
+            if (lastName != null && !Objects.equals(lastName, driver.getLastName()) && !peselRepeatedFlag) {
                 driver.setLastName(lastName);
                 modifyFlag = true;
             }
 
-            if (birthdate != null && !Objects.equals(birthdate, driver.getBirthdate())) {
+            if (birthdate != null && !Objects.equals(birthdate, driver.getBirthdate()) && !peselRepeatedFlag) {
                 driver.setBirthdate(birthdate);
                 modifyFlag = true;
             }
 
-            if (pesel != null && !Objects.equals(pesel, driver.getPesel())) {
-                driver.setPesel(pesel);
-                modifyFlag = true;
-            }
-
-            if (drvLicNo != null && !Objects.equals(drvLicNo, driver.getDrvLicNo())) {
+            if (drvLicNo != null && !Objects.equals(drvLicNo, driver.getDrvLicNo()) && !peselRepeatedFlag) {
                 driver.setDrvLicNo(drvLicNo);
                 modifyFlag = true;
             }
 
-            if (overallDrvRating != null && !Objects.equals(overallDrvRating, driver.getOverallDrvRating())) {
+            if (overallDrvRating != null && !Objects.equals(overallDrvRating, driver.getOverallDrvRating()) && !peselRepeatedFlag) {
                 driver.setOverallDrvRating(overallDrvRating);
                 modifyFlag = true;
             }
 
-            if(modifyFlag == false){
+            if(peselRepeatedFlag){
+                response.put("status", "conflict-0020");
+                response.put("message", "Kierowca o podanym numerze PESEL już istnieje w bazie danych");
+            }
+            else if(modifyFlag == false){
                 response.put("status", "conflict-0009");
                 response.put("message", "Żadna z wartości nie została zmieniona");
             }

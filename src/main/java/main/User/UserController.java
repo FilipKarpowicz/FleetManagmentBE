@@ -24,9 +24,10 @@ public class UserController {
             @RequestParam Integer batch,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String login,
-            @RequestParam(required = false) String privilege
+            @RequestParam(required = false) String privilege,
+            @RequestParam(required = true) String token
     ) {
-        return userService.findUsers(name, login, privilege, batch);
+        return userService.findUsers(name, login, privilege, batch, token);
     }
 
     @GetMapping(path = "login")
@@ -35,7 +36,7 @@ public class UserController {
     }
 
     @GetMapping(path = "getUserByToken")
-    public ResponseEntity<Object> login(@RequestParam("token") String token) {
+    public ResponseEntity<Object> getUserByToken(@RequestParam("token") String token) {
         return userService.getUser(token);
     }
 
@@ -44,9 +45,9 @@ public class UserController {
     public ResponseEntity<Object> updatePassword(
             @RequestHeader String newPassword,
             @RequestHeader String oldPassword,
-            @RequestHeader Long userId
+            @RequestHeader String token
     ) {
-        return userService.updatePassword(userId, newPassword, oldPassword);
+        return userService.updatePassword(token, newPassword, oldPassword);
     }
 
     @PutMapping(path = "modifyById")
@@ -54,18 +55,19 @@ public class UserController {
                                                  @RequestParam(required = false) String login,
                                                  @RequestParam(required = false) String password,
                                                  @RequestParam(required = false) String name,
-                                                 @RequestParam(required = false) String privilege) {
-        return userService.updateUser(userId, login, name, password, privilege);
+                                                 @RequestParam(required = false) String privilege,
+                                             @RequestParam(required = true) String token) {
+        return userService.updateUser(userId, login, name, password, privilege, token);
     }
 
     @PostMapping(path = "add")
-    public ResponseEntity<Object> addUser(@RequestBody UserEntity user) {
-        return userService.addNewUser(user);
+    public ResponseEntity<Object> addUser(@RequestParam(required = true) String token, @RequestBody UserEntity user) {
+        return userService.addNewUser(token, user);
     }
 
     @DeleteMapping(path = "deleteById")
-    public ResponseEntity<Object> deleteUser(@RequestParam Long userId) {
-        return userService.deleteUser(userId);
+    public ResponseEntity<Object> deleteUser(@RequestParam Long userId, @RequestParam(required = true) String token) {
+        return userService.deleteUser(token, userId);
     }
 
     @DeleteMapping(path = "deleteByToken")

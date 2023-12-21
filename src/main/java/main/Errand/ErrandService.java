@@ -51,6 +51,10 @@ public class ErrandService {
             response.put("status", "data-not-found-0017");
             response.put("message", "Pojazd o numerze ID " + errand.getCarId() + " nie istnieje w bazie danych. Zlecenie nie zostało utworzone");
         }
+        else if (!isRouteValid(errand.getPlannedRoute())) {
+            response.put("status", "data-not-found-0019");
+            response.put("message", "Conajmniej jeden z podanych punktów trasy zlecenia nie istnieje w bazie danych");
+        }
         else {
             Errand newErrand = repository.save(errand);
             generateNewDataRecord(errand);
@@ -81,6 +85,7 @@ public class ErrandService {
             Long locationId = Long.parseLong(locationIdString);
             Optional<Location> checkedLocation = locationService.getByLocationId(locationId);
             routeValid = checkedLocation.isPresent();
+            if(!routeValid) break;
         }
         return routeValid;
     }

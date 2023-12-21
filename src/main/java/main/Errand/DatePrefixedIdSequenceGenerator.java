@@ -21,15 +21,10 @@ import java.util.Properties;
 public class DatePrefixedIdSequenceGenerator extends SequenceStyleGenerator {
 
     private static int cycle = 0;
-    private int instanceCycle = cycle;
 
     private Type configure_type = null;
     private Properties configure_params = null;
     private ServiceRegistry configure_serviceRegistry = null;
-
-    private Database registerExportables_database = null;
-
-    private SqlStringGenerationContext initialize_context = null;
 
     public static final String DATE_FORMAT_PARAMETER = "dateFormat";
     public static final String DATE_FORMAT_DEFAULT = "%tY-%tm";
@@ -45,12 +40,6 @@ public class DatePrefixedIdSequenceGenerator extends SequenceStyleGenerator {
     @Override
     public Serializable generate(SharedSessionContractImplementor session,
                                  Object object) throws HibernateException {
-//        if(instanceCycle != cycle){
-//            super.configure(configure_type, configure_params, configure_serviceRegistry);
-//            super.registerExportables(registerExportables_database);
-//            super.initialize(initialize_context);
-//            instanceCycle = cycle;
-//        }
         return String.format(format, LocalDate.now(), super.generate(session, object));
     }
 
@@ -68,20 +57,4 @@ public class DatePrefixedIdSequenceGenerator extends SequenceStyleGenerator {
         this.format = dateFormat+dateNumberSeparator+numberFormat;
     }
 
-//    @Override
-//    public void registerExportables(Database database){
-//        registerExportables_database = database;
-//        super.registerExportables(registerExportables_database);
-//    }
-//
-//    @Override
-//    public void initialize(SqlStringGenerationContext context){
-//        initialize_context = context;
-//        super.initialize(initialize_context);
-//    }
-//
-//    public static void resetAllInstances(){
-//        cycle++;
-//        System.out.println(cycle);
-//    }
 }
