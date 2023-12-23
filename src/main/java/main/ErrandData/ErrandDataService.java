@@ -148,7 +148,7 @@ public class ErrandDataService {
                         CarData carData = maybeCarData.get();
                         Car car = maybeCar.get();
                         if (carData.getBattSoh() != null && car.getBattNominalCapacity() != null && carData.getOverallMileage() != null && carData.getBattSoc() != null && carData.getBattVoltage() != null) {
-                            manipulatedRecord.setAllLocations(null);
+                            manipulatedRecord.setAllLocations(carData.getLastLocation().toString());
                             manipulatedRecord.setErrandStartedTimestamp(LocalDateTime.now());
                             manipulatedRecord.setErrandStartedMileage(carData.getOverallMileage());
                             manipulatedRecord.setErrandStartedBatteryEnergy(car.getBattNominalCapacity() * ((double) carData.getBattSoh() / 100) * ((double) carData.getBattSoc() / 100) * carData.getBattVoltage());

@@ -76,7 +76,7 @@ public class CarDataService {
             if (activeErrandId != null && battEnergy != null) {
                 if (errandDataService.calculateErrandAvgEnergyConsumption(activeErrandId) != null) {
                     if(errandDataService.calculateErrandAvgEnergyConsumption(activeErrandId) > 0) {
-                        remainingRange = battEnergy / errandDataService.calculateErrandAvgEnergyConsumption(activeErrandId);
+                        remainingRange = battEnergy / errandDataService.calculateErrandAvgEnergyConsumption(activeErrandId);    //km
                     }
                 }
             } else if (battEnergy != null){
